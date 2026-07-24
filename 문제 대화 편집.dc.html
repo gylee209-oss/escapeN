@@ -566,7 +566,7 @@ class Component extends DCLogic {
   }
   gotoPage(id){ if(this._sv){ clearTimeout(this._sv); } this.persistPage(); location.href='문제 대화 편집.dc.html?id='+this._roomId+'&page='+id; }
   scheduleSave(){ if(this._sv) clearTimeout(this._sv); this._sv=setTimeout(()=>this.persistPage(),400); }
-  componentDidUpdate(pp, ps){ const s=this.state; if(s.blocks!==ps.blocks||s.problem!==ps.problem||s.bg!==ps.bg) this.scheduleSave(); }
+  componentDidUpdate(pp, ps){ const s=this.state; const p=ps||this._prevSave||{}; if(s.blocks!==p.blocks||s.problem!==p.problem||s.bg!==p.bg) this.scheduleSave(); this._prevSave={ blocks:s.blocks, problem:s.problem, bg:s.bg }; }
 
   componentWillUnmount(){ this._clear(); if(this._sv){ clearTimeout(this._sv); this.persistPage(); } }
   _clear(){ (this._timers||[]).forEach(t=>clearTimeout(t)); this._timers=[]; }

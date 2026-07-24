@@ -607,11 +607,18 @@ class Component extends DCLogic {
     this._sv = setTimeout(() => this.persistRoom(), 400);
   }
   componentDidUpdate(prevProps, prevState) {
-    const s = this.state, p = prevState;
+    // 이 DC 프레임워크의 componentDidUpdate 는 prevState 를 넘겨주지 않으므로
+    // (support.js 에서 componentDidUpdate(prevProps) 만 호출) 직접 이전 값을 추적한다.
+    const s = this.state;
+    const p = prevState || this._prevSave || {};
     if (s.pages !== p.pages || s.title !== p.title || s.pin !== p.pin || s.status !== p.status ||
         s.thumb !== p.thumb || s.share !== p.share || s.hintPolicy !== p.hintPolicy || s.hintCount !== p.hintCount) {
       this.scheduleSave();
     }
+    this._prevSave = {
+      pages: s.pages, title: s.title, pin: s.pin, status: s.status,
+      thumb: s.thumb, share: s.share, hintPolicy: s.hintPolicy, hintCount: s.hintCount,
+    };
   }
 
   componentDidMount() {
