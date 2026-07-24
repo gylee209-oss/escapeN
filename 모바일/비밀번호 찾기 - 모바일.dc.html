@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); text-decoration: underline; }
+    @keyframes qnPop { 0%{ transform: scale(0.6); opacity:0; } 60%{ transform: scale(1.08); } 100%{ transform: scale(1); opacity:1; } }
+    .qn-field:focus-within .qn-fico { color: var(--main-color); }
+    .qn-field:focus-within { border-color: var(--main-color) !important; background:#fff !important; box-shadow: 0 0 0 3px var(--bg-light-color); }
+    .qn-primary:hover { background: var(--btn-hover-color) !important; }
+    .qn-ghost:hover { background: var(--bg-light-color) !important; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; background:#fff; font-family:var(--font-kr); display:flex; justify-content:center;">
+  <div data-screen-label="비밀번호 찾기 · 모바일" style="width:100%; max-width:440px; min-height:100vh; background:#fff; display:flex; flex-direction:column;">
+
+    <!-- top bar -->
+    <div style="flex:none; padding:22px 22px 8px; display:flex; align-items:center;">
+      <a href="로그인 - 모바일.dc.html" style="width:38px; height:38px; border-radius:50%; background:var(--bg-light-color); display:flex; align-items:center; justify-content:center; color:var(--fg-sub);"><i class="icon-left-open" style="font-size:15px;"></i></a>
+    </div>
+
+    <!-- form -->
+    <div style="flex:1; display:flex; flex-direction:column; padding:8px 26px 24px;">
+
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="font-family:var(--font-kr); font-size:23px; font-weight:900; letter-spacing:-1px; color:var(--main-color);">방탈출<span style="color:var(--fg);">N</span></div>
+        <h1 style="font-family:var(--font-kr); font-size:23px; font-weight:700; color:var(--fg); margin:22px 0 0;">비밀번호 찾기</h1>
+        <p style="font-family:var(--font-small); font-size:13px; font-weight:300; color:var(--fg-sub); margin:10px 0 0; line-height:1.65;">가입할 때 사용한 이메일을 입력하면<br>재설정 링크를 보내드릴게요.</p>
+
+        <label style="display:block; font-size:12.5px; font-weight:600; color:var(--fg-sub); margin:28px 0 8px;">이메일</label>
+        <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 15px; height:50px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; transition:all .18s ease;">
+          <i class="icon-mail qn-fico" style="font-size:16px; color:var(--fg-mute); transition:color .18s ease;"></i>
+          <input type="email" value="{{ email }}" onInput="{{ onEmail }}" placeholder="you@example.com" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+        </div>
+
+        <button class="qn-primary" onClick="{{ submit }}" style="width:100%; margin-top:20px; height:50px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">재설정 링크 보내기</button>
+
+        <div style="margin-top:18px; padding:14px 16px; background:var(--bg-light-color); border-radius:12px; display:flex; gap:10px; align-items:flex-start;">
+          <i class="icon-help" style="font-size:15px; color:var(--main-color); margin-top:1px;"></i>
+          <span style="font-family:var(--font-small); font-size:12px; font-weight:300; line-height:1.6; color:var(--fg-sub);">이메일이 기억나지 않으면 <a href="#" style="font-weight:600;">고객센터</a>로 문의해 주세요.</span>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center; display:flex; flex-direction:column; align-items:center; padding-top:36px;">
+        <div style="width:80px; height:80px; border-radius:50%; background:var(--bg-light-color); display:flex; align-items:center; justify-content:center; animation:qnPop .45s ease-out;">
+          <i class="icon-mail" style="font-size:34px; color:var(--main-color);"></i>
+        </div>
+        <h1 style="font-family:var(--font-kr); font-size:22px; font-weight:700; color:var(--fg); margin:22px 0 0;">메일을 확인해 주세요</h1>
+        <p style="font-family:var(--font-small); font-size:13px; font-weight:300; color:var(--fg-sub); margin:12px 0 0; line-height:1.7;"><b style="color:var(--fg); font-weight:600;">{{ emailShown }}</b> 주소로<br>재설정 링크를 보냈어요.</p>
+        <p style="font-family:var(--font-small); font-size:12px; font-weight:300; color:var(--fg-mute); margin:12px 0 0;">메일이 안 보이면 스팸함도 확인해 주세요.</p>
+
+        <button class="qn-primary" style="width:100%; margin-top:28px; height:50px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">메일 앱 열기</button>
+        <button class="qn-ghost" onClick="{{ resend }}" style="width:100%; margin-top:10px; height:48px; border:1.5px solid var(--border); border-radius:14px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:600; cursor:pointer; transition:all .18s ease;">이메일 다시 입력하기</button>
+      </div>
+      </sc-if>
+
+      <div style="margin-top:auto; padding-top:18px; text-align:center; font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);">비밀번호가 기억나셨나요? <a href="로그인 - 모바일.dc.html" style="font-weight:700;">로그인</a></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sent: false, email: '' };
+  renderVals() {
+    const s = this.state;
+    return {
+      sent: s.sent,
+      notSent: !s.sent,
+      email: s.email,
+      emailShown: s.email && s.email.trim() ? s.email.trim() : '입력하신 이메일',
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      submit: () => this.setState({ sent: true }),
+      resend: () => this.setState({ sent: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

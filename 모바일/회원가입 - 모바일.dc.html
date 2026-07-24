@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); text-decoration: underline; }
+    .qn-field:focus-within .qn-fico { color: var(--main-color); }
+    .qn-field:focus-within { border-color: var(--main-color) !important; background:#fff !important; box-shadow: 0 0 0 3px var(--bg-light-color); }
+    .qn-primary:hover { background: var(--btn-hover-color) !important; }
+    .qn-agree { display:flex; align-items:center; gap:9px; cursor:pointer; }
+    .qn-agree input { position:absolute; opacity:0; width:0; height:0; }
+    .qn-agree .dot { width:20px; height:20px; flex:none; border-radius:6px; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; color:transparent; font-size:11px; transition:all .15s ease; }
+    .qn-agree input:checked + .dot { background:var(--main-color); border-color:var(--main-color); color:#fff; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; background:#fff; font-family:var(--font-kr); display:flex; justify-content:center;">
+  <div data-screen-label="회원가입 · 모바일" style="width:100%; max-width:440px; min-height:100vh; background:#fff; display:flex; flex-direction:column;">
+
+    <!-- header -->
+    <div style="position:relative; flex:none; background:linear-gradient(160deg,#ffb37a 0%, #ff8533 60%, #ff6800 100%); padding:52px 26px 26px; overflow:hidden;">
+      <div style="position:absolute; width:170px; height:170px; border-radius:50%; background:rgba(255,255,255,0.15); top:-40px; right:-44px;"></div>
+      <div style="position:relative;">
+        <div style="font-family:var(--font-kr); font-size:24px; font-weight:900; letter-spacing:-1px; color:#fff;">방탈출<span style="color:#ffe0c2;">N</span></div>
+        <div style="margin-top:8px; font-family:var(--font-kr); font-size:22px; font-weight:700; line-height:1.35; color:#fff; letter-spacing:-0.3px;">회원가입</div>
+        <div style="margin-top:5px; font-family:var(--font-small); font-size:13px; font-weight:300; color:rgba(255,255,255,0.9);">몇 가지만 입력하면 바로 시작해요.</div>
+      </div>
+    </div>
+
+    <!-- form -->
+    <div style="flex:1; display:flex; flex-direction:column; padding:22px 24px 28px;">
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 15px; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; transition:all .18s ease;">
+        <i class="icon-user qn-fico" style="font-size:15px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="text" placeholder="이름" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+      </div>
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 15px; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; margin-top:9px; transition:all .18s ease;">
+        <i class="icon-mail qn-fico" style="font-size:15px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="email" placeholder="이메일" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+      </div>
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 15px; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; margin-top:9px; transition:all .18s ease;">
+        <i class="icon-lock-filled qn-fico" style="font-size:15px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="{{ pwType }}" onInput="{{ onPw }}" placeholder="비밀번호 (8자 이상)" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+        <i class="{{ pwIcon }}" onClick="{{ togglePw }}" style="font-size:16px; color:var(--fg-mute); cursor:pointer;"></i>
+      </div>
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 15px; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; margin-top:9px; transition:all .18s ease;">
+        <i class="icon-lock-filled qn-fico" style="font-size:15px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="{{ pw2Type }}" onInput="{{ onPw2 }}" placeholder="비밀번호 확인" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+        <i class="{{ pw2Icon }}" onClick="{{ togglePw2 }}" style="font-size:16px; color:var(--fg-mute); cursor:pointer;"></i>
+      </div>
+      <div style="min-height:16px; margin-top:5px; font-family:var(--font-small); font-size:11.5px; color:{{ matchColor }};">{{ matchMsg }}</div>
+
+      <div style="margin-top:6px; border:1.5px solid var(--border); border-radius:12px; overflow:hidden;">
+        <label class="qn-agree" style="padding:11px 14px; background:var(--bg-light-color); border-bottom:1px solid var(--border);">
+          <input type="checkbox" checked="{{ allAgree }}" onChange="{{ toggleAll }}">
+          <span class="dot"><i class="icon-check"></i></span>
+          <span style="font-size:13.5px; font-weight:700; color:var(--fg);">전체 동의</span>
+        </label>
+        <div style="padding:10px 14px; display:flex; flex-direction:column; gap:9px;">
+          <label class="qn-agree"><input type="checkbox" checked="{{ terms }}" onChange="{{ toggleTerms }}"><span class="dot"><i class="icon-check"></i></span><span style="font-size:12.5px; color:var(--fg-sub);"><b style="color:var(--main-color); font-weight:700;">[필수]</b> 이용약관 동의</span></label>
+          <label class="qn-agree"><input type="checkbox" checked="{{ privacy }}" onChange="{{ togglePrivacy }}"><span class="dot"><i class="icon-check"></i></span><span style="font-size:12.5px; color:var(--fg-sub);"><b style="color:var(--main-color); font-weight:700;">[필수]</b> 개인정보 수집·이용 동의</span></label>
+          <label class="qn-agree"><input type="checkbox" checked="{{ marketing }}" onChange="{{ toggleMarketing }}"><span class="dot"><i class="icon-check"></i></span><span style="font-size:12.5px; color:var(--fg-sub);"><b style="color:var(--fg-mute); font-weight:700;">[선택]</b> 마케팅 정보 수신 동의</span></label>
+        </div>
+      </div>
+
+      <button class="qn-primary" style="width:100%; margin-top:16px; height:50px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">가입하고 시작하기</button>
+
+      <div style="margin-top:auto; padding-top:18px; text-align:center; font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);">이미 계정이 있으신가요? <a href="로그인 - 모바일.dc.html" style="font-weight:700;">로그인</a></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { showPw: false, showPw2: false, pw: '', pw2: '', terms: false, privacy: false, marketing: false };
+  renderVals() {
+    const s = this.state;
+    const allAgree = s.terms && s.privacy && s.marketing;
+    let matchMsg = '', matchColor = 'var(--fg-mute)';
+    if (s.pw2.length > 0) {
+      if (s.pw === s.pw2) { matchMsg = '비밀번호가 일치합니다.'; matchColor = 'var(--correct-color, #1e9e5a)'; }
+      else { matchMsg = '비밀번호가 일치하지 않습니다.'; matchColor = 'var(--incorrect-color, #e0483d)'; }
+    }
+    return {
+      pwType: s.showPw ? 'text' : 'password',
+      pwIcon: s.showPw ? 'icon-eye' : 'icon-eye-none',
+      pw2Type: s.showPw2 ? 'text' : 'password',
+      pw2Icon: s.showPw2 ? 'icon-eye' : 'icon-eye-none',
+      togglePw: () => this.setState(st => ({ showPw: !st.showPw })),
+      togglePw2: () => this.setState(st => ({ showPw2: !st.showPw2 })),
+      onPw: (e) => this.setState({ pw: e.target.value }),
+      onPw2: (e) => this.setState({ pw2: e.target.value }),
+      allAgree,
+      terms: s.terms, privacy: s.privacy, marketing: s.marketing,
+      matchMsg, matchColor,
+      toggleAll: () => this.setState(st => { const v = !(st.terms && st.privacy && st.marketing); return { terms: v, privacy: v, marketing: v }; }),
+      toggleTerms: () => this.setState(st => ({ terms: !st.terms })),
+      togglePrivacy: () => this.setState(st => ({ privacy: !st.privacy })),
+      toggleMarketing: () => this.setState(st => ({ marketing: !st.marketing })),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); text-decoration: underline; }
+    @keyframes qnFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+    @keyframes qnDrift { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(14px); } }
+    @keyframes qnPop { 0%{ transform: scale(0.6); opacity:0; } 60%{ transform: scale(1.08); } 100%{ transform: scale(1); opacity:1; } }
+    .qn-field:focus-within .qn-fico { color: var(--main-color); }
+    .qn-field:focus-within { border-color: var(--main-color) !important; background:#fff !important; box-shadow: 0 0 0 3px var(--bg-light-color); }
+    .qn-primary:hover { background: var(--btn-hover-color) !important; transform: translateY(-2px); box-shadow: 0 12px 24px -10px var(--main-color); }
+    .qn-ghost:hover { background: var(--bg-light-color) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="비밀번호 찾기 · 웹" style="height:100vh; display:flex; font-family:var(--font-kr); background:#fff; overflow:hidden;">
+
+  <!-- Hero panel -->
+  <div style="position:relative; flex:0 0 46%; max-width:620px; background:linear-gradient(155deg,#ff8a3d 0%, #ff6800 55%, #db5800 100%); overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; padding:64px 56px;">
+    <div style="position:absolute; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.14); top:-90px; right:-70px; animation:qnDrift 9s ease-in-out infinite;"></div>
+    <div style="position:absolute; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.10); bottom:220px; left:-60px; animation:qnDrift 11s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:150px; left:64px; color:rgba(255,255,255,0.7); font-size:22px;">✦</div>
+    <div style="position:absolute; top:260px; right:80px; color:rgba(255,255,255,0.55); font-size:14px;">✦</div>
+
+    <div style="position:relative;">
+      <div style="font-family:var(--font-kr); font-size:32px; font-weight:900; letter-spacing:-1px; color:#fff;">방탈출<span style="color:#ffe0c2;">N</span></div>
+      <div style="margin-top:40px; font-family:var(--font-kr); font-size:40px; font-weight:700; line-height:1.34; color:#fff; letter-spacing:-0.5px;">잠긴 문 앞에서<br>당황하지 마세요</div>
+      <div style="margin-top:18px; font-family:var(--font-small); font-size:16px; font-weight:300; line-height:1.72; color:rgba(255,255,255,0.9);">가입한 이메일만 알려주시면<br>재설정 링크를 바로 보내드릴게요.</div>
+    </div>
+
+    <div style="position:relative; margin:0 -22px -34px; text-align:center;">
+      <img src="uploads/character01/play_loading_bg.png" alt="방탈출N 캐릭터들" style="width:100%; max-width:520px; display:block; margin:0 auto; filter:drop-shadow(0 14px 20px rgba(180,60,0,0.35)); animation:qnFloat 6s ease-in-out infinite;">
+    </div>
+  </div>
+
+  <!-- Form panel -->
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow-y:auto; padding:40px;">
+    <div style="width:100%; max-width:420px; display:flex; flex-direction:column;">
+
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="font-family:var(--font-small-en); font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--main-color); margin-bottom:10px;">Reset password</div>
+        <h1 style="font-family:var(--font-kr); font-size:30px; font-weight:700; color:var(--fg); margin:0;">비밀번호 찾기</h1>
+        <p style="font-family:var(--font-small); font-size:14px; font-weight:300; color:var(--fg-sub); margin:8px 0 0; line-height:1.7;">가입할 때 사용한 이메일 주소를 입력해 주세요.<br>비밀번호를 재설정할 수 있는 링크를 보내드립니다.</p>
+
+        <label style="display:block; font-size:13px; font-weight:600; color:var(--fg-sub); margin:32px 0 8px;">이메일</label>
+        <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 16px; height:52px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; transition:all .18s ease;">
+          <i class="icon-mail qn-fico" style="font-size:17px; color:var(--fg-mute); transition:color .18s ease;"></i>
+          <input type="email" value="{{ email }}" onInput="{{ onEmail }}" placeholder="you@example.com" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+        </div>
+
+        <button class="qn-primary" onClick="{{ submit }}" style="width:100%; margin-top:24px; height:52px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">재설정 링크 보내기</button>
+
+        <div style="margin-top:22px; padding:16px 18px; background:var(--bg-light-color); border-radius:12px; display:flex; gap:11px; align-items:flex-start;">
+          <i class="icon-help" style="font-size:16px; color:var(--main-color); margin-top:1px;"></i>
+          <span style="font-family:var(--font-small); font-size:12.5px; font-weight:300; line-height:1.65; color:var(--fg-sub);">이메일이 기억나지 않으시나요? 학교/기관 관리자에게 문의하거나 <a href="#" style="font-weight:600;">고객센터</a>로 연락해 주세요.</span>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+        <div style="width:84px; height:84px; border-radius:50%; background:var(--bg-light-color); display:flex; align-items:center; justify-content:center; animation:qnPop .45s ease-out;">
+          <i class="icon-mail" style="font-size:36px; color:var(--main-color);"></i>
+        </div>
+        <h1 style="font-family:var(--font-kr); font-size:27px; font-weight:700; color:var(--fg); margin:24px 0 0;">메일을 확인해 주세요</h1>
+        <p style="font-family:var(--font-small); font-size:14px; font-weight:300; color:var(--fg-sub); margin:12px 0 0; line-height:1.75; max-width:340px;"><b style="color:var(--fg); font-weight:600;">{{ emailShown }}</b> 주소로<br>재설정 링크를 보냈어요. 메일함을 확인해 주세요.</p>
+        <p style="font-family:var(--font-small); font-size:12.5px; font-weight:300; color:var(--fg-mute); margin:14px 0 0;">메일이 보이지 않으면 스팸함도 확인해 주세요.</p>
+
+        <button class="qn-primary" style="width:100%; max-width:320px; margin-top:30px; height:52px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">메일 앱 열기</button>
+        <button class="qn-ghost" onClick="{{ resend }}" style="width:100%; max-width:320px; margin-top:10px; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:600; cursor:pointer; transition:all .18s ease;">이메일 다시 입력하기</button>
+      </div>
+      </sc-if>
+
+      <div style="margin-top:32px; text-align:center;">
+        <a href="로그인 - 웹.dc.html" style="font-family:var(--font-small); font-size:13.5px; font-weight:600;"><i class="icon-left-open" style="font-size:12px;"></i> 로그인으로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sent: false, email: '' };
+  renderVals() {
+    const s = this.state;
+    return {
+      sent: s.sent,
+      notSent: !s.sent,
+      email: s.email,
+      emailShown: s.email && s.email.trim() ? s.email.trim() : '입력하신 이메일',
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      submit: () => this.setState({ sent: true }),
+      resend: () => this.setState({ sent: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

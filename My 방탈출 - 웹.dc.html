@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes qnFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+    @keyframes qnMenu { from{ transform:translateY(-6px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    .qn-card:hover { box-shadow: 0 16px 34px -18px rgba(0,0,0,0.22) !important; border-color: var(--border) !important; }
+    .qn-card:hover .qn-thumb-img { transform: scale(1.06); }
+    .qn-cta:hover { background: var(--btn-hover-color) !important; transform:translateY(-2px); box-shadow:0 14px 26px -12px var(--main-color) !important; }
+    .qn-tab:hover { color: var(--main-color) !important; }
+    .qn-menu-item:hover { background: var(--bg-warm-2) !important; }
+    .qn-menu-item.danger:hover { background: #fdeaea !important; }
+    .qn-profile:hover { background: var(--bg-warm) !important; }
+    .qn-iconbtn:hover { background: var(--bg-warm-2) !important; color: var(--fg) !important; }
+    .qn-input:focus { border-color: var(--main-color) !important; background:#fff !important; box-shadow:0 0 0 3px var(--bg-light-color); }
+    @keyframes qnFadeIn { from{ opacity:0; } to{ opacity:1; } }
+    @keyframes qnPop { from{ transform:translateY(14px) scale(.97); opacity:0; } to{ transform:translateY(0) scale(1); opacity:1; } }
+    .qn-thumb-opt:hover { border-color: var(--main-color) !important; }
+    .qn-hint-opt:hover { border-color: var(--main-color) !important; }
+    .qn-ghost:hover { background: var(--bg-warm-2) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="My 방탈출 · 웹" style="min-height:100vh; background:#f4f3ef; font-family:var(--font-kr);">
+
+  <!-- top app bar -->
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between; padding:16px 40px; background:rgba(255,255,255,0.9); border-bottom:1px solid var(--border-2); backdrop-filter:blur(8px);">
+    <div style="display:flex; align-items:center; gap:32px;">
+      <div style="font-family:var(--font-kr); font-size:22px; font-weight:900; letter-spacing:-1px; color:var(--fg);">방탈출<span style="color:var(--main-color);">N</span></div>
+      <nav style="display:flex; gap:26px;">
+        <a class="qn-tab" href="#" style="font-family:var(--font-kr); font-size:15px; font-weight:700; color:var(--main-color);">My 방탈출</a>
+        <a class="qn-tab" href="#" style="font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg-sub);">탐색</a>
+      </nav>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-megaphone" style="font-size:16px;"></i><span style="position:absolute; top:-2px; right:-2px; min-width:17px; height:17px; padding:0 4px; border-radius:50px; background:var(--tag-red); color:#fff; font-family:var(--font-en); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">3</span></span>
+      <div style="position:relative;" data-profile-menu>
+        <button class="qn-profile" onClick="{{ onToggleDd }}" style="display:flex; align-items:center; gap:9px; height:48px; padding:0 8px 0 9px; border:none; border-radius:12px; background:transparent; cursor:pointer; transition:background .15s;">
+          <img src="uploads/character01/profile_Kay.png" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);">
+          <div style="line-height:1.3; text-align:left;"><div style="font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">김선생</div><span style="display:inline-flex; align-items:center; gap:4px; margin-top:2px; padding:2px 8px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-small); font-size:10px; font-weight:700;">스튜디오 Pro</span></div>
+          <i class="{{ ddCaret }}" style="font-size:11px; color:var(--fg-mute); margin-left:2px;"></i>
+        </button>
+        <sc-if value="{{ ddOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; right:0; top:56px; z-index:50; width:236px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:0 18px 44px -16px rgba(0,0,0,0.3); overflow:hidden; animation:qnMenu .16s ease;">
+          <div style="display:flex; align-items:center; gap:11px; padding:16px; background:var(--bg-warm); border-bottom:1px solid var(--border-2);">
+            <img src="uploads/character01/profile_Kay.png" style="width:44px; height:44px; border-radius:50%; object-fit:cover;">
+            <div style="min-width:0;"><div style="font-family:var(--font-kr); font-size:14.5px; font-weight:800; color:var(--fg);">김선생</div><div style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">kim@haesal.es.kr</div></div>
+          </div>
+          <div style="padding:6px;">
+            <a class="qn-menu-item" href="마이페이지 - 웹.dc.html" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-user" style="font-size:15px; color:var(--fg-mute);"></i> 마이페이지</a>
+            <div style="height:1px; background:var(--border-2); margin:5px 4px;"></div>
+            <button class="qn-menu-item danger" onClick="{{ onLogout }}" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--tag-red); cursor:pointer; text-align:left;"><i class="icon-export" style="font-size:15px;"></i> 로그아웃</button>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1200px; margin:0 auto; padding:34px 40px 64px;">
+
+    <!-- title row + prominent CTA -->
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;">
+      <div>
+        <h1 style="margin:0; font-family:var(--font-kr); font-size:30px; font-weight:900; letter-spacing:-1.2px; color:var(--fg);">My 방탈출</h1>
+        <p style="margin:7px 0 0; font-family:var(--font-small); font-size:14px; font-weight:300; color:var(--fg-sub);">내가 만든 방탈출을 관리하고, 수업에서 바로 열어보세요.</p>
+      </div>
+      <button class="qn-cta" onClick="{{ onOpenCreate }}" style="display:inline-flex; align-items:center; gap:9px; height:52px; padding:0 26px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease; box-shadow:0 12px 24px -12px var(--main-color);"><i class="icon-plus" style="font-size:15px;"></i> 새 방탈출 만들기</button>
+    </div>
+
+    <!-- toolbar: status tabs (left) clearly separated from search+sort (right) -->
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:26px; flex-wrap:wrap;">
+      <div style="display:flex; gap:5px; padding:5px; background:#fff; border:1px solid var(--border-2); border-radius:12px;">
+        <sc-for list="{{ filterTabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onPick }}" style="{{ t.style }}">{{ t.label }}<span style="{{ t.countStyle }}">{{ t.count }}</span></button>
+        </sc-for>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="qn-input" style="display:flex; align-items:center; gap:9px; height:44px; padding:0 15px; border:1.5px solid var(--border); border-radius:11px; background:#fff; width:250px; transition:all .15s;">
+          <i class="icon-search" style="font-size:15px; color:var(--fg-mute);"></i>
+          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="방탈출 검색" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:14px; color:var(--fg);">
+        </div>
+        <div style="position:relative;">
+          <select value="{{ sort }}" onChange="{{ onSort }}" style="height:44px; padding:0 34px 0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fff; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg); outline:none; -webkit-appearance:none; appearance:none; cursor:pointer;">
+            <option value="recent">최신순</option>
+            <option value="name">이름순</option>
+          </select>
+          <i class="icon-down-open" style="position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--fg-mute); pointer-events:none;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID (3 columns, compact) -->
+    <sc-if value="{{ hasItems }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-top:22px;">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+        <div class="qn-card" style="position:relative; background:#fff; border:1px solid var(--border-2); border-radius:18px; overflow:visible; box-shadow:0 4px 14px -10px rgba(0,0,0,0.14); transition:all .22s ease;">
+          <!-- thumbnail banner -->
+          <div style="position:relative; height:180px; border-radius:18px 18px 0 0; overflow:hidden; background:{{ c.thumbBg }};">{{ c.thumbEl }}
+            <span style="position:absolute; top:12px; left:12px; display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:{{ c.statusBg }}; color:{{ c.statusFg }}; font-family:var(--font-small); font-size:11.5px; font-weight:700;"><span style="width:6px; height:6px; border-radius:50%; background:{{ c.statusFg }};"></span>{{ c.statusLabel }}</span>
+            <span style="position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:4px; height:26px; padding:0 10px; border-radius:50px; background:rgba(20,16,12,0.5); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:600; backdrop-filter:blur(4px);"><i class="{{ c.visIcon }}" style="font-size:10px;"></i>{{ c.visLabel }}</span>
+            <sc-if value="{{ c.hasIssues }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ c.editHref }}" title="{{ c.issueTitle }}" style="position:absolute; bottom:12px; left:12px; display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:{{ c.issueBg }}; color:#fff; font-family:var(--font-small); font-size:11.5px; font-weight:700; box-shadow:0 3px 10px -3px rgba(0,0,0,0.4);"><i class="{{ c.issueIcon }}" style="font-size:12px;"></i>{{ c.issueLabel }}</a>
+            </sc-if>
+          </div>
+          <!-- body -->
+          <div style="padding:15px 16px 16px;">
+            <div style="display:flex; align-items:flex-start; gap:8px;">
+              <div style="flex:1; min-width:0; font-family:var(--font-kr); font-size:17px; font-weight:800; color:var(--fg); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.title }}</div>
+              <div style="position:relative; flex:none;">
+                <button class="qn-iconbtn" onClick="{{ c.onToggleMenu }}" title="더보기" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:30px; height:30px; margin:-2px -4px 0 0; border:none; border-radius:8px; background:transparent; cursor:pointer; transition:all .15s;"><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span></button>
+                <sc-if value="{{ c.menuOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; right:0; top:34px; z-index:20; width:178px; background:#fff; border:1px solid var(--border-2); border-radius:12px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:6px; animation:qnMenu .16s ease;">
+                  <button class="qn-menu-item" onClick="{{ c.onDup }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-005-copy" style="font-size:14px; color:var(--fg-mute);"></i> 복제하기</button>
+                  <a class="qn-menu-item" href="{{ c.reportHref }}" style="display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);"><i class="icon-chart" style="font-size:14px; color:var(--fg-mute);"></i> 결과 리포트</a>
+                  <button class="qn-menu-item" onClick="{{ c.onShare }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-share" style="font-size:14px; color:var(--fg-mute);"></i> 공유하기</button>
+                  <div style="height:1px; background:var(--border-2); margin:5px 0;"></div>
+                  <button class="qn-menu-item danger" onClick="{{ c.onDelete }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--tag-red); cursor:pointer; text-align:left;"><i class="icon-trash" style="font-size:14px;"></i> 삭제하기</button>
+                </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:9px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub); white-space:nowrap;">
+              <span style="display:inline-flex; align-items:center; gap:5px; white-space:nowrap;"><i class="icon-mission" style="font-size:12px; color:var(--main-color);"></i> 문제 {{ c.puzzleCount }}개</span>
+              <span style="color:var(--border);">·</span>
+              <span style="display:inline-flex; align-items:center; gap:5px; white-space:nowrap;"><i class="icon-time" style="font-size:11px; color:var(--fg-mute);"></i> {{ c.date }}</span>
+            </div>
+            <button class="qn-iconbtn" onClick="{{ c.onCopyPin }}" title="PIN 복사" style="display:flex; align-items:center; gap:8px; width:100%; margin-top:12px; height:38px; padding:0 12px; border:1px solid var(--border-2); border-radius:10px; background:#fafafa; cursor:pointer; transition:all .15s;">
+              <i class="icon-qr-code" style="font-size:13px; color:var(--fg-mute);"></i>
+              <span style="font-family:var(--font-small); font-size:11.5px; font-weight:600; color:var(--fg-mute); white-space:nowrap;">입장 PIN</span>
+              <span style="font-family:var(--font-en); font-size:14px; font-weight:800; letter-spacing:1px; color:var(--fg); white-space:nowrap;">{{ c.pin }}</span>
+              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--main-color); white-space:nowrap;"><i class="{{ c.copyIcon }}" style="font-size:11px;"></i>{{ c.copyLabel }}</span>
+            </button>
+            <!-- action buttons row -->
+            <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+              <a href="{{ c.playHref }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:1.5px solid var(--border); border-radius:11px; background:#fff; color:var(--fg); font-family:var(--font-kr); font-size:13.5px; font-weight:700; transition:all .15s;"><i class="icon-play" style="font-size:12px; color:var(--main-color);"></i> 미리보기</a>
+              <a href="{{ c.editHref }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:none; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700; transition:all .15s;"><i class="icon-pen" style="font-size:12px;"></i> 편집</a>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <!-- EMPTY STATE -->
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:22px; background:#fff; border:1.5px dashed var(--border); border-radius:24px; padding:70px 40px; text-align:center; display:flex; flex-direction:column; align-items:center;">
+      <img src="uploads/character01/quiz_nodata_ob.png" style="width:170px; animation:qnFloat 5s ease-in-out infinite;">
+      <h2 style="margin:22px 0 0; font-family:var(--font-kr); font-size:24px; font-weight:800; color:var(--fg);">아직 만든 방탈출이 없어요</h2>
+      <p style="margin:10px 0 0; font-family:var(--font-small); font-size:15px; font-weight:300; line-height:1.7; color:var(--fg-sub); max-width:400px;">문제와 이야기를 엮어 첫 번째 방탈출을 만들어 보세요.<br>드래그 몇 번이면 우리 반 수업이 모험이 됩니다.</p>
+      <button class="qn-cta" onClick="{{ onOpenCreate }}" style="display:inline-flex; align-items:center; gap:8px; height:52px; margin-top:26px; padding:0 28px; border:none; border-radius:13px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 12px 24px -12px var(--main-color);"><i class="icon-plus" style="font-size:14px;"></i> 첫 방탈출 만들기</button>
+    </div>
+    </sc-if>
+
+    <!-- no search result -->
+    <sc-if value="{{ noResult }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:22px; padding:70px 40px; text-align:center;">
+      <div style="font-size:40px; color:var(--fg-mute);"><i class="icon-search"></i></div>
+      <div style="margin-top:14px; font-family:var(--font-kr); font-size:18px; font-weight:700; color:var(--fg);">검색 결과가 없어요</div>
+      <div style="margin-top:6px; font-family:var(--font-small); font-size:14px; color:var(--fg-sub);">다른 검색어나 필터를 사용해 보세요.</div>
+    </div>
+    </sc-if>
+
+  </div>
+
+  <!-- CREATE MODAL -->
+  <sc-if value="{{ createOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:80; display:flex; align-items:center; justify-content:center; padding:24px; background:rgba(28,22,16,0.5); backdrop-filter:blur(3px); animation:qnFadeIn .18s ease;">
+    <div onClick="{{ onCloseCreate }}" style="position:absolute; inset:0;"></div>
+    <div style="position:relative; width:560px; max-width:100%; max-height:calc(100vh - 48px); overflow:auto; background:#fff; border-radius:22px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.5); animation:qnPop .22s cubic-bezier(.22,1,.36,1);">
+      <!-- header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:22px 26px 18px; border-bottom:1px solid var(--border-2);">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:900; letter-spacing:-.5px; color:var(--fg);">새 방탈출 만들기</div>
+          <div style="margin-top:4px; font-family:var(--font-small); font-size:13px; font-weight:300; color:var(--fg-sub);">기본 정보를 설정하고 편집을 시작하세요.</div>
+        </div>
+        <button class="qn-iconbtn" onClick="{{ onCloseCreate }}" title="닫기" style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border:none; border-radius:10px; background:var(--bg-warm); color:var(--fg-mute); cursor:pointer; transition:all .15s;"><i class="icon-cancel" style="font-size:15px;"></i></button>
+      </div>
+      <!-- body -->
+      <div style="padding:22px 26px 6px; display:flex; flex-direction:column; gap:22px;">
+
+        <!-- title -->
+        <div>
+          <label style="display:block; margin-bottom:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">방탈출 제목</label>
+          <input value="{{ newTitle }}" onInput="{{ onNewTitle }}" class="qn-input" placeholder="예: 사라진 실험실의 비밀" style="width:100%; height:48px; padding:0 15px; border:1.5px solid var(--border); border-radius:12px; background:#fafafa; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg); transition:all .15s;">
+        </div>
+
+        <!-- thumbnail -->
+        <div>
+          <label style="display:block; margin-bottom:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">썸네일</label>
+          <sc-if value="{{ hasThumbImg }}" hint-placeholder-val="{{ false }}">
+          <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border-2);">
+            {{ thumbImgEl }}
+            <div style="position:absolute; top:8px; right:8px; display:flex; gap:6px;">
+              <button onClick="{{ onThumbPick }}" style="height:28px; padding:0 11px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:700; cursor:pointer;">변경</button>
+              <button onClick="{{ onThumbClear }}" style="width:28px; height:28px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer;"><i class="icon-close" style="font-size:11px;"></i></button>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ noThumbImg }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onThumbPick }}" onDragOver="{{ onThumbDragOver }}" onDrop="{{ onThumbDrop }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:100%; height:120px; border:2px dashed var(--border); border-radius:12px; background:#fff; cursor:pointer; color:var(--fg-mute);"><i class="icon-camera" style="font-size:24px; color:var(--main-color);"></i><span style="font-family:var(--font-small); font-size:12.5px; font-weight:600;">이미지를 끌어놓거나 클릭해 선택</span></button>
+          </sc-if>
+        </div>
+
+<!-- share -->
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border:1.5px solid var(--border-2); border-radius:14px; background:#fff;">
+          <div>
+            <div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);">공유 허용</div>
+            <div style="margin-top:3px; font-family:var(--font-small); font-size:12px; font-weight:300; color:var(--fg-sub);">{{ shareDesc }}</div>
+          </div>
+          <button onClick="{{ onToggleShare }}" role="switch" style="{{ shareTrackStyle }}"><span style="{{ shareKnobStyle }}"></span></button>
+        </div>
+
+        <!-- hint policy -->
+        <div>
+          <label style="display:block; margin-bottom:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">힌트 정책</label>
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ hintChoices }}" as="h" hint-placeholder-count="3">
+              <div>
+                <button class="qn-hint-opt" onClick="{{ h.onPick }}" style="{{ h.style }}">
+                  <span style="{{ h.radioStyle }}"><sc-if value="{{ h.selected }}" hint-placeholder-val="{{ false }}"><span style="width:9px; height:9px; border-radius:50%; background:#fff;"></span></sc-if></span>
+                  <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:{{ h.iconBg }}; color:{{ h.iconFg }}; flex:none;"><i class="{{ h.icon }}" style="font-size:15px;"></i></span>
+                  <span style="text-align:left; min-width:0;"><span style="display:block; font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);">{{ h.label }}</span><span style="display:block; margin-top:2px; font-family:var(--font-small); font-size:12px; font-weight:300; color:var(--fg-sub);">{{ h.desc }}</span></span>
+                </button>
+                <sc-if value="{{ h.showCount }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; gap:9px; margin-top:9px; padding-left:32px;">
+                  <span style="font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);">전체 힌트 사용 횟수</span>
+                  <div style="display:flex; align-items:center; width:96px; height:40px; border:1.5px solid var(--border); border-radius:10px; background:#fff; padding:0 12px;">
+                    <input class="qn-input" type="number" min="1" value="{{ newHintCount }}" onChange="{{ onNewHintCount }}" style="width:100%; border:none; background:transparent; outline:none; font-family:var(--font-en); font-size:14px; font-weight:700; color:var(--fg);">
+                    <span style="font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute);">회</span>
+                  </div>
+                </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+      <!-- footer -->
+      <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:18px 26px 22px; margin-top:8px;">
+        <button class="qn-ghost" onClick="{{ onCloseCreate }}" style="height:46px; padding:0 22px; border:1.5px solid var(--border); border-radius:12px; background:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:700; color:var(--fg-sub); cursor:pointer; transition:all .15s;">취소</button>
+        <button onClick="{{ onCreateRoom }}" class="qn-cta" style="display:inline-flex; align-items:center; gap:8px; height:46px; padding:0 26px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 12px 24px -12px var(--main-color); transition:all .2s;"><i class="icon-pen" style="font-size:13px;"></i> 만들고 편집하기</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- 썸네일 이미지 등록 팝업 -->
+  <sc-if value="{{ tpOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onTpClose }}" style="position:fixed; inset:0; z-index:90; background:rgba(20,18,16,0.5); display:flex; align-items:center; justify-content:center; padding:24px; font-family:var(--font-kr);">
+    <div onClick="{{ tpStop }}" style="width:440px; max-width:100%; background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px -20px rgba(0,0,0,0.5);">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border-2);">
+        <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:var(--fg);">썸네일 이미지 선택</span>
+        <button onClick="{{ onTpClose }}" style="width:30px; height:30px; border:none; border-radius:8px; background:var(--bg-warm-2); color:var(--fg-mute); cursor:pointer;"><i class="icon-close" style="font-size:12px;"></i></button>
+      </div>
+      <div style="display:flex; gap:4px; padding:12px 20px 0;">
+        <sc-for list="{{ tpTabs }}" as="tt" hint-placeholder-count="2">
+          <button onClick="{{ tt.onPick }}" style="{{ tt.style }}"><i class="{{ tt.icon }}" style="font-size:13px;"></i> {{ tt.label }}</button>
+        </sc-for>
+      </div>
+      <div style="padding:20px;">
+        <sc-if value="{{ tpTabUpload }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onTpFakePick }}" onDragOver="{{ onTpDragOver }}" onDragLeave="{{ onTpDragLeave }}" onDrop="{{ onTpDrop }}" style="{{ tpDropStyle }}">
+            <span style="display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-download" style="font-size:20px;"></i></span>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">파일을 끌어다 놓거나 클릭해 업로드</span>
+            <span style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">JPG · PNG · GIF (최대 20MB)</span>
+          </button>
+          <input ref="{{ setTpFile }}" type="file" accept="image/*" onChange="{{ onTpFile }}" style="display:none;">
+          <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">프리셋</div>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+            <sc-for list="{{ tpPresets }}" as="tpp" hint-placeholder-count="4">
+            <button onClick="{{ tpp.onPick }}" style="border:1px solid var(--border-2); border-radius:11px; overflow:hidden; background:#fff; cursor:pointer; padding:0; text-align:left;">
+              {{ tpp.imgEl }}
+              <div style="padding:7px 9px; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--fg-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ tpp.name }}</div>
+            </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ tpTabUrl }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">이미지 링크</div>
+          <div style="display:flex; gap:8px;">
+            <input value="{{ tpUrl }}" onInput="{{ onTpUrl }}" placeholder="https://..." style="flex:1; height:42px; padding:0 13px; border:1.5px solid var(--border); border-radius:10px; font-family:var(--font-small); font-size:13px; color:var(--fg); outline:none;">
+            <button onClick="{{ onTpApplyUrl }}" style="flex:none; height:42px; padding:0 18px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; cursor:pointer;">적용</button>
+          </div>
+          <sc-if value="{{ tpUrlPreview }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; border:1px solid var(--border-2); border-radius:12px; overflow:hidden; background:#fafafa;">
+            <div style="font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-mute); padding:8px 12px; border-bottom:1px solid var(--border-2);">미리보기</div>
+            {{ tpUrlPreviewEl }}
+          </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- toast -->
+  <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:9px; height:46px; padding:0 22px; border-radius:50px; background:rgba(30,26,22,0.92); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:600; box-shadow:0 12px 30px -10px rgba(0,0,0,0.4); backdrop-filter:blur(6px);"><i class="{{ toastIcon }}" style="font-size:15px; color:#7fe3a0;"></i> {{ toast }}</div>
+  </sc-if>
+
+  <!-- click-away for menus -->
+  <sc-if value="{{ anyMenu }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onCloseMenus }}" style="position:fixed; inset:0; z-index:10;"></div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:900}}">
+const THUMBS = {
+  lab:   { img:'uploads/character01/board_mmgame_bg01.png', bg:'linear-gradient(160deg,#dff0ff,#c9e6ff)' },
+  ship:  { img:'uploads/character01/play_team_ob.png',      bg:'linear-gradient(160deg,#ffe8d6,#ffd3ad)' },
+  space: { img:'uploads/character01/my.png',                bg:'linear-gradient(160deg,#efe4ff,#dcc9ff)' },
+  book:  { img:'uploads/character01/play_single_ob.png',    bg:'linear-gradient(160deg,#e3f9ef,#c6f0dc)' },
+};
+const STATUS = {
+  pre:  { label:'진행 전', bg:'#eef0f2', fg:'#6b7280' },
+  ing:  { label:'진행 중', bg:'#e6f7ee', fg:'#1e9e5a' },
+  done: { label:'종료',   bg:'#fdeaea', fg:'#c0392b' },
+};
+// thumb 값이 이미지(data URL/URL/경로)면 그대로, 프리셋 키면 스토어/로컬 프리셋 이미지로 해석
+function isImgVal(v){ return !!v && /^(data:|https?:|\/|uploads\/)/.test(v); }
+function resolveThumbImg(thumb){
+  if (isImgVal(thumb)) return thumb;
+  try { var t = window.RoomStore && window.RoomStore.THUMBS && window.RoomStore.THUMBS[thumb]; if (t && t.img) return t.img; } catch(e){}
+  return (THUMBS[thumb]||{}).img || '';
+}
+function mapRoom(r){ var v=window.RoomStore.validate(r); return { id:r.id, title:r.title, thumb:r.thumb, img:resolveThumbImg(r.thumb), status:r.status, puzzles:r.puzzles, pin:r.pin, vis:r.vis, date:r.date, order:r.order, errors:v.errors, warns:v.warns }; }
+class Component extends DCLogic {
+  state = {
+    forceEmpty: false,
+    createOpen: false, newTitle: '', newThumb: '', newShare: true, newHint: 'deduct', newHintCount: 3,
+    tp: { open:false, tab:'upload', url:'', drag:false },
+    query: '', sort: 'recent', filter: 'all',
+    openMenuId: null, copiedId: null, ddOpen: false,
+    toast: '', toastIcon: 'icon-check',
+    items: (window.RoomStore ? window.RoomStore.all().map(mapRoom) : [
+      { id:'r1', title:'사라진 실험실의 비밀', thumb:'lab',   img:'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', status:'ing',  puzzles:5, pin:'834 512', vis:'public',  date:'2026.07.10', order:6 },
+    ]),
+  };
+  componentDidMount(){ this._oc=(e)=>{ if(this.state.ddOpen && !e.target.closest('[data-profile-menu]')) this.setState({ddOpen:false}); }; document.addEventListener('click', this._oc); }
+  componentWillUnmount(){ if(this._t) clearTimeout(this._t); document.removeEventListener('click', this._oc); }
+  toast(msg, icon){ if(this._t) clearTimeout(this._t); this.setState({ toast:msg, toastIcon:icon||'icon-check' }); this._t=setTimeout(()=>this.setState({toast:''}), 2000); }
+  readItems(){ return window.RoomStore ? window.RoomStore.all().map(mapRoom) : this.state.items; }
+  createRoom(){ if(!window.RoomStore) return; const S=this.state; const room=window.RoomStore.create({ title:(S.newTitle||'').trim()||'새 방탈출', thumb:S.newThumb, hintPolicy:S.newHint, hintCount:S.newHintCount }); window.RoomStore.saveMeta(room.id,{ vis:S.newShare?'public':'private' }); location.href='방탈출 편집 화면.dc.html?id='+room.id; }
+  tpApply(url){ if(!url) return; this.setState({ newThumb:url, tp:{ open:false, tab:'upload', url:'', drag:false } }); }
+  tpReadFile(file){ if(!file) return; const reader=new FileReader(); reader.onload=()=>this.tpApply(reader.result); reader.readAsDataURL(file); }
+
+  renderVals(){
+    const S = this.state;
+    const all = S.items;
+    const counts = { all:all.length, pre:0, ing:0, done:0 };
+    all.forEach(i=>counts[i.status]++);
+
+    let list = all.slice();
+    if (S.filter !== 'all') list = list.filter(i=>i.status===S.filter);
+    const q = S.query.trim();
+    if (q) list = list.filter(i=>i.title.includes(q));
+    list.sort((a,b)=> S.sort==='name' ? a.title.localeCompare(b.title,'ko') : b.order-a.order);
+
+    const statDef = [
+      { icon:'icon-mission', iconBg:'#fff0e5', iconFg:'var(--main-color)', value:all.length, label:'전체 방탈출' },
+      { icon:'icon-play',    iconBg:'#e6f7ee', iconFg:'#1e9e5a',           value:counts.ing, label:'진행 중' },
+      { icon:'icon-group1',  iconBg:'#eaf5ff', iconFg:'#1e6ba8',           value:'328',      label:'누적 참여자' },
+      { icon:'icon-chart',   iconBg:'#f3edff', iconFg:'#6b3fb5',           value:'82%',      label:'평균 정답률' },
+    ];
+    const stats = statDef.map((s,i)=>({ ...s, wrapStyle:`flex:1; display:flex; align-items:center; gap:11px; padding:12px 18px; ${i<statDef.length-1?'border-right:1px solid var(--border-2);':''}` }));
+
+    const tabDef = [ {k:'all',l:'전체'}, {k:'pre',l:'진행 전'}, {k:'ing',l:'진행 중'}, {k:'done',l:'종료'} ];
+    const filterTabs = tabDef.map(t=>{ const on=S.filter===t.k; return { label:t.l, count:counts[t.k],
+      style:`display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 15px; border:none; border-radius:9px; background:${on?'var(--main-color)':'transparent'}; color:${on?'#fff':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:13.5px; font-weight:${on?700:600}; cursor:pointer; transition:all .15s;`,
+      countStyle:`display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:50px; background:${on?'rgba(255,255,255,0.28)':'var(--bg-warm-2)'}; color:${on?'#fff':'var(--fg-mute)'}; font-family:var(--font-en); font-size:11px; font-weight:800;`,
+      onPick:()=>this.setState({filter:t.k, openMenuId:null}) }; });
+
+    const cards = list.map(it=>{
+      const th = THUMBS[it.thumb]||THUMBS.lab; const st = STATUS[it.status];
+      const menuOpen = S.openMenuId===it.id; const copied = S.copiedId===it.id;
+      const thumbImgSrc = it.img || th.img;
+      return {
+        title:it.title, thumbBg:th.bg,
+        thumbEl: React.createElement('img', { className:'qn-thumb-img', src:thumbImgSrc, onError:(e)=>{ e.target.style.display='none'; }, style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform .3s ease' } }),
+        statusLabel:st.label, statusBg:st.bg, statusFg:st.fg,
+        visIcon: it.vis==='public'?'icon-globe':'icon-lock-filled', visLabel: it.vis==='public'?'공개':'비공개',
+        puzzleCount:it.puzzles, date:it.date, pin:it.pin,
+        hasIssues: (it.errors||0) + (it.warns||0) > 0,
+        issueBg: (it.errors||0) > 0 ? 'var(--tag-red)' : '#c07b12',
+        issueIcon: (it.errors||0) > 0 ? 'icon-attention-alt-1' : 'icon-help',
+        issueLabel: (it.errors||0) > 0 ? ((it.warns||0) > 0 ? ('오류 '+it.errors+'·주의 '+it.warns) : ('오류 '+it.errors)) : ('주의 '+(it.warns||0)),
+        issueTitle: (it.errors||0) > 0 ? ('검증 오류 '+it.errors+'건'+((it.warns||0)?(' · 주의 '+it.warns+'건'):'')+' — 편집에서 확인') : ('검증 주의 '+(it.warns||0)+'건 — 편집에서 확인'),
+        playHref:'참여자 플레이 - 웹.dc.html?id='+it.id,
+        editHref:'방탈출 편집 화면.dc.html?id='+it.id,
+        reportHref:'리포트 상세 - 웹.dc.html?id='+it.id,
+        copyIcon: copied?'icon-check':'icon-005-copy', copyLabel: copied?'복사됨':'복사',
+        menuOpen,
+        onCopyPin:()=>{ this.setState({copiedId:it.id}); this.toast('PIN을 복사했어요'); if(this._c)clearTimeout(this._c); this._c=setTimeout(()=>this.setState({copiedId:null}),1500); },
+        onToggleMenu:()=>this.setState({ openMenuId: menuOpen?null:it.id }),
+        onDup:()=>{ const copy = window.RoomStore && window.RoomStore.duplicate(it.id); this.setState({openMenuId:null, items:this.readItems()}); this.toast('방탈출을 복제했어요'); },
+        onShare:()=>{ this.setState({openMenuId:null}); this.toast('공유 링크를 복사했어요'); },
+        onDelete:()=>{ if(window.RoomStore) window.RoomStore.remove(it.id); this.setState({ items:this.readItems(), openMenuId:null }); this.toast('방탈출을 삭제했어요','icon-trash'); },
+      };
+    });
+
+    const isEmptyData = all.length===0 || S.forceEmpty;
+    const hasItems = !isEmptyData && cards.length>0;
+    const noResult = !isEmptyData && cards.length===0;
+
+    const newThumbImg = resolveThumbImg(S.newThumb);
+    const hasThumbImg = !!newThumbImg;
+    const tpPresets = [ {k:'lab',name:'실험실'}, {k:'space',name:'우주'}, {k:'book',name:'도서관'}, {k:'ship',name:'항해'} ].map(p=>{
+      const th=THUMBS[p.k]; return { name:p.name,
+        imgEl: React.createElement('img', { src:th.img, style:{ width:'100%', height:'70px', objectFit:'cover', display:'block' } }),
+        onPick:()=>this.tpApply(p.k) }; });
+
+const hintDef = [
+      { k:'free',   icon:'icon-help', iconBg:'#e6f7ee', iconFg:'#1e9e5a', label:'무제한', desc:'힌트를 횟수 제한 없이 자유롭게 볼 수 있어요.' },
+      { k:'count',  icon:'icon-mission', iconBg:'#eaf5ff', iconFg:'#1e6ba8', label:'횟수 제한', desc:'정해진 횟수만큼만 힌트를 사용해요.' },
+      { k:'deduct', icon:'icon-minus-circle', iconBg:'#fff0e5', iconFg:'var(--main-color)', label:'점수 차감', desc:'힌트를 볼 때마다 점수가 차감돼요.' },
+    ];
+    const hintChoices = hintDef.map(h=>{ const on=S.newHint===h.k; return { ...h, selected:on, showCount: on && h.k==='count',
+      style:`display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:1.5px solid ${on?'var(--main-color)':'var(--border-2)'}; border-radius:13px; background:${on?'var(--bg-light-color)':'#fff'}; cursor:pointer; transition:all .15s;`,
+      radioStyle:`display:flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; border:2px solid ${on?'var(--main-color)':'var(--border)'}; background:${on?'var(--main-color)':'#fff'}; flex:none; transition:all .15s;`,
+      onPick:()=>this.setState({newHint:h.k}) }; });
+
+    return {
+      stats, filterTabs, cards,
+      createOpen:S.createOpen,
+      onOpenCreate:()=>this.setState({createOpen:true, openMenuId:null, ddOpen:false}),
+      onCloseCreate:()=>this.setState({createOpen:false}),
+      onCreateRoom:()=>this.createRoom(),
+      newTitle:S.newTitle, onNewTitle:(e)=>this.setState({newTitle:e.target.value}),
+      hasThumbImg, noThumbImg: !hasThumbImg,
+      thumbImgEl: hasThumbImg ? React.createElement('img', { src:newThumbImg, alt:'썸네일', style:{ display:'block', width:'100%', maxHeight:'160px', objectFit:'cover' } }) : null,
+      onThumbPick: () => this.setState({ tp:{ open:true, tab:'upload', url:'', drag:false } }),
+      onThumbClear: () => this.setState({ newThumb:'' }),
+      onThumbDragOver: (e) => e.preventDefault(),
+      onThumbDrop: (e) => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) this.tpReadFile(f); },
+      tpOpen: S.tp.open,
+      onTpClose: () => this.setState({ tp:{...S.tp, open:false} }),
+      tpStop: (e) => e.stopPropagation(),
+      tpTabUpload: S.tp.tab === 'upload',
+      tpTabUrl: S.tp.tab === 'url',
+      tpTabs: [ {key:'upload',label:'가져오기',icon:'icon-download'}, {key:'url',label:'이미지 링크',icon:'icon-link'} ].map(t => ({
+        label:t.label, icon:t.icon,
+        onPick: () => this.setState(s => ({ tp:{...s.tp, tab:t.key} })),
+        style:`display:flex; align-items:center; gap:6px; height:36px; padding:0 15px; border:none; border-bottom:2.5px solid ${S.tp.tab===t.key?'var(--main-color)':'transparent'}; background:none; cursor:pointer; font-family:var(--font-kr); font-size:13px; font-weight:${S.tp.tab===t.key?'800':'600'}; color:${S.tp.tab===t.key?'var(--main-color)':'var(--fg-mute)'};`,
+      })),
+      setTpFile: (el) => { this._tpFile = el; },
+      onTpFakePick: () => { if (this._tpFile) this._tpFile.click(); },
+      onTpFile: (e) => { const f = e.target && e.target.files && e.target.files[0]; if (f) this.tpReadFile(f); if (e.target) e.target.value=''; },
+      onTpDragOver: (e) => { e.preventDefault(); if (!S.tp.drag) this.setState(s => ({ tp:{...s.tp, drag:true} })); },
+      onTpDragLeave: (e) => { e.preventDefault(); if (S.tp.drag) this.setState(s => ({ tp:{...s.tp, drag:false} })); },
+      onTpDrop: (e) => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; this.setState(s => ({ tp:{...s.tp, drag:false} })); if (f) this.tpReadFile(f); },
+      tpDropStyle:`width:100%; height:150px; border:2px dashed ${S.tp.drag?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${S.tp.drag?'var(--bg-light-color)':'#fafafa'}; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; cursor:pointer; margin-bottom:18px; transition:all .12s;`,
+      tpUrl: S.tp.url,
+      onTpUrl: (e) => this.setState(s => ({ tp:{...s.tp, url:e.target.value} })),
+      onTpApplyUrl: () => this.tpApply((this.state.tp.url||'').trim()),
+      tpUrlPreview: !!(S.tp.url && S.tp.url.trim()),
+      tpUrlPreviewEl: (S.tp.url && S.tp.url.trim()) ? React.createElement('img', { src:S.tp.url.trim(), style:{ display:'block', width:'100%', maxHeight:'180px', objectFit:'contain', background:'#fff' } }) : null,
+      tpPresets,
+      shareDesc: S.newShare ? '링크를 가진 누구나 참여할 수 있어요.' : '초대받은 사람만 참여할 수 있어요.',
+      shareTrackStyle:`position:relative; width:48px; height:28px; border:none; border-radius:50px; background:${S.newShare?'var(--main-color)':'var(--border)'}; cursor:pointer; flex:none; transition:background .2s;`,
+      shareKnobStyle:`position:absolute; top:3px; left:${S.newShare?'23px':'3px'}; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.25); transition:left .2s;`,
+      onToggleShare:()=>this.setState(s=>({newShare:!s.newShare})),
+      hintChoices,
+      newHintIsCount: S.newHint === 'count',
+      newHintCount: S.newHintCount,
+      onNewHintCount: (e) => { const n = parseInt(e.target.value, 10); this.setState({ newHintCount: (isNaN(n)||n<1) ? 1 : n }); },
+      query:S.query, onQuery:(e)=>this.setState({query:e.target.value}),
+      sort:S.sort, onSort:(e)=>this.setState({sort:e.target.value}),
+      hasItems, isEmpty:isEmptyData, noResult,
+      onToggleEmpty:()=>this.setState(s=>({forceEmpty:!s.forceEmpty, openMenuId:null})),
+      anyMenu:!!S.openMenuId, onCloseMenus:()=>this.setState({openMenuId:null}),
+      toastOpen:!!S.toast, toast:S.toast, toastIcon:S.toastIcon,
+      ddOpen:S.ddOpen, ddCaret:S.ddOpen?'icon-up-open':'icon-down-open',
+      onToggleDd:(e)=>{ e.stopPropagation(); this.setState(s=>({ddOpen:!s.ddOpen})); },
+      onLogout:()=>{ this.setState({ddOpen:false}); this.toast('로그아웃되었어요','icon-export'); },
+    };
+  }
+}
+</script>
+</body>
+</html>

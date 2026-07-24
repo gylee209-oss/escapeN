@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); text-decoration: underline; }
+    @keyframes qnFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+    @keyframes qnDrift { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(14px); } }
+    .qn-field:focus-within .qn-fico { color: var(--main-color); }
+    .qn-field:focus-within { border-color: var(--main-color) !important; background:#fff !important; box-shadow: 0 0 0 3px var(--bg-light-color); }
+    .qn-social:hover { transform: translateY(-2px); box-shadow: 0 8px 18px -8px rgba(0,0,0,0.25); }
+    .qn-primary:hover { background: var(--btn-hover-color) !important; transform: translateY(-2px); box-shadow: 0 12px 24px -10px var(--main-color); }
+  </style>
+</helmet>
+
+<div data-screen-label="로그인 · 웹" style="height:100vh; display:flex; font-family:var(--font-kr); background:#fff; overflow:hidden;">
+
+  <!-- Hero panel -->
+  <div style="position:relative; flex:0 0 46%; max-width:620px; background:linear-gradient(155deg,#ff8a3d 0%, #ff6800 55%, #db5800 100%); overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; padding:64px 56px;">
+    <div style="position:absolute; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.14); top:-90px; right:-70px; animation:qnDrift 9s ease-in-out infinite;"></div>
+    <div style="position:absolute; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.10); bottom:220px; left:-60px; animation:qnDrift 11s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:150px; left:64px; color:rgba(255,255,255,0.7); font-size:22px;">✦</div>
+    <div style="position:absolute; top:260px; right:80px; color:rgba(255,255,255,0.55); font-size:14px;">✦</div>
+
+    <div style="position:relative;">
+      <div style="font-family:var(--font-kr); font-size:32px; font-weight:900; letter-spacing:-1px; color:#fff;">방탈출<span style="color:#ffe0c2;">N</span></div>
+      <div style="margin-top:40px; font-family:var(--font-kr); font-size:40px; font-weight:700; line-height:1.34; color:#fff; letter-spacing:-0.5px;">수업을 방탈출로,<br>학습을 모험으로</div>
+      <div style="margin-top:18px; font-family:var(--font-small); font-size:16px; font-weight:300; line-height:1.72; color:rgba(255,255,255,0.9);">문제와 이야기를 엮어 나만의 방탈출을 만들고,<br>학생들의 풀이 여정을 한눈에 확인하세요.</div>
+    </div>
+
+    <div style="position:relative; margin:0 -22px -34px; text-align:center;">
+      <img src="uploads/character01/play_loading_bg.png" alt="방탈출N 캐릭터들" style="width:100%; max-width:520px; display:block; margin:0 auto; filter:drop-shadow(0 14px 20px rgba(180,60,0,0.35)); animation:qnFloat 6s ease-in-out infinite;">
+    </div>
+  </div>
+
+  <!-- Form panel -->
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow-y:auto; padding:40px;">
+    <div style="width:100%; max-width:400px;">
+      <div style="font-family:var(--font-small-en); font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--main-color); margin-bottom:10px;">Welcome back</div>
+      <h1 style="font-family:var(--font-kr); font-size:30px; font-weight:700; color:var(--fg); margin:0;">로그인</h1>
+      <p style="font-family:var(--font-small); font-size:14px; font-weight:300; color:var(--fg-sub); margin:8px 0 0;">방탈출N 계정으로 시작하세요.</p>
+
+      <label style="display:block; font-size:13px; font-weight:600; color:var(--fg-sub); margin:28px 0 8px;">이메일</label>
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 16px; height:50px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; transition:all .18s ease;">
+        <i class="icon-mail qn-fico" style="font-size:17px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="email" placeholder="you@example.com" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+      </div>
+
+      <label style="display:block; font-size:13px; font-weight:600; color:var(--fg-sub); margin:18px 0 8px;">비밀번호</label>
+      <div class="qn-field" style="display:flex; align-items:center; gap:10px; padding:0 16px; height:50px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; transition:all .18s ease;">
+        <i class="icon-lock-filled qn-fico" style="font-size:16px; color:var(--fg-mute); transition:color .18s ease;"></i>
+        <input type="{{ pwType }}" placeholder="비밀번호를 입력하세요" style="flex:1; border:none; background:transparent; outline:none; font-family:var(--font-kr); font-size:15px; color:var(--fg);">
+        <i class="{{ pwIcon }}" onClick="{{ togglePw }}" style="font-size:17px; color:var(--fg-mute); cursor:pointer;"></i>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
+        <div style="display:flex; gap:18px;">
+          <label class="check" style="font-size:13px;"><input type="checkbox" checked><span class="box"></span><span>아이디 저장</span></label>
+          <label class="check" style="font-size:13px;"><input type="checkbox"><span class="box"></span><span>자동 로그인</span></label>
+        </div>
+        <a href="비밀번호 찾기 - 웹.dc.html" style="font-size:13px; font-weight:500;">비밀번호 찾기</a>
+      </div>
+
+      <button class="qn-primary" onClick="{{ onLogin }}" style="width:100%; margin-top:24px; height:52px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700; cursor:pointer; transition:all .2s ease;">로그인</button>
+
+      <div style="display:flex; align-items:center; gap:14px; margin:24px 0 18px;">
+        <span style="flex:1; height:1px; background:var(--border);"></span>
+        <span style="font-size:12px; color:var(--fg-mute); font-family:var(--font-small);">간편 로그인</span>
+        <span style="flex:1; height:1px; background:var(--border);"></span>
+      </div>
+
+      <button class="qn-social" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; height:50px; border:none; border-radius:12px; background:#FEE500; color:#191600; font-family:var(--font-kr); font-size:15px; font-weight:600; cursor:pointer; transition:all .2s ease;"><i class="icon-speech-bubble" style="font-size:16px;"></i> 카카오로 시작하기</button>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="qn-social" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; height:50px; border:none; border-radius:12px; background:#03C75A; color:#fff; font-family:var(--font-kr); font-size:15px; font-weight:600; cursor:pointer; transition:all .2s ease;"><span style="font-family:var(--font-en); font-weight:800; font-size:17px;">N</span> 네이버</button>
+        <button class="qn-social" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; height:50px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--fg); font-family:var(--font-kr); font-size:15px; font-weight:600; cursor:pointer; transition:all .2s ease;"><span style="font-family:var(--font-en); font-weight:800; font-size:17px; color:#4285F4;">G</span> 구글</button>
+      </div>
+
+      <div style="margin-top:26px; text-align:center; font-family:var(--font-small); font-size:13.5px; color:var(--fg-sub);">아직 회원이 아니신가요? <a href="회원가입 - 웹.dc.html" style="font-weight:700;">회원가입</a></div>
+      <p style="margin:14px 0 0; text-align:center; font-family:var(--font-small); font-size:11px; font-weight:300; line-height:1.6; color:var(--fg-mute);">로그인 시 <a href="#" style="font-weight:500;">이용약관</a> 및 <a href="#" style="font-weight:500;">개인정보처리방침</a>에<br>동의하는 것으로 간주됩니다.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { showPw: false };
+  renderVals() {
+    const showPw = this.state.showPw;
+    return {
+      pwType: showPw ? 'text' : 'password',
+      pwIcon: showPw ? 'icon-eye' : 'icon-eye-none',
+      togglePw: () => this.setState(s => ({ showPw: !s.showPw })),
+      onLogin: () => { location.href = 'My 방탈출 - 웹.dc.html'; },
+    };
+  }
+}
+</script>
+</body>
+</html>

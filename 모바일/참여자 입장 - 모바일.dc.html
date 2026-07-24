@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes qnFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-9px); } }
+    @keyframes qnShake { 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-7px); } 40%,80%{ transform:translateX(7px); } }
+    .pt-primary:hover { filter:brightness(1.04); }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; background:#fff; display:flex; justify-content:center; font-family:var(--font-kr);">
+
+  <div data-screen-label="참여자 입장 · 모바일" style="width:100%; max-width:440px; min-height:100vh; background:#fff; display:flex; flex-direction:column; overflow:hidden;">
+
+    <!-- brand hero -->
+    <div style="position:relative; background:linear-gradient(165deg,#ffb37a 0%, #ff8533 52%, #ff6800 100%); padding:34px 30px 0; text-align:center; overflow:hidden;">
+      <div style="position:absolute; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.14); top:-60px; right:-50px;"></div>
+      <div style="position:relative; color:#fff;">
+        <div style="display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:50px; background:rgba(255,255,255,0.2); font-family:var(--font-small); font-size:12px; font-weight:700;"><i class="icon-mission" style="font-size:12px;"></i> 방탈출 입장</div>
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:28px; font-weight:900; letter-spacing:-1px;">방탈출<span style="color:#ffe0c2;">N</span></div>
+        <div style="margin-top:5px; font-family:var(--font-kr); font-size:15px; font-weight:600; opacity:0.95;">{{ scenarioTitle }}</div>
+        <img src="../uploads/character01/play_loading_bg.png" alt="캐릭터 버스" style="display:block; width:70%; margin:6px auto -6px; filter:drop-shadow(0 12px 16px rgba(150,50,0,0.35)); animation:qnFloat 6s ease-in-out infinite;">
+      </div>
+    </div>
+
+    <!-- body -->
+    <div style="padding:28px 30px 30px;">
+
+      <!-- STEP 1: PIN -->
+      <sc-if value="{{ entryPin }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:7px; font-family:var(--font-kr); font-size:15px; font-weight:700; color:var(--fg);"><span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:11px; font-weight:800;">1</span> 게임 PIN 입력</div>
+        <div style="text-align:center; font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-top:4px;">선생님이 알려준 7자리 번호를 입력하세요</div>
+
+        <div class="pt-pinwrap" style="{{ shakeStyle }}">
+          <div style="position:relative; margin-top:18px;">
+            <div style="display:flex; gap:6px; justify-content:center;">
+              <sc-for list="{{ pinCells }}" as="c" hint-placeholder-count="7">
+                <div style="{{ c.style }}">{{ c.ch }}</div>
+              </sc-for>
+            </div>
+            <input value="{{ pin }}" onInput="{{ onPin }}" inputmode="numeric" autofocus style="position:absolute; inset:0; width:100%; height:100%; opacity:0; border:none; cursor:text; font-size:16px;">
+          </div>
+        </div>
+
+        <div style="min-height:18px; margin-top:8px; text-align:center;">
+          <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--incorrect-color, #e0483d);"><i class="icon-attention-alt-1" style="font-size:12px;"></i> PIN 7자리를 모두 입력해 주세요.</span>
+          </sc-if>
+        </div>
+
+        <button class="pt-primary" onClick="{{ onNext }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:6px; height:54px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17px; font-weight:700; cursor:pointer;">다음 <i class="icon-right-open" style="font-size:12px;"></i></button>
+      </div>
+      </sc-if>
+
+      <!-- STEP 2: NICKNAME -->
+      <sc-if value="{{ entryName }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <button onClick="{{ onBack }}" style="display:inline-flex; align-items:center; gap:5px; border:none; background:transparent; padding:0; color:var(--fg-mute); font-family:var(--font-small); font-size:12.5px; font-weight:600; cursor:pointer;"><i class="icon-left-open" style="font-size:11px;"></i> PIN 다시 입력</button>
+        <div style="margin-top:16px; display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);"><span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:12px; font-weight:800;">2</span> 닉네임을 정해주세요</div>
+        <div style="margin-top:6px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute);">방 안에서 이 이름으로 표시돼요.</div>
+        <input value="{{ name }}" onInput="{{ onName }}" placeholder="사용할 닉네임 (미입력 시 게스트)" style="width:100%; box-sizing:border-box; height:56px; margin-top:16px; padding:0 16px; border:1.5px solid var(--border); border-radius:14px; background:#fafafa; font-family:var(--font-kr); font-size:16px; color:var(--fg); outline:none;">
+        <a class="pt-primary" href="참여자 플레이 - 모바일.dc.html" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; box-sizing:border-box; margin-top:16px; height:56px; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17px; font-weight:700;">입장하기 <i class="icon-right-open" style="font-size:12px;"></i></a>
+        <div style="margin-top:14px; display:flex; gap:8px; align-items:center; justify-content:center; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);"><i class="icon-qr-code" style="font-size:12px;"></i> PIN <b style="font-family:var(--font-en); letter-spacing:1px; color:var(--fg-sub);">{{ pinShown }}</b> 로 입장</div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:760}}">
+class Component extends DCLogic {
+  state = { step: (typeof location !== 'undefined' && new URLSearchParams(location.search).get('step') === 'name') ? 'name' : 'pin', pin: '', name: '', error: false };
+  componentWillUnmount(){ if (this._t) clearTimeout(this._t); }
+  renderVals(){
+    const S = this.state;
+    const pinCells = [0,1,2,3,4,5,6].map(i => {
+      const ch = S.pin[i] || '';
+      const bd = S.error ? 'var(--incorrect-color, #e0483d)' : (ch ? 'var(--main-color)' : 'var(--border)');
+      const bg = S.error ? '#fdecea' : (ch ? 'var(--bg-light-color)' : '#fafafa');
+      return { ch, style:`display:flex; align-items:center; justify-content:center; width:44px; height:56px; border-radius:12px; border:2px solid ${bd}; background:${bg}; font-family:var(--font-en); font-size:24px; font-weight:800; color:var(--fg);` };
+    });
+    const pinShown = S.pin ? S.pin.slice(0,3) + ' ' + S.pin.slice(3) : '';
+    return {
+      scenarioTitle: '사라진 실험실의 비밀',
+      entryPin: S.step==='pin', entryName: S.step==='name',
+      pin: S.pin, name: S.name, pinShown,
+      pinCells, shakeStyle: S.error ? 'animation:qnShake .4s ease;' : '', showError: S.error,
+      onPin: (e)=> this.setState({ pin:(e.target.value||'').replace(/\D/g,'').slice(0,7), error:false }),
+      onName: (e)=> this.setState({ name:e.target.value }),
+      onNext: ()=> {
+        if (this.state.pin.length === 7) { this.setState({ step:'name', error:false }); }
+        else { this.setState({ error:true }); if (this._t) clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ error:false }), 500); }
+      },
+      onBack: ()=> this.setState({ step:'pin' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <style>
+    * { box-sizing:border-box; }
+    a { color: var(--main-color); text-decoration:none; }
+    a:hover { color: var(--btn-hover-color); }
+    .qn-tab:hover { color: var(--main-color) !important; }
+    @keyframes qnMenu { from{ transform:translateY(-6px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    .qn-dd-item:hover { background: var(--bg-warm-2) !important; }
+    .qn-dd-item.danger:hover { background:#fdeaea !important; }
+    .qn-profile:hover { background: var(--bg-warm) !important; }
+    .qn-back:hover { color: var(--main-color) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="리포트 개인별 상세 · 웹" style="min-height:100vh; background:#f4f3ef; font-family:var(--font-kr);">
+
+  <header style="position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between; padding:16px 40px; background:rgba(255,255,255,0.9); border-bottom:1px solid var(--border-2); backdrop-filter:blur(8px);">
+    <div style="display:flex; align-items:center; gap:32px;">
+      <div style="font-family:var(--font-kr); font-size:22px; font-weight:900; letter-spacing:-1px; color:var(--fg);">방탈출<span style="color:var(--main-color);">N</span></div>
+      <nav style="display:flex; gap:26px;">
+        <a class="qn-tab" href="My 방탈출 - 웹.dc.html" style="font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg-sub);">My 방탈출</a>
+        <a class="qn-tab" href="#" style="font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg-sub);">탐색</a>
+      </nav>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-megaphone" style="font-size:16px;"></i><span style="position:absolute; top:-2px; right:-2px; min-width:17px; height:17px; padding:0 4px; border-radius:50px; background:var(--tag-red); color:#fff; font-family:var(--font-en); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">3</span></span>
+      <div style="position:relative;" data-profile-menu>
+        <button class="qn-profile" onClick="{{ onToggleDd }}" style="display:flex; align-items:center; gap:9px; height:48px; padding:0 8px 0 9px; border:none; border-radius:12px; background:transparent; cursor:pointer; transition:background .15s;">
+          <img src="uploads/character01/profile_Kay.png" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);">
+          <div style="line-height:1.3; text-align:left;"><div style="font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">김선생</div><span style="display:inline-flex; align-items:center; gap:4px; margin-top:2px; padding:2px 8px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-small); font-size:10px; font-weight:700;">스튜디오 Pro</span></div>
+          <i class="{{ ddCaret }}" style="font-size:11px; color:var(--fg-mute); margin-left:2px;"></i>
+        </button>
+        <sc-if value="{{ ddOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; right:0; top:56px; z-index:50; width:236px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:0 18px 44px -16px rgba(0,0,0,0.3); overflow:hidden; animation:qnMenu .16s ease;">
+          <div style="display:flex; align-items:center; gap:11px; padding:16px; background:var(--bg-warm); border-bottom:1px solid var(--border-2);">
+            <img src="uploads/character01/profile_Kay.png" style="width:44px; height:44px; border-radius:50%; object-fit:cover;">
+            <div style="min-width:0;"><div style="font-family:var(--font-kr); font-size:14.5px; font-weight:800; color:var(--fg);">김선생</div><div style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">kim@haesal.es.kr</div></div>
+          </div>
+          <div style="padding:6px;">
+            <a class="qn-dd-item" href="마이페이지 - 웹.dc.html" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-user" style="font-size:15px; color:var(--fg-mute);"></i> 마이페이지</a>
+            <div style="height:1px; background:var(--border-2); margin:5px 4px;"></div>
+            <button class="qn-dd-item danger" onClick="{{ onLogout }}" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--tag-red); cursor:pointer; text-align:left;"><i class="icon-export" style="font-size:15px;"></i> 로그아웃</button>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:940px; margin:0 auto; padding:28px 40px 64px;">
+    <a class="qn-back" href="{{ backHref }}" style="display:inline-flex; align-items:center; gap:6px; font-family:var(--font-small); font-size:13px; font-weight:600; color:var(--fg-sub);"><i class="icon-left-open" style="font-size:11px;"></i> 전체 리포트로</a>
+
+    <!-- header -->
+    <div style="display:flex; align-items:center; gap:18px; margin-top:16px; background:#fff; border:1px solid var(--border-2); border-radius:18px; padding:22px 24px;">
+      <span style="display:flex; align-items:center; justify-content:center; width:64px; height:64px; flex:none; border-radius:50%; background:{{ avBg }}; color:#fff; font-family:var(--font-kr); font-size:26px; font-weight:800;">{{ initial }}</span>
+      <div style="flex:1; min-width:0;">
+        <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:var(--font-kr); font-size:22px; font-weight:900; color:var(--fg);">{{ name }}</span><span style="{{ resultBadgeStyle }}">{{ resultLabel }}</span></div>
+        <div style="margin-top:5px; font-family:var(--font-small); font-size:13px; color:var(--fg-sub);"><i class="icon-mission" style="font-size:12px; color:var(--fg-mute); margin-right:4px;"></i>{{ scTitle }}</div>
+      </div>
+    </div>
+
+    <!-- 4 summary cards -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:16px;">
+      <sc-for list="{{ summary }}" as="s" hint-placeholder-count="4">
+        <div style="{{ s.style }}">
+          <div style="font-family:var(--font-en); font-size:26px; font-weight:800; color:{{ s.valColor }}; line-height:1;">{{ s.value }}</div>
+          <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:6px;">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- timeline -->
+    <div style="margin-top:24px; font-family:var(--font-kr); font-size:17px; font-weight:800; color:var(--fg);">문제별 풀이 타임라인</div>
+    <div style="margin-top:14px; display:flex; flex-direction:column; gap:0;">
+      <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="5">
+        <div style="display:flex; gap:16px;">
+          <!-- rail -->
+          <div style="display:flex; flex-direction:column; align-items:center; flex:none; width:34px;">
+            <span style="{{ t.dotStyle }}"><i class="{{ t.dotIcon }}" style="font-size:12px;"></i></span>
+            <sc-if value="{{ t.hasLine }}" hint-placeholder-val="{{ true }}"><span style="width:2px; flex:1; min-height:26px; background:var(--border-2);"></span></sc-if>
+          </div>
+          <!-- content -->
+          <div style="flex:1; padding-bottom:18px;">
+            <div style="background:#fff; border:1px solid {{ t.border }}; border-radius:14px; padding:15px 17px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                  <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:var(--fg);">{{ t.title }}</span>
+                  <span style="display:inline-flex; align-items:center; height:20px; padding:0 8px; border-radius:50px; background:{{ t.typeBg }}; color:{{ t.typeFg }}; font-family:var(--font-small); font-size:10.5px; font-weight:700;">{{ t.typeLabel }}</span>
+                  <sc-if value="{{ t.stuck }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex; align-items:center; gap:3px; height:20px; padding:0 8px; border-radius:50px; background:#fdeaea; color:#c0392b; font-family:var(--font-small); font-size:10.5px; font-weight:700;"><i class="icon-attention-alt-1" style="font-size:10px;"></i>막힘</span></sc-if>
+                </div>
+                <span style="{{ t.resultStyle }}">{{ t.resultLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px; margin-top:10px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);">
+                <span style="display:inline-flex; align-items:center; gap:5px;"><i class="icon-ccw" style="font-size:11px; color:var(--fg-mute);"></i> 시도 {{ t.attempts }}회</span>
+                <span style="display:inline-flex; align-items:center; gap:5px; color:{{ t.timeColor }};"><i class="icon-time" style="font-size:11px;"></i> {{ t.time }}<sc-if value="{{ t.slow }}" hint-placeholder-val="{{ false }}"><span style="font-family:var(--font-small); font-weight:700;"> · 느림</span></sc-if></span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><i class="icon-help" style="font-size:11px; color:var(--fg-mute);"></i> 힌트 {{ t.hints }}회</span>
+              </div>
+              <sc-if value="{{ t.hasWrong }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px; padding:9px 12px; border-radius:9px; background:#fdf3f2; font-family:var(--font-small); font-size:12px; color:#a3312f;">오답 입력: <b style="font-weight:700;">{{ t.wrongText }}</b></div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+
+      <!-- ending step -->
+      <div style="display:flex; gap:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex:none; width:34px;">
+          <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:{{ endDotBg }}; color:#fff;"><i class="{{ endDotIcon }}" style="font-size:14px;"></i></span>
+        </div>
+        <div style="flex:1;">
+          <div style="border-radius:14px; padding:16px 18px; background:{{ endBg }}; color:#fff;">
+            <div style="font-family:var(--font-kr); font-size:16px; font-weight:800;">{{ endTitle }}</div>
+            <div style="margin-top:4px; font-family:var(--font-small); font-size:13px; opacity:0.92;">{{ endBody }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:940,&quot;height&quot;:900}}">
+const PTYPE = { mc:{l:'객관식',bg:'#eaf5ff',fg:'#1e6ba8'}, ox:{l:'OX',bg:'#fff6e0',fg:'#9a6b00'}, short:{l:'주관식',bg:'#e5fbf3',fg:'#0a8560'}, order:{l:'순서',bg:'#f3edff',fg:'#6b3fb5'}, hotspot:{l:'핫스팟',bg:'#ffe8ec',fg:'#c0392b'} };
+const POINT=100, HINT_PENALTY=50;
+const TYPE_TIME={ mc:50, ox:65, short:95, order:120, hotspot:85 };
+const WRONG_SAMPLE={ mc:'2번 보기', ox:'O', short:'응결', order:'순서 뒤바뀜', hotspot:'엉뚱한 지점' };
+
+// 문제 순서 = 실제 방 구성 순서
+const S1_META=[
+  {t:'실험실 입구',ty:'mc'},{t:'온도 판단',ty:'ox'},{t:'증발의 원리',ty:'short'},
+  {t:'실험 순서',ty:'order'},{t:'반응 지점 찾기',ty:'hotspot'},
+];
+const S1_ROWS=[
+  ['최지우','c c c c c','05:30'],
+  ['김민준','c c C c c','06:12'],
+  ['이서연','C c c c w','09:40'],
+  ['강시우','c c c c w','09:05'],
+  ['유나','c c c c a','—'],
+  ['세아','c c w c w','09:25'],
+  ['도현','c c w . .','07:20'],
+  ['지호','c c w w .','08:40'],
+  ['민재','c c w . .','07:55'],
+  ['수빈','c c w a .','08:10'],
+  ['박도윤','c C w . .','09:55'],
+  ['태호','c c a . .','—'],
+  ['정하은','c w . . .','10:20'],
+  ['나윤','c a . . .','—'],
+  ['하율','c W . . .','06:40'],
+  ['보검','w . . . .','05:10'],
+];
+const S2_META=[
+  {t:'도킹 코드',ty:'mc'},{t:'산소 밸브',ty:'short'},{t:'궤도 순서',ty:'order'},
+  {t:'중력 보정',ty:'ox'},{t:'배선 연결',ty:'hotspot'},{t:'암호 해독',ty:'mc'},{t:'탈출 포드',ty:'short'},
+];
+const S2_ROWS=[
+  ['오세훈','c c c c c c c','09:10'],
+  ['배준서','c c C c c c c','08:25'],
+  ['신유나','c c c c c w .','10:50'],
+  ['조수빈','c c c w . . .','10:05'],
+  ['한도윤','c c c c a . .','—'],
+  ['서하은','c c w a . . .','09:15'],
+  ['오지아','c c c w . . .','09:30'],
+  ['권민재','c c w . . . .','08:55'],
+  ['임채원','c C w . . . .','11:40'],
+  ['정우진','c w . . . . .','07:40'],
+  ['강나윤','c a . . . . .','—'],
+  ['윤태호','w . . . . . .','05:20'],
+];
+const SCEN={
+  s1:{ title:'사라진 실험실의 비밀', meta:S1_META, rows:S1_ROWS },
+  s2:{ title:'우주 정거장 탈출', meta:S2_META, rows:S2_ROWS },
+};
+// 정답 직전 오답을 남긴 문제(1-indexed)
+const WRONG_MAP={ '박도윤':{ 2:'응결' } };
+function parseCells(str){
+  return str.trim().split(/\s+/).map(tok=>{
+    const low=tok.toLowerCase();
+    const s = low==='c'?'c':(low==='w'?'w':(low==='a'?'a':'n'));
+    return { s, h:(tok==='C'||tok==='W')?1:0 };
+  });
+}
+function fmt(s){ return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let id='s1'; this._room=null; this._backId='s1';
+    try{ const u=new URLSearchParams(location.search); const raw=u.get('id');
+      if(raw&&SCEN[raw]){ id=raw; this._backId=raw; }
+      else if(raw&&window.RoomStore){ const rm=window.RoomStore.get(raw); if(rm){ this._room=rm; this._backId=raw; id=(/2$/.test(raw)?'s2':'s1'); } }
+      const n=u.get('name'); if(n) this._name=decodeURIComponent(n);
+    }catch(e){}
+    this.state={ id, ddOpen:false };
+  }
+  componentDidMount(){ this._oc=(e)=>{ if(this.state.ddOpen && !e.target.closest('[data-profile-menu]')) this.setState({ddOpen:false}); }; document.addEventListener('click', this._oc); }
+  componentWillUnmount(){ document.removeEventListener('click', this._oc); }
+  renderVals(){
+    const S=this.state; const sc=SCEN[S.id]||SCEN.s1; const meta=sc.meta;
+    let row=sc.rows.find(r=>r[0]===this._name)||sc.rows[0];
+    const name=row[0];
+    const cells=parseCells(row[1]);
+    const totalTime=row[2];
+    const scTitle=this._room?this._room.title:sc.title;
+
+    const score=cells.reduce((n,c)=>n+(c.s==='c'?POINT:0)-(c.h?HINT_PENALTY:0),0);
+    const hintsTotal=cells.filter(c=>c.h).length;
+    const completed=cells.every(c=>c.s==='c');
+    const active=cells.some(c=>c.s==='a');
+    const state=active?'active':(completed?'done':'dropped');
+    const RES={ done:{label:'성공',bg:'#e6f7ee',fg:'#1e9e5a'}, active:{label:'진행 중',bg:'#eaf2ff',fg:'#1e6ba8'}, dropped:{label:'실패',bg:'#fdeaea',fg:'#c0392b'} };
+    const rs=RES[state];
+
+    const summary=[
+      { value:score, label:'최종 점수', emph:true, valColor:'var(--main-color)' },
+      { value:rs.label, label:'결과', emph:false, valColor:rs.fg },
+      { value:totalTime, label:'총 시간', emph:false, valColor:'var(--fg)' },
+      { value:hintsTotal+'회', label:'힌트 사용', emph:false, valColor:'var(--fg)' },
+    ].map(c=>({ ...c, style:`background:${c.emph?'var(--bg-light-color)':'#fff'}; border:1px solid ${c.emph?'var(--main-color)':'var(--border-2)'}; border-radius:16px; padding:18px 20px;` }));
+
+    const steps=[];
+    cells.forEach((cl,i)=>{
+      if(cl.s==='n') return;
+      const m=meta[i], pt=PTYPE[m.ty]||PTYPE.mc, num=i+1;
+      const ok=cl.s==='c', stuck=cl.s==='w', act=cl.s==='a';
+      const attempts= ok?(cl.h?2:1):(stuck?3:1);
+      const base=TYPE_TIME[m.ty]||60;
+      const timeSec= ok?(base+(cl.h?30:0)):(stuck?190:25);
+      const slow=timeSec>150;
+      const wrong = WRONG_MAP[name] && WRONG_MAP[name][num] ? WRONG_MAP[name][num] : (stuck?WRONG_SAMPLE[m.ty]:'');
+      const res= ok?{l:'정답',bg:'#e6f7ee',fg:'#1e9e5a'} : (act?{l:'진행 중',bg:'#eaf2ff',fg:'#1e6ba8'} : {l:'미해결',bg:'#fdeaea',fg:'#c0392b'});
+      const dotBg= ok?'#1e9e5a':(act?'#1e6ba8':'#c0392b');
+      const dotIcon= ok?'icon-check':(act?'icon-play':'icon-close');
+      steps.push({ title:`${num}. ${m.t}`, typeLabel:pt.l, typeBg:pt.bg, typeFg:pt.fg,
+        stuck, hasLine:true,
+        dotStyle:`display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:${dotBg}; color:#fff;`, dotIcon,
+        border: stuck?'#f5c6c6':'var(--border-2)',
+        resultLabel:res.l, resultStyle:`flex:none; display:inline-flex; align-items:center; height:22px; padding:0 10px; border-radius:50px; background:${res.bg}; color:${res.fg}; font-family:var(--font-small); font-size:11.5px; font-weight:700;`,
+        attempts, time:act?'—':fmt(timeSec), timeColor: slow?'#c0392b':'var(--fg-sub)', slow,
+        hints:cl.h, hasWrong:!!wrong, wrongText:wrong });
+    });
+
+    const endMap={
+      done:{ dotBg:'#12b57e', dotIcon:'icon-studio', bg:'linear-gradient(120deg,#1f9e5a,#0f7a45)', title:'탈출 성공!', body:'모든 미션을 해결하고 방을 빠져나왔어요.' },
+      active:{ dotBg:'#1e6ba8', dotIcon:'icon-play', bg:'linear-gradient(120deg,#2a6fdb,#1a4fa0)', title:'아직 진행 중', body:'지금 이 방을 풀고 있어요.' },
+      dropped:{ dotBg:'#d9534f', dotIcon:'icon-big_x', bg:'linear-gradient(120deg,#b5372f,#8a2822)', title:'탈출 실패', body:'제한된 미션을 넘지 못하고 종료되었어요.' },
+    };
+    const end=endMap[state];
+    const avColor= state==='done'?'#1e9e5a':(state==='active'?'#1e6ba8':'#c0392b');
+
+    return {
+      ddOpen:S.ddOpen, ddCaret:S.ddOpen?'icon-up-open':'icon-down-open',
+      onToggleDd:()=>this.setState(s=>({ddOpen:!s.ddOpen})),
+      onLogout:()=>this.setState({ddOpen:false}),
+      backHref:`리포트 상세 - 웹.dc.html?id=${this._backId}`,
+      initial:name.charAt(0), avBg:avColor,
+      name, scTitle,
+      resultLabel:rs.label, resultBadgeStyle:`display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 12px; border-radius:50px; background:${rs.bg}; color:${rs.fg}; font-family:var(--font-small); font-size:12.5px; font-weight:700;`,
+      summary, timeline:steps,
+      endDotBg:end.dotBg, endDotIcon:end.dotIcon, endBg:end.bg, endTitle:end.title, endBody:end.body,
+    };
+  }
+}
+</script>
+</body>
+</html>

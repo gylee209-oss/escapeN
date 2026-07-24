@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="../_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="../room-store.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes qnBub { from{ transform:translateY(10px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes qnRise { from{ transform:translateY(16px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes qnPop { 0%{ transform:scale(0.7); opacity:0; } 60%{ transform:scale(1.06); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes qnShake { 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-8px); } 40%,80%{ transform:translateX(8px); } }
+    @keyframes qnFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-7px); } }
+    .pt-opt:hover { border-color: var(--main-color) !important; background:var(--bg-light-color) !important; }
+    .pt-primary:hover { filter:brightness(1.04); transform:translateY(-2px); box-shadow:0 14px 28px -12px var(--main-color); }
+    .pt-ghost:hover { background: var(--bg-warm-2) !important; }
+    .pt-hot:hover { box-shadow:0 0 0 4px rgba(255,104,0,0.25) !important; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; background:#141414; display:flex; justify-content:center; font-family:var(--font-kr);">
+<div data-screen-label="참여자 플레이 · 모바일" style="position:relative; width:100%; max-width:440px; min-height:100vh; height:100vh; box-sizing:border-box; background:radial-gradient(130% 90% at 50% -10%, #fff4ea 0%, #fbf3e9 45%, #f2efe7 100%); display:flex; flex-direction:column; font-family:var(--font-kr); overflow:hidden;">
+
+  <!-- TOP BAR -->
+  <div style="flex:none; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:14px 18px; background:rgba(255,255,255,0.85); border-bottom:1px solid var(--border-2); backdrop-filter:blur(8px);">
+    <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+      <div style="font-family:var(--font-kr); font-size:16px; font-weight:900; letter-spacing:-0.5px; color:var(--fg); white-space:nowrap;">방탈출<span style="color:var(--main-color);">N</span></div>
+      <span style="flex:none; font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-mute); white-space:nowrap;">{{ stepLabel }}</span>
+    </div>
+    <div style="flex:1; display:flex; align-items:center; gap:10px;">
+      <div style="flex:1; height:8px; border-radius:50px; background:var(--bg-warm-2); overflow:hidden;"><div style="width:{{ progressPct }}%; height:100%; border-radius:50px; background:linear-gradient(90deg,#ffc91b,#ff6800); transition:width .4s ease;"></div></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-en); font-size:15px; font-weight:800;"><i class="icon-heart" style="font-size:13px; color:var(--main-color);"></i> {{ score }}</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div style="flex:1; overflow-y:auto; display:flex; justify-content:center; padding:26px 20px 16px;">
+    <div style="width:100%; max-width:720px;">
+
+      <!-- STORY / QUESTION -->
+      <sc-if value="{{ isPlay }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ shakeStyle }}">
+        <!-- 대화 말풍선 (화자별) -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <sc-for list="{{ bubbles }}" as="b" hint-placeholder-count="2">
+            <sc-if value="{{ b.isNarr }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ b.bubbleStyle }}">{{ b.text }}</div>
+            </sc-if>
+            <sc-if value="{{ b.isBubble }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ b.rowStyle }}">
+                <sc-if value="{{ b.showAvatar }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ b.avatarStyle }}"><i class="{{ b.avatarIcon }}" style="font-size:22px;"></i></div>
+                </sc-if>
+                <div style="{{ b.wrapStyle }}"><div style="{{ b.bubbleStyle }}">{{ b.text }}</div></div>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+
+        <!-- answer area -->
+        <sc-if value="{{ answerReady }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:26px; animation:qnRise .4s ease;">
+
+          <!-- MC -->
+          <sc-if value="{{ isMc }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+            <sc-for list="{{ choices }}" as="c" hint-placeholder-count="4">
+              <button class="pt-opt" onClick="{{ c.onPick }}" style="{{ c.style }}"><span style="{{ c.numStyle }}">{{ c.num }}</span><span style="flex:1; text-align:left;">{{ c.text }}</span></button>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- OX -->
+          <sc-if value="{{ isOx }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:14px;">
+            <sc-for list="{{ oxOpts }}" as="o" hint-placeholder-count="2">
+              <button class="pt-opt" onClick="{{ o.onPick }}" style="{{ o.style }}"><span style="{{ o.symStyle }}">{{ o.label }}</span><span style="{{ o.subStyle }}">{{ o.sub }}</span></button>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- SHORT -->
+          <sc-if value="{{ isShort }}" hint-placeholder-val="{{ false }}">
+          <input value="{{ shortText }}" onInput="{{ onShort }}" placeholder="정답을 입력하세요" style="width:100%; box-sizing:border-box; height:58px; padding:0 18px; border:1.5px solid var(--border); border-radius:14px; background:#fff; font-family:var(--font-kr); font-size:17px; color:var(--fg); outline:none;">
+          </sc-if>
+
+          <!-- ORDER -->
+          <sc-if value="{{ isOrder }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ orderItems }}" as="o" hint-placeholder-count="4">
+              <button class="pt-opt" onClick="{{ o.onTap }}" style="{{ o.style }}"><span style="{{ o.badgeStyle }}">{{ o.badge }}</span><span style="flex:1; text-align:left;">{{ o.text }}</span></button>
+            </sc-for>
+            <button class="pt-ghost" onClick="{{ onOrderReset }}" style="align-self:flex-start; display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border:1px solid var(--border); border-radius:50px; background:#fff; color:var(--fg-sub); font-family:var(--font-small); font-size:12.5px; font-weight:600; cursor:pointer;"><i class="icon-ccw" style="font-size:12px;"></i> 순서 초기화</button>
+          </div>
+          </sc-if>
+
+          <!-- HOTSPOT -->
+          <sc-if value="{{ isHotspot }}" hint-placeholder-val="{{ false }}">
+          <div style="position:relative; height:300px; border-radius:16px; overflow:hidden; border:1.5px solid var(--border-2); background:linear-gradient(160deg,#dff0ff,#eafaf2);">
+            <img src="{{ hotspotImg }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+            <div style="position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.28));"></div>
+            <sc-for list="{{ hotspots }}" as="h" hint-placeholder-count="3">
+              <button class="pt-hot" onClick="{{ h.onPick }}" title="{{ h.label }}" style="{{ h.style }}"><i class="icon-location" style="font-size:16px;"></i></button>
+            </sc-for>
+          </div>
+          <div style="margin-top:8px; text-align:center; font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">이미지에서 정답 위치를 눌러 주세요</div>
+          </sc-if>
+
+          <!-- feedback -->
+          <sc-if value="{{ showFeedback }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px; display:flex; align-items:center; gap:10px; padding:15px 18px; border-radius:14px; background:{{ fbBg }}; animation:qnPop .3s ease;">
+            <i class="{{ fbIcon }}" style="font-size:19px; color:{{ fbColor }};"></i>
+            <span style="font-family:var(--font-kr); font-size:15px; font-weight:700; color:{{ fbColor }};">{{ fbText }}</span>
+          </div>
+          </sc-if>
+
+          <!-- hint -->
+          <sc-if value="{{ hasHint }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;">
+            <sc-if value="{{ hintRevealed }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:10px; padding:15px 18px; border-radius:14px; background:#fff7e0; border:1px solid #f0dca0; animation:qnRise .3s ease;">
+              <i class="icon-help" style="font-size:16px; color:#c07b12; margin-top:1px;"></i>
+              <span style="font-family:var(--font-small); font-size:13.5px; line-height:1.6; color:var(--fg-sub);">{{ hintText }}</span>
+            </div>
+            </sc-if>
+            <sc-if value="{{ hintHidden }}" hint-placeholder-val="{{ true }}">
+            <button class="pt-ghost" onClick="{{ onHint }}" style="display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 20px; border:1px solid var(--border); border-radius:50px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:13.5px; font-weight:600; cursor:pointer;"><i class="icon-help" style="font-size:14px; color:#c07b12;"></i> {{ hintBtnLabel }}</button>
+            </sc-if>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- FOOTER ACTION (문제 준비됐을 때만 제출 · 대화/스토리는 자동 진행) -->
+  <div style="flex:none; padding:14px 18px 20px; background:linear-gradient(0deg, rgba(0,0,0,0.04), transparent);">
+    <div style="max-width:720px; margin:0 auto;">
+      <sc-if value="{{ answerReady }}" hint-placeholder-val="{{ true }}">
+      <button class="pt-primary" onClick="{{ onSubmit }}" style="{{ submitStyle }}">제출하기</button>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- ENDING -->
+  <sc-if value="{{ isEnding }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; background:{{ endBg }};">
+    <div style="animation:qnPop .5s ease;">{{ endImgEl }}</div>
+    <div style="margin-top:10px; display:inline-flex; align-items:center; gap:6px; padding:6px 15px; border-radius:50px; background:rgba(255,255,255,0.2); color:#fff; font-family:var(--font-small); font-size:12.5px; font-weight:700;">{{ endBadge }}</div>
+    <h1 style="margin:16px 0 0; font-family:var(--font-kr); font-size:38px; font-weight:900; color:#fff; letter-spacing:-1px;">{{ endTitle }}</h1>
+    <p style="margin:14px 0 0; font-family:var(--font-small); font-size:15px; font-weight:300; line-height:1.65; color:rgba(255,255,255,0.9); max-width:440px;">{{ endBody }}</p>
+    <div style="display:flex; gap:12px; margin-top:26px; width:100%; max-width:400px;">
+      <div style="flex:1; padding:16px 0; border-radius:16px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:26px; font-weight:800; color:#fff;">{{ score }}</div><div style="font-family:var(--font-small); font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:3px;">최종 점수</div></div>
+      <div style="flex:1; padding:16px 0; border-radius:16px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:26px; font-weight:800; color:#fff;">{{ elapsed }}</div><div style="font-family:var(--font-small); font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:3px;">소요 시간</div></div>
+    </div>
+    <button class="pt-primary" onClick="{{ onRetry }}" style="width:100%; max-width:400px; margin-top:24px; height:54px; border:none; border-radius:14px; background:#fff; color:var(--main-color); font-family:var(--font-kr); font-size:16px; font-weight:800; cursor:pointer;"><i class="icon-ccw" style="font-size:14px;"></i> 다시 하기</button>
+    <a href="참여자 입장 - 모바일.dc.html" style="display:flex; align-items:center; justify-content:center; width:100%; max-width:400px; margin-top:10px; height:50px; border:1px solid rgba(255,255,255,0.4); border-radius:14px; background:transparent; color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:600;">처음으로</a>
+  </div>
+  </sc-if>
+
+  <!-- deduct confirm -->
+  <sc-if value="{{ askDeduct }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; padding:30px; background:rgba(0,0,0,0.5);" onClick="{{ onCancelHint }}">
+    <div onClick="{{ stop }}" style="width:100%; max-width:360px; background:#fff; border-radius:20px; padding:26px 24px; text-align:center; animation:qnPop .3s ease;">
+      <div style="width:56px; height:56px; margin:0 auto; border-radius:50%; background:#fff7e0; display:flex; align-items:center; justify-content:center; color:#c07b12;"><i class="icon-help" style="font-size:24px;"></i></div>
+      <h3 style="margin:14px 0 0; font-family:var(--font-kr); font-size:18px; font-weight:800; color:var(--fg);">힌트를 볼까요?</h3>
+      <p style="margin:8px 0 0; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub);">힌트를 열면 <b style="color:var(--main-color);">{{ deductAmt }}점</b>이 차감됩니다.</p>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button onClick="{{ onCancelHint }}" style="flex:1; height:48px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:600; cursor:pointer;">취소</button>
+        <button class="pt-primary" onClick="{{ onConfirmHint }}" style="flex:1; height:48px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:700; cursor:pointer;">보기 (−{{ deductAmt }})</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820}}">
+const START_SCORE = 1000;
+const SPK = {
+  host:{ name:'호스트', icon:'icon-megaphone', color:'#ff6800', bg:'#fff2e8', avatarBg:'linear-gradient(135deg,#ff8533,#ff6800)' },
+  narrator:{ name:'내레이터', icon:'icon-mission', color:'#6b5bd2', bg:'#f1eefb', avatarBg:'linear-gradient(135deg,#8b7be8,#6b5bd2)' },
+  char:{ name:'캐릭터', icon:'icon-user', color:'#1e9e7a', bg:'#e8f7f1', avatarBg:'linear-gradient(135deg,#3fc79a,#1e9e7a)' },
+};
+function buildScenario(){
+  return {
+    title:'사라진 실험실의 비밀', hintPolicy:'deduct', hintCount:2, startId:'p1', total:5,
+    pages:{
+      p1:{ id:'p1', step:1, type:'normal', lock:'mc',
+        msgs:[{speaker:'host',type:'text',text:'낡은 철문 앞에 도착했어.'},{speaker:'narrator',type:'text',text:'문에는 암호 자물쇠가 달려 있어.'}],
+        q:'물질이 기체로 변하는 현상은 무엇일까?',
+        choices:[{t:'얼음이 어는 것',c:false},{t:'물이 수증기가 되는 것',c:true},{t:'수증기가 물이 되는 것',c:false},{t:'물이 어는 것',c:false}],
+        correctExit:'p2', wrongExit:null, hint:'액체가 기체로 변하는 현상을 떠올려 봐.', hintDeduct:50 },
+      p2:{ id:'p2', step:2, type:'normal', lock:'ox',
+        msgs:[{speaker:'host',type:'text',text:'문이 열리자 온도계가 놓인 방이 나왔어.'},{speaker:'narrator',type:'text',text:'벽에 이런 문장이 적혀 있어.'}],
+        q:'“얼음이 녹는 동안 온도는 계속 올라간다.” 맞을까?',
+        oxAnswer:'X', correctExit:'p3', wrongExit:'p8', hint:'상태가 변하는 동안의 온도를 생각해 봐.', hintDeduct:50 },
+      p3:{ id:'p3', step:3, type:'normal', lock:'short',
+        msgs:[{speaker:'host',type:'text',text:'다음 방에는 빈 칸이 있는 팻말이 있어.'},{speaker:'narrator',type:'text',text:'비커의 물이 점점 줄어드는 그림도 함께 있어.'}],
+        q:'이 현상을 부르는 두 글자 단어를 입력해 줘.',
+        answer:'증발', correctExit:'p4', wrongExit:null, hint:'액체가 기체로 변하는 “ㅈㅂ”.', hintDeduct:50 },
+      p4:{ id:'p4', step:4, type:'normal', lock:'order',
+        msgs:[{speaker:'host',type:'text',text:'실험대 위에 카드가 흩어져 있어.'},{speaker:'narrator',type:'text',text:'물을 끓이는 실험 순서를 맞춰야 해.'}],
+        q:'올바른 실험 순서대로 카드를 눌러 줘.',
+        orderItems:['비커에 물을 넣는다','알코올램프에 불을 붙인다','물이 끓기 시작한다','수증기가 피어오른다'],
+        orderAnswer:[0,1,2,3], correctExit:'p5', wrongExit:null, hint:'물을 담는 것이 가장 먼저야.', hintDeduct:50 },
+      p5:{ id:'p5', step:5, type:'normal', lock:'hotspot',
+        msgs:[{speaker:'host',type:'text',text:'마지막 방이야! 실험 도구가 잔뜩 놓인 실험대야.'},{speaker:'narrator',type:'text',text:'지금 막 반응이 일어나고 있는 지점을 찾아야 문이 열려.'}],
+        q:'사진 속에서 "보라색 용액이 떨어지고 있는 곳"을 찾아 눌러 줘.',
+        img:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=900&q=80',
+        hotspots:[{x:20,y:66,c:false,label:'빈 시험관'},{x:46,y:47,c:true,label:'용액 떨어지는 곳'},{x:76,y:64,c:false,label:'빈 시험관'}],
+        correctExit:'p6', wrongExit:null, hint:'보라색 액체가 흘러내리는 가운데 지점을 잘 봐.', hintDeduct:50 },
+      p6:{ id:'p6', type:'story',
+        msgs:[{speaker:'host',type:'text',text:'정답이야! 벽이 스르륵 열렸어.'},{speaker:'narrator',type:'text',text:'어두운 통로를 따라 조심스럽게 걸어가.'},{speaker:'char',type:'text',text:'저 끝에 밝은 빛이 보여!'}],
+        correctExit:'p7' },
+      p7:{ id:'p7', type:'ending', endingType:'success', title:'탈출 성공!', body:'마지막 문을 열고 실험실을 무사히 빠져나왔어. 모든 미션을 해결했어!' },
+      p8:{ id:'p8', type:'ending', endingType:'fail', title:'탈출 실패', body:'온도 판단을 잘못해 경보가 울리고 문이 잠겨버렸어. 다시 도전해 보자.' },
+    },
+  };
+}
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.sc = (function(){
+      try { var u = new URLSearchParams(location.search); var id = u.get('id');
+        if (id && window.RoomStore) return window.RoomStore.toPlay(id);
+        if (window.RoomStore) return window.RoomStore.toPlay('r1');
+      } catch(e){}
+      return buildScenario();
+    })();
+    let startId = this.sc.startId, deep = false, hintMode = '';
+    try { const u = new URLSearchParams(location.search); const q = u.get('p'); if (q && this.sc.pages[q]) { startId = q; deep = true; } hintMode = u.get('hint') || ''; this._noAutoReveal = u.get('reveal') === '0'; } catch(e){}
+    this.state = this.freshState(startId);
+    this.state.startedAt = Date.now();
+    const sp = this.sc.pages[startId];
+    if (sp && sp.type === 'ending') { this.state.endedAt = Date.now() + 15000; }
+    if (deep && sp && sp.type === 'normal') { if (!this._noAutoReveal) this.state.revealed = this.lineCount(sp); if (hintMode === '1') this.state.hintRevealed = true; else if (hintMode === 'ask') this.state.askDeduct = true; }
+  }
+  freshState(id){ return { curId:id, revealed:1, score:START_SCORE, hintLeft:this.sc?this.sc.hintCount:2, hintRevealed:false, askDeduct:false, sel:null, shortText:'', order:[], shake:false, feedback:null, locked:false, endedAt:0 }; }
+  componentDidMount(){ this.scheduleReveal(); }
+  componentWillUnmount(){ [this._t1,this._t2,this._tr,this._tg].forEach(t=>t&&clearTimeout(t)); }
+  // 말풍선/질문을 타이머로 하나씩 자동 등장, story는 다 나오면 자동으로 다음 페이지.
+  // (componentDidUpdate 에 의존하지 않고 타이머가 스스로 다음 단계를 예약)
+  scheduleReveal(){
+    if (this._tr) clearTimeout(this._tr);
+    const p = this.cur(); if (!p || p.type === 'ending') return;
+    const total = this.lineCount(p);
+    const startId = this.state.curId;
+    if (this.state.revealed < total) {
+      this._tr = setTimeout(()=>{
+        if (this.state.curId !== startId) return; // 페이지가 바뀌었으면 중단
+        this.setState(s=>({ revealed: Math.min(total, s.revealed+1) }));
+        this.scheduleReveal(); // 다음 줄 예약
+      }, 900);
+      return;
+    }
+    if (p.type === 'story') { this._tr = setTimeout(()=>{ if (this.state.curId===startId) this.goTo(p.correctExit); }, 1100); }
+  }
+  cur(){ return this.sc.pages[this.state.curId]; }
+  msgList(p){ if (p.msgs) return p.msgs.filter(m=>m.type!=='delay'); return (p.lines||[]).map((t,i)=>({ speaker:(i%2?'narrator':'host'), type:'text', text:t })); }
+  lineCount(p){ return this.msgList(p).length + (p.q?1:0); }
+  goTo(id){ const p=this.sc.pages[id]; if(!p) return; if(p.type==='ending'){ this.setState({curId:id, endedAt:Date.now(), askDeduct:false, revealed:1, feedback:null, locked:false}); return; } this.setState({ ...this.stateReset(), curId:id }); this._tg=setTimeout(()=>this.scheduleReveal(),0); }
+  stateReset(){ return { revealed:1, hintRevealed:false, askDeduct:false, sel:null, shortText:'', order:[], shake:false, feedback:null, locked:false }; }
+  judge(){ const p=this.cur(); const S=this.state;
+    if(p.lock==='mc') return S.sel!=null && p.choices[S.sel] && p.choices[S.sel].c;
+    if(p.lock==='ox') return S.sel===p.oxAnswer;
+    if(p.lock==='short') return (S.shortText||'').trim().toLowerCase()===(p.answer||'').trim().toLowerCase();
+    if(p.lock==='order') return S.order.length===p.orderAnswer.length && S.order.every((v,i)=>v===p.orderAnswer[i]);
+    if(p.lock==='hotspot') return typeof S.sel==='number' && p.hotspots[S.sel] && p.hotspots[S.sel].c;
+    return false; }
+  canSubmit(){ const p=this.cur(); const S=this.state;
+    if(p.lock==='short') return (S.shortText||'').trim().length>0;
+    if(p.lock==='order') return S.order.length===p.orderItems.length;
+    return S.sel!=null; }
+  onSubmit=()=>{ const p=this.cur();
+    if(p.type==='story'){ this._t1=setTimeout(()=>this.goTo(p.correctExit),200); return; }
+    if(this.state.locked||!this.canSubmit()) return;
+    if(this.judge()){ this.setState({feedback:'correct', locked:true}); this._t1=setTimeout(()=>this.goTo(p.correctExit),820); }
+    else if(p.wrongExit){ this.setState({feedback:'wrong', locked:true, shake:true}); this._t1=setTimeout(()=>this.setState({shake:false}),500); this._t2=setTimeout(()=>this.goTo(p.wrongExit),980); }
+    else { this.setState({feedback:'wrong', shake:true}); this._t1=setTimeout(()=>this.setState({shake:false, feedback:null, sel:(p.lock==='hotspot'||p.lock==='mc'||p.lock==='ox')?null:this.state.sel}),650); } };
+  tapOrder=(i)=>{ if(this.state.locked) return; const cur=this.state.order.slice(); const at=cur.indexOf(i); if(at>=0){ cur.splice(at,1); } else { cur.push(i); } this.setState({order:cur}); };
+  onHint=()=>{ const policy=this.sc.hintPolicy; if(policy==='free'){ this.setState({hintRevealed:true}); } else if(policy==='count'){ if(this.state.hintLeft>0) this.setState({hintRevealed:true, hintLeft:this.state.hintLeft-1}); } else { this.setState({askDeduct:true}); } };
+  onConfirmHint=()=>{ const p=this.cur(); this.setState(s=>({askDeduct:false, hintRevealed:true, score:Math.max(0,s.score-(p.hintDeduct||0))})); };
+  onCancelHint=()=>this.setState({askDeduct:false});
+  onRetry=()=>{ this.setState({ ...this.freshState(this.sc.startId), startedAt:Date.now() }); };
+  renderVals(){
+    const S=this.state, sc=this.sc, p=this.cur();
+    const isEnding=p.type==='ending', isStory=p.type==='story', isPlay=!isEnding;
+    const msgs=this.msgList(p); const totalLines=this.lineCount(p);
+    const shown = msgs.slice(0, Math.min(S.revealed, msgs.length));
+    const qShown = p.q && S.revealed>=totalLines;
+    const bubbles=[]; let prevSpeaker=null;
+    shown.forEach((m)=>{
+      const isNarr = m.speaker==='narrator';
+      const isChar = m.speaker==='char';
+      const isBubble = !isNarr;
+      const sameAsPrev = prevSpeaker===m.speaker; prevSpeaker=m.speaker;
+      const showAvatar = isBubble && !isChar && !sameAsPrev;
+      const sp = SPK[m.speaker] || SPK.host;
+      let rowStyle='', wrapStyle='', bubbleStyle='';
+      if (isNarr) {
+        bubbleStyle = 'text-align:center; font-family:var(--font-small); font-size:14px; font-weight:300; font-style:italic; line-height:1.6; color:var(--fg-mute); white-space:pre-wrap; word-break:break-word;';
+      } else if (isChar) {
+        rowStyle = 'display:flex; flex-direction:row-reverse; align-items:flex-start; gap:14px;';
+        wrapStyle = 'max-width:70%;';
+        bubbleStyle = `background:#e8f7f1; border:1px solid #bfe6d6; border-radius:16px ${showAvatar?'4px':'16px'} 16px 16px; padding:14px 18px; font-family:var(--font-small); font-size:15.5px; font-weight:300; line-height:1.65; color:#155e47; box-shadow:0 4px 14px -8px rgba(0,0,0,0.14); white-space:pre-wrap; word-break:break-word; text-align:left;`;
+      } else {
+        rowStyle = 'display:flex; align-items:flex-start; gap:14px;';
+        wrapStyle = `max-width:70%; ${showAvatar?'':'margin-left:66px;'}`;
+        bubbleStyle = `background:#fff; border:1px solid var(--border-2); border-radius:${showAvatar?'4px':'16px'} 16px 16px 16px; padding:14px 18px; font-family:var(--font-small); font-size:15.5px; font-weight:300; line-height:1.65; color:var(--fg); box-shadow:0 4px 14px -8px rgba(0,0,0,0.14); white-space:pre-wrap; word-break:break-word;`;
+      }
+      bubbles.push({ text:m.text||'…', isNarr, isBubble, isChar, showAvatar,
+        avatarIcon:sp.icon,
+        avatarStyle:`flex:none; width:52px; height:52px; border-radius:50%; background:${sp.avatarBg}; display:flex; align-items:center; justify-content:center; color:#fff;`,
+        rowStyle, wrapStyle, bubbleStyle });
+    });
+    if(qShown){ bubbles.push({ text:p.q, isNarr:false, isBubble:true, isChar:false, showAvatar:false,
+      avatarIcon:'', avatarStyle:'display:none;',
+      rowStyle:'display:block;', wrapStyle:'width:100%;',
+      bubbleStyle:'width:100%; box-sizing:border-box; text-align:center; background:var(--bg-light-color); border:1.5px solid var(--main-color); border-radius:16px; padding:15px 18px; font-family:var(--font-kr); font-size:16px; font-weight:700; line-height:1.55; color:var(--theme-deep);' }); }
+    const answerReady = isPlay && !isStory && qShown;
+
+    const isMc=answerReady&&p.lock==='mc', isOx=answerReady&&p.lock==='ox', isShort=answerReady&&p.lock==='short', isOrder=answerReady&&p.lock==='order', isHotspot=answerReady&&p.lock==='hotspot';
+
+    const choices=isMc?p.choices.map((c,i)=>{ const on=S.sel===i; return { num:i+1, text:c.t, style:`display:flex; align-items:center; gap:11px; width:100%; box-sizing:border-box; padding:15px 16px; border:1.5px solid ${on?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${on?'var(--bg-light-color)':'#fff'}; font-family:var(--font-kr); font-size:15.5px; font-weight:600; color:var(--fg); cursor:pointer; transition:all .12s;`, numStyle:`display:flex; align-items:center; justify-content:center; width:27px; height:27px; flex:none; border-radius:8px; background:${on?'var(--main-color)':'var(--bg-warm-2)'}; color:${on?'#fff':'var(--fg-sub)'}; font-family:var(--font-en); font-size:13px; font-weight:800;`, onPick:()=>{ if(!S.locked) this.setState({sel:i}); } }; }):[];
+    const oxOpts=isOx?[{k:'O',sym:'O',sub:'맞다',accent:'#1e9e5a',accentBg:'#e6f7ee'},{k:'X',sym:'X',sub:'틀리다',accent:'#c0392b',accentBg:'#fdeaea'}].map(o=>{ const on=S.sel===o.k; return { label:o.sym, sub:o.sub, style:`flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; height:130px; border:2px solid ${on?o.accent:'var(--border)'}; border-radius:18px; background:${on?o.accentBg:'#fff'}; cursor:pointer; transition:all .12s;`, symStyle:`font-family:var(--font-en); font-size:46px; font-weight:800; line-height:1; color:${o.accent}; opacity:${on?1:0.55};`, subStyle:`font-family:var(--font-kr); font-size:14px; font-weight:700; color:${on?o.accent:'var(--fg-mute)'};`, onPick:()=>{ if(!S.locked) this.setState({sel:o.k}); } }; }):[];
+    const orderItems=isOrder?p.orderItems.map((t,i)=>{ const pos=S.order.indexOf(i); const on=pos>=0; return { text:t, badge: on?String(pos+1):'', badgeStyle:`display:flex; align-items:center; justify-content:center; width:27px; height:27px; flex:none; border-radius:8px; background:${on?'var(--main-color)':'var(--bg-warm-2)'}; color:${on?'#fff':'var(--fg-mute)'}; font-family:var(--font-en); font-size:13px; font-weight:800;`, style:`display:flex; align-items:center; gap:11px; width:100%; box-sizing:border-box; padding:15px 16px; border:1.5px solid ${on?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${on?'var(--bg-light-color)':'#fff'}; font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg); cursor:pointer; transition:all .12s;`, onTap:()=>this.tapOrder(i) }; }):[];
+    const hotspots=isHotspot?p.hotspots.map((h,i)=>{ const on=S.sel===i; return { label:h.label, style:`position:absolute; left:${h.x}%; top:${h.y}%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; border:3px solid #fff; background:${on?'var(--main-color)':'rgba(255,104,0,0.8)'}; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:all .12s;`, onPick:()=>{ if(!S.locked) this.setState({sel:i}); } }; }):[];
+    const hotspotImg = isHotspot ? (p.img || 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=900&q=80') : '';
+
+    const showFeedback=!!S.feedback, fbCorrect=S.feedback==='correct';
+    const fbBg=fbCorrect?'#e6f7ee':'#fdeaea', fbColor=fbCorrect?'#1e9e5a':'#c0392b', fbIcon=fbCorrect?'icon-check':'icon-cancel';
+    const fbText=fbCorrect?'정답이에요!':(p.wrongExit?'아쉽지만 오답이에요…':'다시 시도해 보세요');
+
+    const hasHint=answerReady&&!!(p.hint&&p.hint.trim()); const policy=sc.hintPolicy;
+    let hintBtnLabel='힌트 보기'; if(policy==='count') hintBtnLabel=`힌트 보기 (${S.hintLeft}회 남음)`; else if(policy==='deduct') hintBtnLabel=`힌트 보기 (−${p.hintDeduct||0}점)`;
+    const hintDisabledCount=policy==='count'&&S.hintLeft<=0&&!S.hintRevealed;
+
+    const canSub=this.canSubmit()&&!S.locked;
+    const submitStyle=`width:100%; height:56px; border:none; border-radius:14px; background:${canSub?'var(--main-color)':'var(--bg-warm-2)'}; color:${canSub?'#fff':'var(--fg-mute)'}; font-family:var(--font-kr); font-size:17px; font-weight:700; cursor:${canSub?'pointer':'not-allowed'}; transition:all .15s;`;
+
+    const endSuccess=p.endingType==='success';
+    const endBg=endSuccess?'radial-gradient(120% 90% at 50% 0%, #1f9e5a 0%, #0f7a45 60%, #0b5a33 100%)':'radial-gradient(120% 90% at 50% 0%, #b5372f 0%, #8a2822 60%, #641c18 100%)';
+    const endImg=endSuccess?'../uploads/character01/play_team_ob.png':'../uploads/character01/quiz_nodata_ob.png';
+    const endImgEl=React.createElement('img',{src:endImg, alt:'결과', style:{width:'200px', filter:'drop-shadow(0 16px 22px rgba(0,0,0,0.35))', animation:'qnFloat 5s ease-in-out infinite'}});
+    const ms=(S.endedAt||Date.now())-(S.startedAt||Date.now()); const sec=Math.max(0,Math.floor(ms/1000));
+    const elapsed=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    const stepNum=p.step||1; const progressPct=(isEnding||isStory)?100:Math.round(((stepNum-1)/sc.total)*100);
+
+    return {
+      scenarioTitle:sc.title, stepLabel: isEnding?'완료':(isStory?'이야기':`미션 ${stepNum} / ${sc.total}`), score:S.score, progressPct,
+      isPlay, isStory, isEnding,
+      bubbles, answerReady,
+      shakeStyle:S.shake?'animation:qnShake .4s ease;':'',
+      isMc, isOx, isShort, isOrder, isHotspot,
+      choices, oxOpts, orderItems, hotspots, hotspotImg,
+      shortText:S.shortText, onShort:(e)=>this.setState({shortText:e.target.value}),
+      onOrderReset:()=>this.setState({order:[]}),
+      showFeedback, fbBg, fbColor, fbIcon, fbText,
+      hasHint, hintRevealed:S.hintRevealed, hintHidden:!S.hintRevealed, hintText:p.hint, hintBtnLabel,
+      onHint:()=>{ if(!hintDisabledCount) this.onHint(); },
+      onSubmit:this.onSubmit, submitStyle,
+      endBg, endImgEl, endTitle:p.title, endBody:p.body, endBadge:endSuccess?'탈출 성공':'탈출 실패', elapsed,
+      onRetry:this.onRetry,
+      askDeduct:S.askDeduct, deductAmt:p.hintDeduct||0, onConfirmHint:this.onConfirmHint, onCancelHint:this.onCancelHint, stop:(e)=>e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>

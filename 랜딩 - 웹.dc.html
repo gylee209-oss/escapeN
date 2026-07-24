@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes qnFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-12px); } }
+    @keyframes qnFloatS { 0%,100%{ transform: translateY(0) rotate(-3deg); } 50%{ transform: translateY(-9px) rotate(-3deg); } }
+    @keyframes qnDrift { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(16px); } }
+    .qn-cta:hover { background: var(--btn-hover-color) !important; transform: translateY(-3px); box-shadow: 0 16px 30px -12px var(--main-color) !important; }
+    .qn-ghost:hover { border-color: var(--main-color) !important; color: var(--main-color) !important; transform: translateY(-3px); }
+    .qn-nav:hover { color: var(--main-color) !important; }
+    .qn-fcard:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -22px rgba(0,0,0,0.22) !important; }
+    .qn-flink:hover { color: #fff !important; }
+    .qn-opt:hover { border-color: var(--main-color) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="랜딩 · 웹" style="background:#fff; font-family:var(--font-kr);">
+  <div style="max-width:1440px; margin:0 auto;">
+
+    <!-- ===== NAV ===== -->
+    <header style="position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between; padding:20px 56px; background:rgba(255,255,255,0.9); border-bottom:1px solid var(--border-2); backdrop-filter:blur(6px);">
+      <div style="display:flex; align-items:center; gap:44px;">
+        <div style="font-family:var(--font-kr); font-size:24px; font-weight:900; letter-spacing:-1px; color:var(--fg);">방탈출<span style="color:var(--main-color);">N</span></div>
+        <nav style="display:flex; gap:32px;">
+          <a class="qn-nav" href="#" style="color:var(--fg-sub); font-size:15px; font-weight:600;">기능</a>
+          <a class="qn-nav" href="#" style="color:var(--fg-sub); font-size:15px; font-weight:600;">이용 방법</a>
+          <a class="qn-nav" href="#" style="color:var(--fg-sub); font-size:15px; font-weight:600;">요금</a>
+          <a class="qn-nav" href="#" style="color:var(--fg-sub); font-size:15px; font-weight:600;">고객 사례</a>
+        </nav>
+      </div>
+      <div style="display:flex; align-items:center; gap:20px;">
+        <a class="qn-nav" href="로그인 - 웹.dc.html" style="color:var(--fg-sub); font-size:15px; font-weight:600;">로그인</a>
+        <a class="qn-cta" href="회원가입 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:44px; padding:0 22px; border-radius:50px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:15px; font-weight:700; transition:all .2s ease;">무료로 시작하기 <i class="icon-right-open" style="font-size:12px;"></i></a>
+      </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section style="position:relative; overflow:hidden; padding:76px 56px 90px; background:radial-gradient(120% 90% at 82% 8%, #fff2e8 0%, #fff9f4 42%, #ffffff 72%);">
+      <div style="position:absolute; width:320px; height:320px; border-radius:50%; background:rgba(255,104,0,0.06); top:-90px; right:220px; animation:qnDrift 12s ease-in-out infinite;"></div>
+      <div style="position:absolute; top:150px; left:640px; color:rgba(255,104,0,0.35); font-size:22px;">✦</div>
+      <div style="position:absolute; top:340px; left:44px; color:rgba(172,142,248,0.5); font-size:16px;">✦</div>
+
+      <div style="position:relative; display:flex; align-items:center; gap:36px;">
+        <div style="flex:1; max-width:560px;">
+          <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 15px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-size:13px; font-weight:700;"><i class="icon-quiz" style="font-size:14px;"></i> 선생님을 위한 방탈출 학습 플랫폼</div>
+          <h1 style="margin:22px 0 0; font-family:var(--font-kr); font-size:56px; font-weight:900; line-height:1.18; letter-spacing:-2px; color:var(--fg);">수업이 놀이가 되는<br>순간, <span style="color:var(--main-color);">방탈출N</span></h1>
+          <p style="margin:22px 0 0; font-family:var(--font-small); font-size:18px; font-weight:300; line-height:1.72; color:var(--fg-sub);">문제와 이야기를 엮어 나만의 방탈출을 만들고,<br>학생들이 미션을 풀며 몰입하는 수업을 시작하세요.<br>복잡한 준비 없이, 드래그 몇 번이면 완성됩니다.</p>
+          <div style="display:flex; align-items:center; gap:14px; margin-top:34px;">
+            <a class="qn-cta" href="회원가입 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:56px; padding:0 32px; border-radius:50px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17px; font-weight:700; transition:all .2s ease; box-shadow:0 12px 26px -12px var(--main-color);">무료로 시작하기 <i class="icon-right-open" style="font-size:13px;"></i></a>
+            <a class="qn-ghost" href="#" style="display:inline-flex; align-items:center; gap:9px; height:56px; padding:0 28px; border-radius:50px; background:#fff; color:var(--fg); border:1.5px solid var(--border); font-family:var(--font-kr); font-size:17px; font-weight:700; transition:all .2s ease;"><i class="icon-play" style="font-size:13px; color:var(--main-color);"></i> 데모 둘러보기</a>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:26px;">
+            <div style="display:flex;">
+              <img src="uploads/character01/profile_Kay.png" style="width:34px; height:34px; border-radius:50%; border:2px solid #fff; object-fit:cover;">
+              <img src="uploads/character01/profile_Kongkong.png" style="width:34px; height:34px; border-radius:50%; border:2px solid #fff; object-fit:cover; margin-left:-10px;">
+              <img src="uploads/character01/profile_Zizi.png" style="width:34px; height:34px; border-radius:50%; border:2px solid #fff; object-fit:cover; margin-left:-10px;">
+              <img src="uploads/character01/profile_Frankie.png" style="width:34px; height:34px; border-radius:50%; border:2px solid #fff; object-fit:cover; margin-left:-10px;">
+            </div>
+            <span style="font-family:var(--font-small); font-size:13.5px; color:var(--fg-sub);">이미 <b style="color:var(--fg);">1,200+ 학교</b>의 선생님이 함께하고 있어요</span>
+          </div>
+        </div>
+
+        <div style="position:relative; flex:none; width:640px; height:520px;">
+          <img src="uploads/character01/play_loading_bg.png" alt="방탈출N 캐릭터 버스" style="position:absolute; bottom:-18px; left:-30px; width:400px; filter:drop-shadow(0 18px 24px rgba(180,60,0,0.25)); animation:qnFloat 7s ease-in-out infinite; z-index:1;">
+
+          <div style="position:absolute; top:8px; right:12px; width:340px; background:#fff; border-radius:28px; box-shadow:0 30px 60px -24px rgba(0,0,0,0.28); overflow:hidden; transform:rotate(-3deg); animation:qnFloatS 6.5s ease-in-out infinite; z-index:3;">
+            <div style="background:linear-gradient(120deg,#ff8a3d,#ff6800); padding:16px 18px; display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:8px; color:#fff;">
+                <i class="icon-mission" style="font-size:15px;"></i>
+                <span style="font-family:var(--font-kr); font-size:14px; font-weight:700;">사라진 실험실의 비밀</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.22); padding:4px 10px; border-radius:50px; color:#fff;"><i class="icon-time" style="font-size:11px;"></i><span style="font-family:var(--font-en); font-size:12px; font-weight:700;">02:14</span></div>
+            </div>
+            <div style="padding:14px 18px 0;">
+              <div style="display:flex; justify-content:space-between; font-family:var(--font-small); font-size:11px; color:var(--fg-mute); margin-bottom:6px;"><span>미션 3 / 5</span><span>320점</span></div>
+              <div style="height:7px; border-radius:50px; background:var(--bg-warm-2); overflow:hidden;"><div style="width:60%; height:100%; border-radius:50px; background:linear-gradient(90deg,#ffc91b,#ff6800);"></div></div>
+            </div>
+            <div style="padding:16px 18px 20px;">
+              <div style="display:flex; gap:10px; align-items:flex-start;">
+                <img src="uploads/character01/my.png" style="width:46px; height:46px; flex:none;">
+                <div style="background:var(--bg-warm); border-radius:4px 16px 16px 16px; padding:11px 13px; font-family:var(--font-kr); font-size:13.5px; font-weight:600; line-height:1.5; color:var(--fg);">암호를 풀려면 먼저 정답을 골라야 해!</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:14px;">
+                <div class="qn-opt" style="padding:12px; border:1.5px solid var(--border); border-radius:12px; font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">1. 광합성</div>
+                <div style="padding:12px; border:1.5px solid var(--main-color); border-radius:12px; background:var(--bg-light-color); font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--theme-deep); display:flex; align-items:center; justify-content:space-between;">2. 증발 <i class="icon-check" style="font-size:12px;"></i></div>
+                <div class="qn-opt" style="padding:12px; border:1.5px solid var(--border); border-radius:12px; font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">3. 응결</div>
+                <div class="qn-opt" style="padding:12px; border:1.5px solid var(--border); border-radius:12px; font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">4. 확산</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:absolute; top:64px; right:-6px; z-index:4; background:#fff; border-radius:16px; padding:10px 14px; box-shadow:0 14px 30px -14px rgba(0,0,0,0.28); display:flex; align-items:center; gap:9px; transform:rotate(4deg);">
+            <div style="width:34px; height:34px; border-radius:50%; background:var(--c-mint); display:flex; align-items:center; justify-content:center; color:#fff;"><i class="icon-group1" style="font-size:15px;"></i></div>
+            <div><div style="font-family:var(--font-en); font-size:15px; font-weight:800; color:var(--fg); line-height:1;">28</div><div style="font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute);">실시간 참여</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS ===== -->
+    <section style="padding:40px 56px;">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; background:linear-gradient(120deg,#ff8a3d 0%, #ff6800 60%, #db5800 100%); border-radius:24px; padding:38px 30px; box-shadow:0 24px 50px -26px var(--main-color);">
+        <div style="text-align:center; color:#fff; border-right:1px solid rgba(255,255,255,0.22);">
+          <div style="font-family:var(--font-en); font-size:44px; font-weight:800; line-height:1;">1,200<span style="font-size:26px;">+</span></div>
+          <div style="font-family:var(--font-kr); font-size:14px; font-weight:600; margin-top:8px; color:rgba(255,255,255,0.92);">사용 학교</div>
+        </div>
+        <div style="text-align:center; color:#fff; border-right:1px solid rgba(255,255,255,0.22);">
+          <div style="font-family:var(--font-en); font-size:44px; font-weight:800; line-height:1;">48<span style="font-size:26px;">K+</span></div>
+          <div style="font-family:var(--font-kr); font-size:14px; font-weight:600; margin-top:8px; color:rgba(255,255,255,0.92);">만들어진 방탈출</div>
+        </div>
+        <div style="text-align:center; color:#fff; border-right:1px solid rgba(255,255,255,0.22);">
+          <div style="font-family:var(--font-en); font-size:44px; font-weight:800; line-height:1;">92<span style="font-size:26px;">만+</span></div>
+          <div style="font-family:var(--font-kr); font-size:14px; font-weight:600; margin-top:8px; color:rgba(255,255,255,0.92);">참여한 학생</div>
+        </div>
+        <div style="text-align:center; color:#fff;">
+          <div style="font-family:var(--font-en); font-size:44px; font-weight:800; line-height:1;">4.9<span style="font-size:24px;">/5</span></div>
+          <div style="font-family:var(--font-kr); font-size:14px; font-weight:600; margin-top:8px; color:rgba(255,255,255,0.92);">선생님 만족도</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section style="padding:60px 56px 20px; text-align:center;">
+      <div style="font-family:var(--font-small-en); font-size:12px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--main-color);">FEATURES</div>
+      <h2 style="margin:12px 0 0; font-family:var(--font-kr); font-size:40px; font-weight:900; letter-spacing:-1.5px; color:var(--fg);">방탈출N만의 <span style="color:var(--main-color);">5가지</span></h2>
+      <p style="margin:14px auto 0; max-width:540px; font-family:var(--font-small); font-size:16px; font-weight:300; line-height:1.7; color:var(--fg-sub);">시나리오를 한눈에 짜고, 끊김 없이 검증하고, 몰입감 있게 플레이하고, 결과까지 한 흐름으로.</p>
+    </section>
+
+    <!-- big feature · ① 노드로 시나리오 한눈에 파악 -->
+    <section style="padding:44px 56px;">
+      <div style="display:flex; align-items:center; gap:52px; background:var(--bg-warm); border-radius:28px; padding:48px; overflow:hidden;">
+        <div style="flex:1;">
+          <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:50px; background:#fff; color:var(--main-color); font-size:12.5px; font-weight:700;"><i class="icon-share" style="font-size:13px;"></i> 노드 에디터</div>
+          <h3 style="margin:18px 0 0; font-family:var(--font-kr); font-size:30px; font-weight:900; letter-spacing:-1px; line-height:1.3; color:var(--fg);">노드 형식으로<br>시나리오를 한눈에</h3>
+          <p style="margin:16px 0 0; font-family:var(--font-small); font-size:15.5px; font-weight:300; line-height:1.75; color:var(--fg-sub);">페이지를 노드로 잇고, 정답·오답에 따라 갈라지는 흐름을 한 화면에서 봅니다. 복잡한 분기도 지도처럼 펼쳐 놓고 드래그로 자유롭게 구성하세요.</p>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:24px;">
+            <div style="display:flex; align-items:center; gap:11px; font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg);"><span style="width:24px; height:24px; border-radius:50%; background:var(--main-color); color:#fff; display:inline-flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:11px;"></i></span> 드래그로 페이지를 잇는 노드 맵</div>
+            <div style="display:flex; align-items:center; gap:11px; font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg);"><span style="width:24px; height:24px; border-radius:50%; background:var(--main-color); color:#fff; display:inline-flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:11px;"></i></span> 정답·오답 분기를 화살표로 한눈에</div>
+            <div style="display:flex; align-items:center; gap:11px; font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg);"><span style="width:24px; height:24px; border-radius:50%; background:var(--main-color); color:#fff; display:inline-flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:11px;"></i></span> 전체 시나리오를 지도처럼 조망</div>
+          </div>
+        </div>
+        <div style="flex:none; width:420px; position:relative;">
+          <div style="background:#fff; border-radius:20px; box-shadow:0 24px 48px -22px rgba(0,0,0,0.22); overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:6px; padding:12px 16px; border-bottom:1px solid var(--border-2);">
+              <span style="width:11px; height:11px; border-radius:50%; background:#ff5f57;"></span>
+              <span style="width:11px; height:11px; border-radius:50%; background:#febc2e;"></span>
+              <span style="width:11px; height:11px; border-radius:50%; background:#28c840;"></span>
+              <span style="margin-left:10px; font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">방탈출 편집기</span>
+            </div>
+            <div style="display:flex; height:236px;">
+              <div style="flex:1; position:relative; background:#f4f3ef; background-image:radial-gradient(rgba(0,0,0,0.05) 1.3px, transparent 1.3px); background-size:16px 16px; overflow:hidden;">
+                <svg width="100%" height="100%" style="position:absolute; inset:0; pointer-events:none;">
+                  <defs>
+                    <marker id="lm-g" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#1faf6a"></path></marker>
+                    <marker id="lm-x" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#9a9a9a"></path></marker>
+                  </defs>
+                  <!-- 1 → 2 : 세로 직선 (정답 흐름) -->
+                  <path d="M150 52 L150 78" fill="none" stroke="#1faf6a" stroke-width="2" marker-end="url(#lm-g)"></path>
+                  <!-- 2 → 3(성공) : 왼쪽으로 갈라지는 정답 곡선 -->
+                  <path d="M150 122 C150 142, 84 138, 84 156" fill="none" stroke="#1faf6a" stroke-width="2" marker-end="url(#lm-g)"></path>
+                  <!-- 2 → 4(실패) : 오른쪽으로 갈라지는 오답 점선 -->
+                  <path d="M150 122 C150 142, 226 138, 226 156" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#lm-x)"></path>
+                </svg>
+                <!-- 1. 시작 (상단 중앙) -->
+                <div style="position:absolute; left:102px; top:12px; width:96px; background:#fff; border:1.5px solid var(--main-color); border-radius:11px; box-shadow:0 5px 12px -5px rgba(255,104,0,0.4);">
+                  <div style="display:flex; align-items:center; gap:5px; padding:6px 7px 3px;">
+                    <span style="display:flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:5px; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:9px; font-weight:800;">1</span>
+                    <span style="padding:1px 6px; border-radius:50px; background:#fff0e5; color:#c85400; font-family:var(--font-small); font-size:8.5px; font-weight:700;">시작</span>
+                  </div>
+                  <div style="padding:0 8px 7px; font-family:var(--font-kr); font-size:10.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">실험실 입구</div>
+                </div>
+                <!-- 2. 문제 (중앙) -->
+                <div style="position:absolute; left:102px; top:84px; width:96px; background:#fff; border:1.5px solid #4a92d6; border-radius:11px; box-shadow:0 5px 12px -6px rgba(74,146,214,0.35);">
+                  <div style="display:flex; align-items:center; gap:5px; padding:6px 7px 3px;">
+                    <span style="display:flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:5px; background:#4a92d6; color:#fff; font-family:var(--font-en); font-size:9px; font-weight:800;">2</span>
+                    <span style="padding:1px 6px; border-radius:50px; background:#eaf5ff; color:#1e6ba8; font-family:var(--font-small); font-size:8.5px; font-weight:700;">문제</span>
+                  </div>
+                  <div style="padding:0 8px 7px; font-family:var(--font-kr); font-size:10.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">증발의 원리</div>
+                </div>
+                <!-- 3. 성공 엔딩 (좌하) -->
+                <div style="position:absolute; left:36px; top:158px; width:96px; background:#fff; border:1.5px solid var(--border); border-radius:11px; box-shadow:0 5px 12px -6px rgba(0,0,0,0.2);">
+                  <div style="display:flex; align-items:center; gap:5px; padding:6px 7px 3px;">
+                    <span style="display:flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:5px; background:#12b57e; color:#fff; font-family:var(--font-en); font-size:9px; font-weight:800;">3</span>
+                    <span style="padding:1px 6px; border-radius:50px; background:#e5fbf3; color:#0a8560; font-family:var(--font-small); font-size:8.5px; font-weight:700;">엔딩 · 성공</span>
+                  </div>
+                  <div style="padding:0 8px 7px; font-family:var(--font-kr); font-size:10.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">탈출 성공</div>
+                </div>
+                <!-- 4. 실패 엔딩 (우하) -->
+                <div style="position:absolute; left:178px; top:158px; width:96px; background:#fff; border:1.5px solid var(--border); border-radius:11px; box-shadow:0 5px 12px -6px rgba(0,0,0,0.2);">
+                  <div style="display:flex; align-items:center; gap:5px; padding:6px 7px 3px;">
+                    <span style="display:flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:5px; background:#d9534f; color:#fff; font-family:var(--font-en); font-size:9px; font-weight:800;">4</span>
+                    <span style="padding:1px 6px; border-radius:50px; background:#fdeaea; color:#c0392b; font-family:var(--font-small); font-size:8.5px; font-weight:700;">엔딩 · 실패</span>
+                  </div>
+                  <div style="padding:0 8px 7px; font-family:var(--font-kr); font-size:10.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">탈출 실패</div>
+                </div>
+                <div style="position:absolute; left:12px; bottom:9px; display:flex; gap:10px;">
+                  <span style="display:flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:8.5px; color:var(--fg-sub);"><span style="width:12px; height:2px; background:#1faf6a; display:inline-block;"></span>정답</span>
+                  <span style="display:flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:8.5px; color:var(--fg-sub);"><span style="width:12px; border-top:2px dashed #9a9a9a; display:inline-block;"></span>오답</span>
+                </div>
+              </div>
+              <div style="width:106px; flex:none; border-left:1px solid var(--border-2); padding:12px 11px; background:#fff;">
+                <div style="font-family:var(--font-kr); font-size:10px; font-weight:700; color:var(--fg-sub);">페이지 편집</div>
+                <div style="height:24px; margin-top:8px; border-radius:6px; background:#fafafa; border:1px solid var(--border-2);"></div>
+                <div style="display:flex; gap:4px; margin-top:8px;">
+                  <div style="flex:1; height:20px; border-radius:6px; background:var(--bg-light-color); border:1px solid var(--main-color);"></div>
+                  <div style="flex:1; height:20px; border-radius:6px; background:#fafafa; border:1px solid var(--border-2);"></div>
+                </div>
+                <div style="font-family:var(--font-small); font-size:8.5px; color:var(--fg-mute); margin-top:10px;">자물쇠</div>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:5px;">
+                  <div style="height:20px; border-radius:6px; background:var(--bg-light-color); border:1px solid var(--main-color); display:flex; align-items:center; justify-content:center; color:var(--main-color);"><i class="icon-quiz-01" style="font-size:10px;"></i></div>
+                  <div style="height:20px; border-radius:6px; background:#fafafa; border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; color:var(--fg-mute);"><i class="icon-pen" style="font-size:10px;"></i></div>
+                  <div style="height:20px; border-radius:6px; background:#fafafa; border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; color:var(--fg-mute);"><i class="icon-help" style="font-size:10px;"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <img src="uploads/character01/plan_pick.png" style="position:absolute; bottom:-26px; right:-14px; width:120px; filter:drop-shadow(0 10px 14px rgba(0,0,0,0.15)); animation:qnFloat 6s ease-in-out infinite;">
+        </div>
+      </div>
+    </section>
+
+    <!-- feature grid · ②③④⑤ -->
+    <section style="padding:24px 56px 20px;">
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:22px;">
+
+        <!-- ② 검증으로 시나리오 끊김 없음 -->
+        <div class="qn-fcard" style="background:#fff; border:1px solid var(--border-2); border-radius:24px; padding:30px 28px; transition:all .25s ease;">
+          <div style="height:150px; border-radius:18px; background:linear-gradient(160deg,#e5fbf3,#c6f0dc); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+            <div style="width:210px; background:#fff; border-radius:12px; box-shadow:0 10px 24px -14px rgba(0,0,0,0.2); padding:13px;">
+              <div style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:12px; font-weight:800; color:#0a8560;"><i class="icon-check" style="font-size:13px;"></i> 흐름 검증 · 이상 없음</div>
+              <div style="display:flex; align-items:center; gap:7px; margin-top:11px;"><span style="width:18px; height:18px; border-radius:50%; background:#e6f7ee; color:#1e9e5a; display:flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:9px;"></i></span><div style="flex:1; height:8px; border-radius:50px; background:#d9f2e3;"></div></div>
+              <div style="display:flex; align-items:center; gap:7px; margin-top:7px;"><span style="width:18px; height:18px; border-radius:50%; background:#e6f7ee; color:#1e9e5a; display:flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:9px;"></i></span><div style="width:78%; height:8px; border-radius:50px; background:#d9f2e3;"></div></div>
+              <div style="display:flex; align-items:center; gap:7px; margin-top:7px;"><span style="width:18px; height:18px; border-radius:50%; background:#e6f7ee; color:#1e9e5a; display:flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:9px;"></i></span><div style="width:60%; height:8px; border-radius:50px; background:#d9f2e3;"></div></div>
+            </div>
+          </div>
+          <div style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; padding:5px 11px; border-radius:50px; background:#e5fbf3; color:#0a8560; font-size:11.5px; font-weight:700;"><i class="icon-check" style="font-size:11px;"></i> 흐름 검증</div>
+          <h4 style="margin:12px 0 0; font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">검증으로 끊김 없이</h4>
+          <p style="margin:9px 0 0; font-family:var(--font-small); font-size:14px; font-weight:300; line-height:1.65; color:var(--fg-sub);">막다른 길, 빠진 정답, 도달할 수 없는 페이지를 자동으로 찾아 알려줘요. 검증 통과 후 안심하고 수업에 내보내세요.</p>
+        </div>
+
+        <!-- ③ 다양한 자물쇠 타입 -->
+        <div class="qn-fcard" style="background:#fff; border:1px solid var(--border-2); border-radius:24px; padding:30px 28px; transition:all .25s ease;">
+          <div style="height:150px; border-radius:18px; background:linear-gradient(160deg,#fff2e8,#ffe0c2); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:9px;">
+              <div style="width:56px; height:56px; border-radius:14px; background:#fff; box-shadow:0 6px 14px -8px rgba(0,0,0,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:var(--main-color);"><i class="icon-quiz-01" style="font-size:18px;"></i><span style="font-family:var(--font-small); font-size:8.5px; font-weight:700; color:var(--fg-sub);">객관식</span></div>
+              <div style="width:56px; height:56px; border-radius:14px; background:#fff; box-shadow:0 6px 14px -8px rgba(0,0,0,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#1e6ba8;"><i class="icon-pen" style="font-size:18px;"></i><span style="font-family:var(--font-small); font-size:8.5px; font-weight:700; color:var(--fg-sub);">주관식</span></div>
+              <div style="width:56px; height:56px; border-radius:14px; background:#fff; box-shadow:0 6px 14px -8px rgba(0,0,0,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#9a6b00;"><i class="icon-help" style="font-size:18px;"></i><span style="font-family:var(--font-small); font-size:8.5px; font-weight:700; color:var(--fg-sub);">OX</span></div>
+              <div style="width:56px; height:56px; border-radius:14px; background:#fff; box-shadow:0 6px 14px -8px rgba(0,0,0,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#6b3fb5;"><i class="icon-sliders" style="font-size:18px;"></i><span style="font-family:var(--font-small); font-size:8.5px; font-weight:700; color:var(--fg-sub);">순서</span></div>
+              <div style="width:56px; height:56px; border-radius:14px; background:#fff; box-shadow:0 6px 14px -8px rgba(0,0,0,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:#c0392b;"><i class="icon-location" style="font-size:18px;"></i><span style="font-family:var(--font-small); font-size:8.5px; font-weight:700; color:var(--fg-sub);">핫스팟</span></div>
+              <div style="width:56px; height:56px; border-radius:14px; background:var(--bg-light-color); border:1.5px dashed var(--main-color); display:flex; align-items:center; justify-content:center; color:var(--main-color);"><i class="icon-plus" style="font-size:16px;"></i></div>
+            </div>
+          </div>
+          <div style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; padding:5px 11px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-size:11.5px; font-weight:700;"><i class="icon-lock-filled" style="font-size:11px;"></i> 자물쇠</div>
+          <h4 style="margin:12px 0 0; font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">다양한 자물쇠 타입</h4>
+          <p style="margin:9px 0 0; font-family:var(--font-small); font-size:14px; font-weight:300; line-height:1.65; color:var(--fg-sub);">객관식·주관식·OX·순서·핫스팟까지. 문제 성격에 맞는 자물쇠를 골라 페이지마다 다르게 낼 수 있어요.</p>
+        </div>
+
+        <!-- ④ 대화챗 애니메이션 + 블록 단위 편집 -->
+        <div class="qn-fcard" style="background:#fff; border:1px solid var(--border-2); border-radius:24px; padding:30px 28px; transition:all .25s ease;">
+          <div style="height:150px; border-radius:18px; background:linear-gradient(160deg,#f3edff,#e6d9ff); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <div style="width:190px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:7px; align-items:flex-start;"><img src="uploads/character01/my.png" style="width:28px; height:28px; flex:none;"><div style="background:#fff; border-radius:4px 12px 12px 12px; padding:8px 11px; font-family:var(--font-small); font-size:11px; font-weight:300; color:var(--fg); box-shadow:0 4px 10px -6px rgba(0,0,0,0.18);">낡은 철문 앞에 도착했어.</div></div>
+              <div style="margin-left:35px; background:var(--bg-light-color); border:1.5px solid var(--main-color); border-radius:12px; padding:8px 11px; font-family:var(--font-kr); font-size:11px; font-weight:700; color:var(--theme-deep);">암호를 풀어 문을 열어 봐!</div>
+              <div style="margin-left:35px; display:flex; gap:4px; align-items:center; color:var(--fg-mute);"><span style="width:5px; height:5px; border-radius:50%; background:var(--fg-mute);"></span><span style="width:5px; height:5px; border-radius:50%; background:var(--fg-mute); opacity:.6;"></span><span style="width:5px; height:5px; border-radius:50%; background:var(--fg-mute); opacity:.3;"></span></div>
+            </div>
+          </div>
+          <div style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; padding:5px 11px; border-radius:50px; background:#f3edff; color:#6b3fb5; font-size:11.5px; font-weight:700;"><i class="icon-speech-bubble" style="font-size:11px;"></i> 대화 플레이</div>
+          <h4 style="margin:12px 0 0; font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">대화챗으로 긴장감 있게</h4>
+          <p style="margin:9px 0 0; font-family:var(--font-small); font-size:14px; font-weight:300; line-height:1.65; color:var(--fg-sub);">상황 설명이 말풍선으로 한 문장씩 등장해 몰입감을 높여요. 블록 단위로 대화·이미지·문제를 쌓아 손쉽게 편집합니다.</p>
+        </div>
+
+        <!-- ⑤ 리포트 타임라인 -->
+        <div class="qn-fcard" style="background:#fff; border:1px solid var(--border-2); border-radius:24px; padding:30px 28px; transition:all .25s ease;">
+          <div style="height:150px; border-radius:18px; background:linear-gradient(160deg,#eaf5ff,#d6ecff); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <div style="width:200px; display:flex; flex-direction:column; gap:0;">
+              <div style="display:flex; gap:10px;"><div style="display:flex; flex-direction:column; align-items:center; flex:none;"><span style="width:20px; height:20px; border-radius:50%; background:#1e9e5a; color:#fff; display:flex; align-items:center; justify-content:center;"><i class="icon-check" style="font-size:9px;"></i></span><span style="width:2px; flex:1; min-height:14px; background:var(--border-2);"></span></div><div style="background:#fff; border-radius:9px; padding:6px 9px; margin-bottom:7px; flex:1; box-shadow:0 3px 9px -6px rgba(0,0,0,0.2);"><div style="font-family:var(--font-kr); font-size:9.5px; font-weight:700; color:var(--fg);">1. 실험실 입구</div><div style="font-family:var(--font-small); font-size:8px; color:var(--fg-mute);">정답 · 0:42</div></div></div>
+              <div style="display:flex; gap:10px;"><div style="display:flex; flex-direction:column; align-items:center; flex:none;"><span style="width:20px; height:20px; border-radius:50%; background:#c0392b; color:#fff; display:flex; align-items:center; justify-content:center;"><i class="icon-close" style="font-size:9px;"></i></span></div><div style="background:#fff; border:1px solid #f5c6c6; border-radius:9px; padding:6px 9px; flex:1; box-shadow:0 3px 9px -6px rgba(0,0,0,0.2);"><div style="font-family:var(--font-kr); font-size:9.5px; font-weight:700; color:var(--fg);">2. 온도 판단 <span style="color:#c0392b;">· 막힘</span></div><div style="font-family:var(--font-small); font-size:8px; color:var(--fg-mute);">시도 4회 · 3:30</div></div></div>
+            </div>
+          </div>
+          <div style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; padding:5px 11px; border-radius:50px; background:#eaf5ff; color:#1e6ba8; font-size:11.5px; font-weight:700;"><i class="icon-chart" style="font-size:11px;"></i> 결과 리포트</div>
+          <h4 style="margin:12px 0 0; font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">리포트 타임라인으로</h4>
+          <p style="margin:9px 0 0; font-family:var(--font-small); font-size:14px; font-weight:300; line-height:1.65; color:var(--fg-sub);">학생이 어느 문제에서 막히고 얼마나 걸렸는지 타임라인으로 되짚어요. 풀이 여정을 한눈에 보고 바로 피드백하세요.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== BOTTOM CTA ===== -->
+    <section style="padding:56px;">
+      <div style="position:relative; overflow:hidden; border-radius:30px; background:linear-gradient(120deg,#ff8a3d 0%, #ff6800 55%, #db5800 100%); padding:64px 56px; box-shadow:0 30px 60px -30px var(--main-color);">
+        <div style="position:absolute; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.12); top:-100px; left:-40px; animation:qnDrift 11s ease-in-out infinite;"></div>
+        <div style="position:absolute; top:40px; right:340px; color:rgba(255,255,255,0.6); font-size:24px;">✦</div>
+        <div style="position:relative; display:flex; align-items:center; justify-content:space-between; gap:40px;">
+          <div style="max-width:560px;">
+            <h2 style="margin:0; font-family:var(--font-kr); font-size:38px; font-weight:900; line-height:1.28; letter-spacing:-1.2px; color:#fff;">지금, 첫 번째 방탈출을<br>만들어보세요</h2>
+            <p style="margin:16px 0 0; font-family:var(--font-small); font-size:16px; font-weight:300; line-height:1.7; color:rgba(255,255,255,0.92);">오늘 만든 방탈출을 다음 수업에서 바로 써보세요.</p>
+            <div style="display:flex; align-items:center; gap:14px; margin-top:30px;">
+              <a class="qn-ghost" href="회원가입 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:56px; padding:0 32px; border-radius:50px; background:#fff; color:var(--main-color); border:none; font-family:var(--font-kr); font-size:17px; font-weight:800; transition:all .2s ease;">무료로 시작하기 <i class="icon-right-open" style="font-size:13px;"></i></a>
+              <a href="#" style="display:inline-flex; align-items:center; gap:8px; height:56px; padding:0 8px; color:#fff; font-family:var(--font-kr); font-size:16px; font-weight:700;"><i class="icon-play" style="font-size:12px;"></i> 도입 문의하기</a>
+            </div>
+          </div>
+          <img src="uploads/character01/play_team_ob.png" alt="방탈출N 캐릭터" style="flex:none; width:300px; filter:drop-shadow(0 18px 24px rgba(150,50,0,0.3)); animation:qnFloat 7s ease-in-out infinite;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer style="background:var(--footer-bg); padding:52px 56px 34px;">
+      <div style="display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap;">
+        <div style="max-width:300px;">
+          <div style="font-family:var(--font-kr); font-size:22px; font-weight:900; letter-spacing:-1px; color:#fff;">방탈출<span style="color:var(--main-color);">N</span></div>
+          <p style="margin:14px 0 0; font-family:var(--font-small); font-size:13px; font-weight:300; line-height:1.7; color:rgba(255,255,255,0.6);">수업을 방탈출로, 학습을 모험으로.<br>선생님을 위한 게임형 학습 플랫폼.</p>
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <span style="width:36px; height:36px; border-radius:50%; background:var(--footer-bg-2); display:flex; align-items:center; justify-content:center; color:#fff;"><i class="icon-instagram" style="font-size:15px;"></i></span>
+            <span style="width:36px; height:36px; border-radius:50%; background:var(--footer-bg-2); display:flex; align-items:center; justify-content:center; color:#fff;"><i class="icon-youtube-play" style="font-size:15px;"></i></span>
+            <span style="width:36px; height:36px; border-radius:50%; background:var(--footer-bg-2); display:flex; align-items:center; justify-content:center; color:#fff;"><i class="icon-mail" style="font-size:15px;"></i></span>
+          </div>
+        </div>
+        <div style="display:flex; gap:64px;">
+          <div style="display:flex; flex-direction:column; gap:13px;">
+            <div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:#fff; margin-bottom:2px;">제품</div>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">기능</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">이용 방법</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">요금 안내</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">업데이트</a>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:13px;">
+            <div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:#fff; margin-bottom:2px;">지원</div>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">고객센터</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">자주 묻는 질문</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">도입 문의</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">교육 자료실</a>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:13px;">
+            <div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:#fff; margin-bottom:2px;">회사</div>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">소개</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">블로그</a>
+            <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.6); font-family:var(--font-small); font-size:13.5px; font-weight:300;">채용</a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:36px; padding-top:22px; border-top:1px solid var(--footer-bg-2); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <span style="font-family:var(--font-small); font-size:12px; font-weight:300; color:rgba(255,255,255,0.45);">© 2025 방탈출N. All rights reserved.</span>
+        <div style="display:flex; gap:20px;">
+          <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.55); font-family:var(--font-small); font-size:12px; font-weight:300;">이용약관</a>
+          <a class="qn-flink" href="#" style="color:rgba(255,255,255,0.55); font-family:var(--font-small); font-size:12px; font-weight:300;">개인정보처리방침</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

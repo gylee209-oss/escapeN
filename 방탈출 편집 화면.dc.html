@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    .qn-tbtn:hover { background: var(--bg-warm-2) !important; }
+    .qn-cta:hover { background: var(--btn-hover-color) !important; }
+    .qn-panelinput:focus { border-color: var(--main-color) !important; background:#fff !important; box-shadow:0 0 0 3px var(--bg-light-color); }
+    /* 페이지 편집 섹션 — 플랫(카드 없음): 얇은 구분선 + 작은 컬러 라벨 */
+    .qn-sec { margin:0; padding:16px 2px; border-top:1px solid var(--border-2); background:transparent; }
+    .qn-sec:first-of-type { border-top:none; padding-top:6px; }
+    .qn-sechead { display:flex; align-items:center; gap:7px; padding:0; margin:0 0 12px; border:none; background:transparent; }
+    /* 헤더 아이콘 — 작은 점 색상만, 배지 없음 */
+    .qn-sechead > i { font-size:12px !important; }
+    .qn-sechead > span:first-of-type { font-size:12px !important; font-weight:800 !important; letter-spacing:-.2px; color:var(--fg-sub) !important; text-transform:none; }
+    .qn-editcontent:hover { background:var(--btn-hover-color) !important; }
+    .qn-choice:hover .qn-chdel { opacity:1 !important; }
+    .qn-ghostbtn:hover { border-color: var(--main-color) !important; color: var(--main-color) !important; }
+    .qn-edgehit:hover + .qn-edgevis { stroke-width:4 !important; }
+    .qn-pvchoice:hover { border-color: var(--main-color) !important; background: var(--bg-light-color) !important; }
+    .qn-thumb:hover { transform: translateY(-2px); }
+    .qn-hint-opt:hover { border-color: var(--main-color) !important; }
+    @keyframes qnToastIn { from { opacity:0; transform:translate(-50%,10px); } to { opacity:1; transform:translate(-50%,0); } }
+  </style>
+</helmet>
+
+<div style="height:100vh; background:#f4f3ef; font-family:var(--font-kr); display:flex;">
+<div data-screen-label="Escape Editor" style="position:relative; flex:1; min-width:0; background:#f4f3ef; overflow:hidden; display:flex; flex-direction:column;">
+
+  <!-- ===================== TOP TOOLBAR ===================== -->
+  <header style="position:relative; z-index:40; flex:none; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; background:#fff; border-bottom:1px solid var(--border-2);">
+    <div style="display:flex; align-items:center; gap:14px; min-width:0;">
+      <button class="qn-tbtn" onClick="{{ onBack }}" style="display:flex; align-items:center; gap:6px; height:38px; padding:0 12px 0 8px; border:none; border-radius:9px; background:transparent; color:var(--fg-sub); font-family:var(--font-kr); font-size:13.5px; font-weight:600; cursor:pointer; transition:background .15s;"><i class="icon-left-open" style="font-size:13px;"></i> My 방탈출</button>
+      <span style="width:1px; height:22px; background:var(--border);"></span>
+      <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+        <!-- 진행상태 배지 — 클릭하면 상태 변경 드롭다운 -->
+        <div style="position:relative;">
+          <button onClick="{{ onToggleStatusMenu }}" title="진행 상태 변경" style="display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 9px; border:none; border-radius:50px; background:{{ sStatusBg }}; color:{{ sStatusFg }}; font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;"><span style="width:6px; height:6px; border-radius:50%; background:{{ sStatusFg }};"></span>{{ sStatus }}<i class="{{ statusChevron }}" style="font-size:9px; margin-left:1px;"></i></button>
+          <sc-if value="{{ statusMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; top:30px; left:0; z-index:60; width:150px; background:#fff; border:1px solid var(--border-2); border-radius:11px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:5px;">
+            <sc-for list="{{ statusMenu }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.onPick }}" style="{{ s.style }}"><span style="{{ s.dotStyle }}"></span>{{ s.label }}</button>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        <span style="font-family:var(--font-kr); font-size:15.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">{{ sTitle }}</span>
+        <button class="qn-tbtn" onClick="{{ onToggleSettings }}" style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border:1.5px solid var(--border); border-radius:9px; background:#fff; color:var(--fg-sub); cursor:pointer; transition:all .15s;"><i class="icon-cog-1" style="font-size:15px;"></i></button>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 9px 0 8px; border-radius:7px; background:var(--bg-warm-2); font-family:var(--font-small); font-size:11.5px; color:var(--fg-sub);"><i class="icon-qr-code" style="font-size:12px;"></i>PIN <b style="font-family:var(--font-en); letter-spacing:1px; color:var(--fg);">{{ sPin }}</b></span>
+      <button class="qn-cta" onClick="{{ onOpenPreview }}" style="display:flex; align-items:center; gap:7px; height:38px; padding:0 16px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700; cursor:pointer; transition:background .15s;"><i class="icon-play" style="font-size:12px;"></i> 미리보기</button>
+    </div>
+  </header>
+
+  <!-- 진행상태 드롭다운 바깥 클릭 시 닫기 (헤더 zIndex 40 보다 낮게 둬서 헤더 안 메뉴가 항상 위에) -->
+  <sc-if value="{{ statusMenuOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onCloseStatusMenu }}" style="position:fixed; inset:0; z-index:39;"></div>
+  </sc-if>
+
+  <!-- ===================== BODY ===================== -->
+  <div style="flex:1; display:flex; min-height:0;">
+
+    <!-- ============ CANVAS ============ -->
+    <div style="flex:1; position:relative; min-width:0;">
+      <div ref="{{ setVp }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" style="{{ vpStyle }}">
+
+        <!-- WORLD -->
+        <div style="{{ worldStyle }}">
+          <!-- edges -->
+          <svg width="2600" height="1750" style="position:absolute; left:0; top:0; overflow:visible; pointer-events:none;">
+            <defs>
+              <marker id="arw-g" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1faf6a"></path></marker>
+              <marker id="arw-x" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#9a9a9a"></path></marker>
+            </defs>
+            <sc-for list="{{ edges }}" as="e" hint-placeholder-count="5">
+              <g style="pointer-events:auto;">
+                <path class="qn-edgehit" d="{{ e.d }}" fill="none" stroke="transparent" stroke-width="18" style="cursor:pointer;" onClick="{{ e.onDelete }}"></path>
+                <path class="qn-edgevis" d="{{ e.d }}" fill="none" stroke="{{ e.stroke }}" stroke-width="2.5" stroke-dasharray="{{ e.dash }}" marker-end="{{ e.marker }}" style="pointer-events:none;"></path>
+              </g>
+            </sc-for>
+            <sc-if value="{{ linking }}" hint-placeholder-val="{{ false }}">
+              <path d="{{ tempD }}" fill="none" stroke="{{ tempStroke }}" stroke-width="2.5" stroke-dasharray="{{ tempDash }}"></path>
+            </sc-if>
+          </svg>
+
+          <!-- nodes -->
+          <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="6">
+            <div style="{{ n.style }}" onPointerDown="{{ n.onDown }}">
+              <!-- header -->
+              <div style="display:flex; align-items:center; gap:7px; padding:9px 11px 7px;">
+                <span style="display:flex; align-items:center; justify-content:center; width:22px; height:22px; flex:none; border-radius:7px; background:{{ n.numBg }}; color:#fff; font-family:var(--font-en); font-size:12px; font-weight:800;">{{ n.num }}</span>
+                <span style="display:inline-flex; align-items:center; gap:4px; height:20px; padding:0 8px; border-radius:50px; background:{{ n.chipBg }}; color:{{ n.chipFg }}; font-family:var(--font-small); font-size:10.5px; font-weight:700;">{{ n.chipLabel }}</span>
+                <sc-if value="{{ n.hasLock }}" hint-placeholder-val="{{ true }}">
+                  <span style="display:inline-flex; align-items:center; gap:4px; margin-left:auto; color:var(--fg-mute); font-family:var(--font-small); font-size:10.5px; font-weight:600;"><i class="{{ n.lockIcon }}" style="font-size:11px;"></i>{{ n.lockLabel }}</span>
+                </sc-if>
+              </div>
+              <!-- title + summary -->
+              <div style="padding:0 12px 10px;">
+                <div style="font-family:var(--font-kr); font-size:14.5px; font-weight:700; color:var(--fg); line-height:1.3; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ n.title }}</div>
+                <div style="font-family:var(--font-small); font-size:11.5px; font-weight:300; color:var(--fg-sub); line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ n.summary }}</div>
+              </div>
+              <!-- footer -->
+              <div style="display:flex; align-items:center; gap:6px; padding:8px 12px; border-top:1px solid var(--bg-warm-2); min-height:34px;">
+                <sc-if value="{{ n.warn }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:inline-flex; align-items:center; gap:4px; height:20px; padding:0 8px; border-radius:6px; background:{{ n.warnBg }}; color:{{ n.warnFg }}; font-family:var(--font-small); font-size:10.5px; font-weight:700;"><i class="{{ n.warnIcon }}" style="font-size:11px;"></i>{{ n.warnText }}</span>
+                </sc-if>
+                <sc-if value="{{ n.showExit }}" hint-placeholder-val="{{ true }}">
+                  <span style="margin-left:auto; font-family:var(--font-small); font-size:10.5px; font-weight:600; color:var(--fg-mute);">{{ n.exitText }}</span>
+                </sc-if>
+              </div>
+              <!-- exit handles -->
+              <sc-if value="{{ n.hasCorrectHandle }}" hint-placeholder-val="{{ false }}">
+                <div onPointerDown="{{ n.onLinkCorrect }}" title="정답 출구" style="{{ n.correctHandleStyle }}"></div>
+              </sc-if>
+              <sc-if value="{{ n.hasWrongHandle }}" hint-placeholder-val="{{ false }}">
+                <div onPointerDown="{{ n.onLinkWrong }}" title="오답 출구" style="{{ n.wrongHandleStyle }}"></div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- top-left: 페이지 · 연결 · 검증 -->
+      <div style="position:absolute; top:14px; left:14px; z-index:11; display:flex; align-items:center; gap:8px;">
+        <span style="display:flex; align-items:center; gap:8px; height:34px; padding:0 14px; border-radius:50px; background:#fff; border:1px solid var(--border-2); box-shadow:0 3px 10px -4px rgba(0,0,0,0.12); font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);"><i class="icon-blank-page" style="font-size:13px; color:var(--fg-mute);"></i>페이지 <b style="color:var(--fg); font-family:var(--font-en);">{{ pageCount }}</b><span style="width:1px; height:14px; background:var(--border-2);"></span><i class="icon-share" style="font-size:13px; color:var(--fg-mute);"></i>연결 <b style="color:var(--fg); font-family:var(--font-en);">{{ edgeCount }}</b></span>
+        <!-- 검증 버튼 + 그 바로 아래 흐름검증 패널 (relative 래퍼로 버튼에 고정) -->
+        <div style="position:relative;">
+          <button class="qn-tbtn" onClick="{{ onToggleValidation }}" style="position:relative; display:flex; align-items:center; gap:6px; height:34px; padding:0 13px; border:1px solid {{ valBtnBorder }}; border-radius:50px; background:{{ valBtnBg }}; color:{{ valBtnFg }}; box-shadow:0 3px 10px -4px rgba(0,0,0,0.12); font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:pointer; transition:all .15s;"><i class="{{ valIcon }}" style="font-size:14px;"></i> 검증 <span style="display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:50px; background:{{ valBadgeBg }}; color:#fff; font-family:var(--font-en); font-size:10.5px; font-weight:800;">{{ valCount }}</span></button>
+          <sc-if value="{{ validationOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; top:42px; left:0; z-index:50; width:360px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:0 20px 50px -18px rgba(0,0,0,0.32); overflow:hidden;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border-2);">
+              <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);"><i class="icon-check" style="font-size:14px; color:var(--main-color);"></i> 흐름 검증</div>
+              <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub);">{{ valSummary }}</span>
+            </div>
+            <div style="max-height:340px; overflow-y:auto; padding:10px;">
+              <sc-if value="{{ valClean }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:26px 16px; text-align:center;">
+                  <div style="font-size:30px; color:#1faf6a; margin-bottom:8px;"><i class="icon-check"></i></div>
+                  <div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);">문제가 없어요!</div>
+                  <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">모든 흐름이 올바르게 연결되었습니다.</div>
+                </div>
+              </sc-if>
+              <sc-for list="{{ valItems }}" as="v" hint-placeholder-count="3">
+                <button onClick="{{ v.onGo }}" style="width:100%; text-align:left; display:flex; gap:10px; padding:11px 12px; margin-bottom:6px; border:1px solid {{ v.border }}; border-radius:10px; background:{{ v.bg }}; cursor:pointer;">
+                  <i class="{{ v.icon }}" style="font-size:15px; color:{{ v.color }}; margin-top:1px;"></i>
+                  <div style="min-width:0;">
+                    <div style="font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg);">{{ v.title }}</div>
+                    <div style="font-family:var(--font-small); font-size:11.5px; line-height:1.45; color:var(--fg-sub); margin-top:2px;">{{ v.desc }}</div>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- top-right: 페이지 추가 -->
+      <div style="position:absolute; top:14px; right:14px; z-index:11;">
+        <button class="qn-cta" onClick="{{ onAddPage }}" style="display:flex; align-items:center; gap:7px; height:38px; padding:0 16px 0 13px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px -6px rgba(255,104,0,0.55);"><i class="icon-plus-circle" style="font-size:15px;"></i> 페이지 추가</button>
+      </div>
+
+      <!-- bottom-left: 범례 -->
+      <div style="position:absolute; bottom:16px; left:16px; z-index:10; display:flex; align-items:center; gap:16px; font-family:var(--font-small); font-size:12px; color:var(--fg-sub);">
+        <span style="display:flex; align-items:center; gap:7px;"><span style="width:18px; height:2.5px; border-radius:2px; background:#1faf6a;"></span>정답 연결</span>
+        <span style="display:flex; align-items:center; gap:7px;"><span style="width:18px; height:2.5px; border-radius:2px; background:#c0c0c0;"></span>오답 연결</span>
+        <span style="display:flex; align-items:center; gap:7px;"><span style="width:12px; height:12px; border-radius:3px; border:1.5px solid var(--tag-red);"></span>문제 있음</span>
+      </div>
+
+      <!-- TOAST (캔버스 정중앙) -->
+      <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; bottom:56px; left:50%; transform:translateX(-50%); z-index:80; display:flex; align-items:center; gap:9px; height:44px; padding:0 20px; border-radius:50px; background:rgba(30,26,22,0.92); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:600; box-shadow:0 12px 30px -10px rgba(0,0,0,0.4); backdrop-filter:blur(6px); animation:qnToastIn .28s ease;"><i class="{{ toastIcon }}" style="font-size:14px; color:{{ toastColor }};"></i> {{ toast }}</div>
+      </sc-if>
+
+      <!-- bottom-center: 조작 힌트 -->
+      <div style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:10; display:flex; align-items:center; gap:8px; height:32px; padding:0 14px; border-radius:50px; background:rgba(255,255,255,0.94); border:1px solid var(--border-2); box-shadow:0 3px 10px -4px rgba(0,0,0,0.15); font-family:var(--font-small); font-size:11.5px; color:var(--fg-sub); backdrop-filter:blur(4px); white-space:nowrap;"><i class="icon-share" style="font-size:12px; color:var(--main-color);"></i> 빈 곳을 끌거나 <kbd style="display:inline-flex; align-items:center; height:18px; padding:0 6px; border-radius:5px; background:var(--bg-warm-2); border:1px solid var(--border); font-family:var(--font-en); font-size:10.5px; font-weight:700; color:var(--fg);">Space</kbd> +드래그로 이동 · 휠로 확대/축소</div>
+
+      <!-- bottom-right: 확대/축소 -->
+      <div style="position:absolute; bottom:14px; right:14px; z-index:10; display:flex; align-items:center; gap:6px;">
+        <div style="display:flex; align-items:center; gap:2px; height:34px; padding:0 4px; border-radius:9px; background:#fff; border:1px solid var(--border-2); box-shadow:0 3px 10px -4px rgba(0,0,0,0.12);">
+          <button class="qn-tbtn" onClick="{{ onZoomOut }}" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border:none; border-radius:7px; background:transparent; color:var(--fg-sub); cursor:pointer;"><i class="icon-minus-circle" style="font-size:13px;"></i></button>
+          <span style="min-width:44px; text-align:center; font-family:var(--font-en); font-size:12.5px; font-weight:700; color:var(--fg);">{{ zoomPct }}%</span>
+          <button class="qn-tbtn" onClick="{{ onZoomIn }}" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border:none; border-radius:7px; background:transparent; color:var(--fg-sub); cursor:pointer;"><i class="icon-plus-circle" style="font-size:13px;"></i></button>
+        </div>
+        <button class="qn-tbtn" onClick="{{ onFit }}" style="display:flex; align-items:center; gap:6px; height:34px; padding:0 13px; border:1px solid var(--border-2); border-radius:9px; background:#fff; color:var(--fg-sub); box-shadow:0 3px 10px -4px rgba(0,0,0,0.12); font-family:var(--font-kr); font-size:12.5px; font-weight:600; cursor:pointer;"><i class="icon-all" style="font-size:12px;"></i> 전체 보기</button>
+      </div>
+    </div>
+
+    <!-- ============ EDIT PANEL ============ -->
+    <aside style="flex:none; width:388px; background:#fff; border-left:1px solid var(--border-2); display:flex; flex-direction:column; min-height:0;">
+      <!-- panel header -->
+      <div style="flex:none; display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border-2);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; background:{{ selNumBg }}; color:#fff; font-family:var(--font-en); font-size:12px; font-weight:800;">{{ selNum }}</span>
+          <span style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);">페이지 편집</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px;">
+          <button class="qn-tbtn" onClick="{{ onPanelPreview }}" title="이 페이지 미리보기" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--fg-sub); cursor:pointer;"><i class="icon-play" style="font-size:13px; position:relative; left:-2px;"></i></button>
+          <button class="qn-tbtn" onClick="{{ onDup }}" title="페이지 복제" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:1px solid var(--border-2); border-radius:8px; background:#fafafa; color:var(--fg-sub); cursor:pointer; transition:all .15s;"><i class="icon-005-copy" style="font-size:14px;"></i></button>
+          <button class="qn-tbtn" onClick="{{ onDel }}" title="{{ delTitle }}" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:1px solid {{ delBorder }}; border-radius:8px; background:{{ delBg }}; color:{{ delFg }}; cursor:{{ delCursor }}; transition:all .15s;"><i class="icon-trash" style="font-size:14px;"></i></button>
+        </div>
+      </div>
+
+      <!-- panel scroll body -->
+      <div style="flex:1; overflow-y:auto; padding:18px;">
+
+        <!-- sticky validation banner -->
+        <sc-if value="{{ selHasWarn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:sticky; top:0; z-index:6; margin:0 0 14px; border:1px solid #f5c6c6; border-radius:12px; background:#fdeaea; padding:11px 13px; box-shadow:0 6px 16px -8px rgba(214,69,69,0.45);">
+            <div style="display:flex; align-items:center; gap:6px; font-family:var(--font-kr); font-size:12.5px; font-weight:800; color:var(--tag-red); margin-bottom:5px;"><i class="icon-attention-alt-1" style="font-size:13px;"></i> 이 페이지의 검증 경고</div>
+            <sc-for list="{{ selWarnings }}" as="w" hint-placeholder-count="1">
+              <div style="font-family:var(--font-small); font-size:12px; line-height:1.5; color:#a3312f;">· {{ w }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- 그룹 1 · 기본 -->
+        <div class="qn-sec">
+          <div class="qn-sechead">
+            <i class="icon-edit" style="font-size:13px; color:#ff8a3d;"></i>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:var(--fg);">기본</span>
+          </div>
+          <div style="padding:0;">
+            <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin-bottom:6px;">페이지 제목</div>
+            <input class="qn-panelinput" type="text" value="{{ selTitle }}" onChange="{{ onSelTitle }}" style="width:100%; height:40px; padding:0 12px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; font-family:var(--font-kr); font-size:14px; color:var(--fg); outline:none; transition:all .15s;">
+            <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin:15px 0 6px;">페이지 종류</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+              <sc-for list="{{ typeCards }}" as="t" hint-placeholder-count="3">
+                <button onClick="{{ t.onPick }}" style="{{ t.cardStyle }}">
+                  <span style="{{ t.titleStyle }}"><i class="{{ t.icon }}" style="font-size:14px;"></i>{{ t.title }}</span>
+                  <span style="font-family:var(--font-small); font-size:10.5px; font-weight:300; color:var(--fg-mute);">{{ t.desc }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isEnding }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:13px;">
+                <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin-bottom:6px;">엔딩 결과</div>
+                <div style="display:flex; gap:8px;">
+                  <sc-for list="{{ endingSeg }}" as="es" hint-placeholder-count="2">
+                    <button onClick="{{ es.onPick }}" style="{{ es.style }}"><i class="{{ es.icon }}" style="font-size:13px;"></i> {{ es.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- 그룹 2 · 대화 · 문제 -->
+        <div class="qn-sec">
+          <div class="qn-sechead">
+            <i class="icon-quiz" style="font-size:13px; color:#1e6ba8;"></i>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:var(--fg);">대화 · 문제</span>
+            <span class="qn-sum" style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute); margin-left:auto; margin-right:8px;">{{ contentBadge }}</span>
+          </div>
+          <div style="padding:0;">
+            <div style="padding:12px; border:1px solid var(--border-2); border-radius:11px; background:#fafafa; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                <span style="display:inline-flex; align-items:center; gap:5px; height:22px; padding:0 9px; border-radius:50px; background:var(--bg-light-color); font-family:var(--font-small); font-size:10.5px; font-weight:800; color:var(--theme-deep);"><i class="icon-lock-filled" style="font-size:10px;"></i> {{ contentBadge }}</span>
+              </div>
+              <div style="font-family:var(--font-kr); font-size:12.5px; line-height:1.5; color:var(--fg-sub);">{{ bodySnippet }}</div>
+            </div>
+            <a class="qn-editcontent" href="{{ editContentHref }}" onClick="{{ onEditContent }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; height:44px; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; box-shadow:0 8px 18px -10px var(--main-color); transition:background .15s;"><i class="icon-edit" style="font-size:13px;"></i> 내용 편집 (대화 · 문제)</a>
+          </div>
+        </div>
+
+        <!-- 그룹 3 · 점수 · 힌트 -->
+        <sc-if value="{{ showScoreGroup }}" hint-placeholder-val="{{ true }}">
+        <div class="qn-sec">
+          <div class="qn-sechead">
+            <i class="icon-chart" style="font-size:13px; color:#6b3fb5;"></i>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:var(--fg);">점수 · 힌트</span>
+            <span class="qn-sum" style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute); margin-left:auto; margin-right:8px;">{{ scoreSummary }}</span>
+          </div>
+          <div style="padding:0;">
+            <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin-bottom:6px;">배점</div>
+            <div style="display:flex; align-items:center; width:130px; height:40px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; padding:0 12px;">
+              <input class="qn-panelinput" type="number" value="{{ selPoints }}" onChange="{{ onPoints }}" style="width:100%; border:none; background:transparent; outline:none; font-family:var(--font-en); font-size:14px; font-weight:700; color:var(--fg);">
+              <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); flex:none;">점</span>
+            </div>
+
+            <sc-if value="{{ hintIsDeduct }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin:16px 0 6px;">힌트 사용 시 차감</div>
+            <div style="display:flex; align-items:center; width:130px; height:40px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; padding:0 12px;">
+              <span style="font-family:var(--font-en); font-size:14px; font-weight:700; color:var(--tag-red); flex:none; margin-right:2px;">−</span>
+              <input class="qn-panelinput" type="number" value="{{ selDeduct }}" onChange="{{ onDeduct }}" style="width:100%; border:none; background:transparent; outline:none; font-family:var(--font-en); font-size:14px; font-weight:700; color:var(--fg);">
+              <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); flex:none;">점</span>
+            </div>
+            </sc-if>
+            <div style="margin-top:14px; padding:10px 12px; border-radius:9px; background:var(--bg-warm); display:flex; align-items:center; gap:7px;">
+              <i class="icon-help" style="font-size:12px; color:var(--fg-mute);"></i>
+              <span style="font-family:var(--font-small); font-size:11px; line-height:1.5; color:var(--fg-mute);">힌트 정책(무제한 · 차감 · 횟수)은 상단 <b style="color:var(--fg-sub);">방탈출 설정 <i class="icon-cog-1" style="font-size:10px;"></i></b>에서 시나리오 전체에 지정합니다.</span>
+            </div>
+
+            <div style="font-family:var(--font-kr); font-size:11.5px; font-weight:600; color:var(--fg-mute); margin:15px 0 6px;">힌트 문구</div>
+            <textarea class="qn-panelinput" value="{{ selHint }}" onChange="{{ onHint }}" rows="2" placeholder="학생이 힌트를 요청하면 보여줄 문구" style="width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; font-family:var(--font-kr); font-size:13px; line-height:1.55; color:var(--fg); outline:none; resize:vertical; transition:all .15s;"></textarea>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- 그룹 4 · 연결 -->
+        <sc-if value="{{ showExits }}" hint-placeholder-val="{{ true }}">
+        <div class="qn-sec">
+          <div class="qn-sechead">
+            <i class="icon-link" style="font-size:13px; color:#0a8560;"></i>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:var(--fg);">연결 (흐름)</span>
+            <span class="qn-sum" style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute); margin-left:auto; margin-right:8px;">{{ flowSummary }}</span>
+          </div>
+          <div style="padding:0;">
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
+              <span style="display:flex; align-items:center; gap:5px; flex:none; width:96px; font-family:var(--font-small); font-size:12px; font-weight:600; color:#1faf6a;"><span style="width:9px; height:9px; border-radius:50%; background:#1faf6a;"></span>{{ correctExitLabel }}</span>
+              <div style="flex:1; position:relative;">
+                <select value="{{ selCorrectExit }}" onChange="{{ onCorrectExit }}" style="width:100%; height:38px; padding:0 30px 0 12px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; font-family:var(--font-kr); font-size:12.5px; color:var(--fg); outline:none; -webkit-appearance:none; appearance:none; cursor:pointer;">
+                  <sc-for list="{{ exitOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+                <i class="icon-down-open" style="position:absolute; right:11px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--fg-mute); pointer-events:none;"></i>
+              </div>
+            </div>
+            <sc-if value="{{ showWrongExit }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; gap:9px;">
+                <span style="display:flex; align-items:center; gap:5px; flex:none; width:96px; font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-mute);"><span style="width:9px; height:9px; border-radius:50%; background:#9a9a9a;"></span>오답 출구</span>
+                <div style="flex:1; position:relative;">
+                  <select value="{{ selWrongExit }}" onChange="{{ onWrongExit }}" style="width:100%; height:38px; padding:0 30px 0 12px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; font-family:var(--font-kr); font-size:12.5px; color:var(--fg); outline:none; -webkit-appearance:none; appearance:none; cursor:pointer;">
+                    <sc-for list="{{ exitOptionsWrong }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                  </select>
+                  <i class="icon-down-open" style="position:absolute; right:11px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--fg-mute); pointer-events:none;"></i>
+                </div>
+              </div>
+              <div style="margin-top:8px; font-family:var(--font-small); font-size:11px; line-height:1.5; color:var(--fg-mute);">오답 출구를 비우면, 틀렸을 때 제자리에서 다시 시도합니다.</div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===================== OVERLAYS ===================== -->
+
+  <!-- outside-click catcher for dropdowns -->
+  <sc-if value="{{ anyDropdown }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseDropdowns }}" style="position:absolute; inset:0; z-index:45;"></div>
+  </sc-if>
+
+
+  <!-- SETTINGS dropdown -->
+  <sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:58px; left:200px; z-index:50; width:380px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:0 20px 50px -18px rgba(0,0,0,0.32); overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--border-2); font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);"><i class="icon-cog-1" style="font-size:14px; color:var(--main-color);"></i> 시나리오 설정</div>
+      <div style="padding:16px;">
+        <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">시나리오 제목</div>
+        <input class="qn-panelinput" type="text" value="{{ sTitle }}" onChange="{{ onSetTitle }}" style="width:100%; height:40px; padding:0 12px; border:1.5px solid var(--border); border-radius:9px; background:#fafafa; font-family:var(--font-kr); font-size:13.5px; color:var(--fg); outline:none; transition:all .15s;">
+
+        <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin:16px 0 7px;">썸네일</div>
+        <sc-if value="{{ hasThumbImg }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border-2);">
+          {{ thumbImgEl }}
+          <div style="position:absolute; top:8px; right:8px; display:flex; gap:6px;">
+            <button onClick="{{ onThumbPick }}" style="height:28px; padding:0 11px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:700; cursor:pointer;">변경</button>
+            <button onClick="{{ onThumbClear }}" style="width:28px; height:28px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer;"><i class="icon-close" style="font-size:11px;"></i></button>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ noThumbImg }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onThumbPick }}" onDragOver="{{ onThumbDragOver }}" onDrop="{{ onThumbDrop }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:100%; height:120px; border:2px dashed var(--border); border-radius:12px; background:#fff; cursor:pointer; color:var(--fg-mute);"><i class="icon-camera" style="font-size:24px; color:var(--main-color);"></i><span style="font-family:var(--font-small); font-size:12.5px; font-weight:600;">이미지를 끌어놓거나 클릭해 선택</span></button>
+        </sc-if>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding:12px 13px; border:1px solid var(--border-2); border-radius:11px;">
+          <div><div style="font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg);">공유 허용</div><div style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute); margin-top:1px;">다른 선생님이 복제할 수 있어요</div></div>
+          <button onClick="{{ onToggleShare }}" style="{{ shareToggleStyle }}"><span style="{{ shareKnobStyle }}"></span></button>
+        </div>
+
+        <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin:16px 0 7px;">힌트 정책</div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <sc-for list="{{ hintChoices }}" as="h" hint-placeholder-count="3">
+            <div>
+              <button class="qn-hint-opt" onClick="{{ h.onPick }}" style="{{ h.style }}">
+                <span style="{{ h.radioStyle }}"><sc-if value="{{ h.selected }}" hint-placeholder-val="{{ false }}"><span style="width:9px; height:9px; border-radius:50%; background:#fff;"></span></sc-if></span>
+                <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:{{ h.iconBg }}; color:{{ h.iconFg }}; flex:none;"><i class="{{ h.icon }}" style="font-size:15px;"></i></span>
+                <span style="text-align:left; min-width:0;"><span style="display:block; font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--fg);">{{ h.label }}</span><span style="display:block; margin-top:2px; font-family:var(--font-small); font-size:12px; font-weight:300; color:var(--fg-sub);">{{ h.desc }}</span></span>
+              </button>
+              <sc-if value="{{ h.showCount }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; gap:9px; margin-top:9px; padding-left:32px;">
+                <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub);">전체 힌트 사용 횟수</span>
+                <div style="display:flex; align-items:center; width:92px; height:38px; border:1.5px solid var(--border); border-radius:9px; background:#fff; padding:0 11px;">
+                  <input class="qn-panelinput" type="number" value="{{ hintCount }}" onChange="{{ onHintCount }}" style="width:100%; border:none; background:transparent; outline:none; font-family:var(--font-en); font-size:13.5px; font-weight:700; color:var(--fg);">
+                  <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">회</span>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- MEDIA modal -->
+  <sc-if value="{{ mediaOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:60; background:rgba(30,24,18,0.42); display:flex; align-items:center; justify-content:center;" onClick="{{ onMediaClose }}">
+      <div onClick="{{ stop }}" style="width:560px; background:#fff; border-radius:18px; box-shadow:0 30px 70px -25px rgba(0,0,0,0.4); overflow:hidden;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border-2);">
+          <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-kr); font-size:16px; font-weight:700; color:var(--fg);"><i class="icon-camera" style="font-size:16px; color:var(--main-color);"></i> {{ mediaTitle }}</div>
+          <button onClick="{{ onMediaClose }}" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:8px; background:var(--bg-warm-2); color:var(--fg-sub); cursor:pointer;"><i class="icon-close" style="font-size:13px;"></i></button>
+        </div>
+        <div style="display:flex; gap:4px; padding:12px 20px 0;">
+          <sc-for list="{{ mediaTabs }}" as="mt" hint-placeholder-count="3">
+            <button onClick="{{ mt.onPick }}" style="{{ mt.style }}"><i class="{{ mt.icon }}" style="font-size:13px;"></i> {{ mt.label }}</button>
+          </sc-for>
+        </div>
+        <div style="padding:20px; min-height:250px;">
+          <!-- upload tab -->
+          <sc-if value="{{ mediaTabUpload }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ onMediaFakePick }}" style="width:100%; height:210px; border:2px dashed var(--border); border-radius:14px; background:#fafafa; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer;">
+              <span style="display:flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-download" style="font-size:22px;"></i></span>
+              <span style="font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg);">파일을 끌어다 놓거나 클릭해 업로드</span>
+              <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">JPG · PNG · GIF · MP4 (최대 20MB)</span>
+            </button>
+          </sc-if>
+          <!-- url tab -->
+          <sc-if value="{{ mediaTabUrl }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">이미지 URL</div>
+            <input class="qn-panelinput" type="text" onChange="{{ onMediaUrl }}" placeholder="https://..." style="width:100%; height:42px; padding:0 13px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; font-family:var(--font-small); font-size:13px; color:var(--fg); outline:none; transition:all .15s;">
+            <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin:16px 0 8px;">프리셋 배경</div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+              <sc-for list="{{ mediaPresets }}" as="mp" hint-placeholder-count="4">
+                <button onClick="{{ mp.onPick }}" style="{{ mp.style }}"><i class="{{ mp.icon }}" style="font-size:18px;"></i></button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <!-- youtube tab -->
+          <sc-if value="{{ mediaTabYt }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">유튜브 링크</div>
+            <input class="qn-panelinput" type="text" onChange="{{ onMediaUrl }}" placeholder="https://youtube.com/watch?v=..." style="width:100%; height:42px; padding:0 13px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; font-family:var(--font-small); font-size:13px; color:var(--fg); outline:none; transition:all .15s;">
+            <div style="margin-top:14px; height:150px; border-radius:12px; background:var(--bg-warm-2); display:flex; align-items:center; justify-content:center; color:var(--fg-mute);"><i class="icon-youtube-play" style="font-size:34px;"></i></div>
+          </sc-if>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-top:1px solid var(--border-2);">
+          <button onClick="{{ onMediaClose }}" style="height:42px; padding:0 20px; border:1.5px solid var(--border); border-radius:10px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14px; font-weight:600; cursor:pointer;">취소</button>
+          <button onClick="{{ onMediaApply }}" style="{{ mediaApplyStyle }}">적용</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- PREVIEW overlay (participant screen) -->
+  <sc-if value="{{ previewOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:70; background:rgba(20,16,12,0.62); display:flex; align-items:center; justify-content:center;" onClick="{{ onPreviewClose }}">
+      <div onClick="{{ stop }}" style="width:390px; height:786px; background:#1c1b1a; border-radius:44px; padding:11px; box-shadow:0 40px 90px -30px rgba(0,0,0,0.6);">
+        <div style="position:relative; width:100%; height:100%; background:#fff; border-radius:34px; overflow:hidden;">
+          {{ pvFrame }}
+        </div>
+      </div>
+      <div onClick="{{ onPreviewClose }}" style="position:absolute; top:26px; right:30px; display:flex; align-items:center; gap:7px; height:40px; padding:0 16px; border-radius:50px; background:rgba(255,255,255,0.16); color:#fff; font-family:var(--font-kr); font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px);"><i class="icon-close" style="font-size:12px;"></i> 미리보기 닫기 (ESC)</div>
+    </div>
+  </sc-if>
+
+  <!-- 썸네일 이미지 등록 팝업 -->
+  <sc-if value="{{ tpOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onTpClose }}" style="position:absolute; inset:0; z-index:100; background:rgba(20,18,16,0.5); display:flex; align-items:center; justify-content:center; padding:24px; font-family:var(--font-kr);">
+    <div onClick="{{ tpStop }}" style="width:440px; max-width:100%; background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px -20px rgba(0,0,0,0.5);">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border-2);">
+        <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:var(--fg);">썸네일 이미지 선택</span>
+        <button onClick="{{ onTpClose }}" style="width:30px; height:30px; border:none; border-radius:8px; background:var(--bg-warm-2); color:var(--fg-mute); cursor:pointer;"><i class="icon-close" style="font-size:12px;"></i></button>
+      </div>
+      <div style="display:flex; gap:4px; padding:12px 20px 0;">
+        <sc-for list="{{ tpTabs }}" as="tt" hint-placeholder-count="2">
+          <button onClick="{{ tt.onPick }}" style="{{ tt.style }}"><i class="{{ tt.icon }}" style="font-size:13px;"></i> {{ tt.label }}</button>
+        </sc-for>
+      </div>
+      <div style="padding:20px;">
+        <sc-if value="{{ tpTabUpload }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onTpFakePick }}" onDragOver="{{ onTpDragOver }}" onDragLeave="{{ onTpDragLeave }}" onDrop="{{ onTpDrop }}" style="{{ tpDropStyle }}">
+            <span style="display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-download" style="font-size:20px;"></i></span>
+            <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">파일을 끌어다 놓거나 클릭해 업로드</span>
+            <span style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">JPG · PNG · GIF (최대 20MB)</span>
+          </button>
+          <input ref="{{ setTpFile }}" type="file" accept="image/*" onChange="{{ onTpFile }}" style="display:none;">
+          <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">프리셋</div>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+            <sc-for list="{{ tpPresets }}" as="tpp" hint-placeholder-count="4">
+            <button onClick="{{ tpp.onPick }}" style="border:1px solid var(--border-2); border-radius:11px; overflow:hidden; background:#fff; cursor:pointer; padding:0; text-align:left;">
+              {{ tpp.imgEl }}
+              <div style="padding:7px 9px; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--fg-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ tpp.name }}</div>
+            </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ tpTabUrl }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">이미지 링크</div>
+          <div style="display:flex; gap:8px;">
+            <input value="{{ tpUrl }}" onInput="{{ onTpUrl }}" placeholder="https://..." style="flex:1; height:42px; padding:0 13px; border:1.5px solid var(--border); border-radius:10px; font-family:var(--font-small); font-size:13px; color:var(--fg); outline:none;">
+            <button onClick="{{ onTpApplyUrl }}" style="flex:none; height:42px; padding:0 18px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; cursor:pointer;">적용</button>
+          </div>
+          <sc-if value="{{ tpUrlPreview }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; border:1px solid var(--border-2); border-radius:12px; overflow:hidden; background:#fafafa;">
+            <div style="font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-mute); padding:8px 12px; border-bottom:1px solid var(--border-2);">미리보기</div>
+            {{ tpUrlPreviewEl }}
+          </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+const NODE_W = 232, NODE_H = 142;
+const WORLD_W = 2600, WORLD_H = 1750;
+
+const LOCKS = [
+  { key:'mc',      label:'객관식', icon:'icon-quiz-01' },
+  { key:'short',   label:'주관식', icon:'icon-pen' },
+  { key:'ox',      label:'OX',    icon:'icon-help' },
+  { key:'order',   label:'순서',   icon:'icon-sliders' },
+  { key:'hotspot', label:'핫스팟', icon:'icon-location' },
+];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let id = 'r1';
+    try { const u = new URLSearchParams(location.search); if (u.get('id')) id = u.get('id'); this._initPage = u.get('page') || null; } catch(e){}
+    const room = (window.RoomStore && window.RoomStore.get(id)) || null;
+    this._roomId = room ? room.id : id;
+    const pages = room && room.pages ? JSON.parse(JSON.stringify(room.pages)) : [
+      // 새 방 첫 페이지는 문제 없는 설명형으로 시작 (내용 편집에서 문제를 추가하면 일반으로 전환)
+      { id:'p1', num:1, type:'start', title:'첫 페이지', body:'', summary:'', x:240, y:80, correctExit:null, wrongExit:null, points:100, hint:'', hintDeduct:50 },
+    ];
+    const pageFromUrl = this._initPage ? pages.find(p => p.id === this._initPage) : null;
+    const firstSel = pageFromUrl || pages.find(p => p.type === 'normal') || pages.find(p => p.type === 'start') || pages[0];
+    this.state = {
+      title: room ? room.title : '사라진 실험실의 비밀',
+      pin: room ? room.pin : '834 512',
+      status: room ? room.status : 'ing',          // pre | ing | done
+      thumb: room ? room.thumb : 'lab',
+      share: room ? (room.vis === 'public') : true,
+      hintPolicy: room ? room.hintPolicy : 'deduct', // free | deduct | count
+      hintCount: room ? (room.hintCount || 2) : 2,
+      selectedId: firstSel ? firstSel.id : 'p1',
+      panelTab: 'basic',
+      pan: { x: 264, y: 50 },
+      zoom: 0.96,
+      dragging: null,
+      linking: null,
+      panning: null,
+      moved: false,
+      validationOpen: false,
+      settingsOpen: false,
+      statusMenuOpen: false,
+      mediaOpen: false,
+      mediaFor: 'bg',
+      mediaTab: 'url',
+      mediaValid: false,
+      previewOpen: false,
+      pvReveal: true,
+      pvChoice: null,
+      pvSubmitted: false,
+      toast: '',
+      toastIcon: 'icon-check',
+      toastColor: '#7fe3a0',
+      tp: { open:false, tab:'upload', url:'', drag:false },
+      pages,
+    };
+  }
+
+  // 썸네일 이미지 등록 팝업
+  tpApply(url) { if (!url) return; this.setState({ thumb:url, tp:{ open:false, tab:'upload', url:'', drag:false } }); }
+  tpReadFile(file) { if (!file) return; const reader = new FileReader(); reader.onload = () => this.tpApply(reader.result); reader.readAsDataURL(file); }
+
+  // 스토어에 현재 방탈출(메타+페이지) 저장
+  persistRoom() {
+    if (!window.RoomStore) return;
+    const S = this.state;
+    const room = window.RoomStore.get(this._roomId);
+    const pagesChanged = JSON.stringify(room.pages) !== JSON.stringify(S.pages);
+    const saved = Object.assign({}, room, {
+      id: this._roomId, title: S.title, pin: S.pin, status: S.status, thumb: S.thumb,
+      vis: S.share ? 'public' : 'private', hintPolicy: S.hintPolicy, hintCount: S.hintCount,
+      pages: JSON.parse(JSON.stringify(S.pages)),
+    });
+    if (pagesChanged) delete saved.play; // 페이지가 실제로 바뀐 경우에만 pages 기준으로 플레이 파생
+    window.RoomStore.save(saved);
+  }
+  scheduleSave() {
+    if (this._sv) clearTimeout(this._sv);
+    this._sv = setTimeout(() => this.persistRoom(), 400);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    const s = this.state, p = prevState;
+    if (s.pages !== p.pages || s.title !== p.title || s.pin !== p.pin || s.status !== p.status ||
+        s.thumb !== p.thumb || s.share !== p.share || s.hintPolicy !== p.hintPolicy || s.hintCount !== p.hintCount) {
+      this.scheduleSave();
+    }
+  }
+
+  componentDidMount() {
+    this._esc = (e) => {
+      if (e.key === 'Escape') this.setState({ previewOpen:false, mediaOpen:false, validationOpen:false, settingsOpen:false, statusMenuOpen:false });
+    };
+    window.addEventListener('keydown', this._esc);
+    requestAnimationFrame(() => {
+      // 새로 생성한 방탈출(페이지 1개)은 100%로 시작, 그 외에는 전체 맞춤
+      const pages = this.state.pages;
+      if (pages.length <= 1) {
+        const p0 = pages[0];
+        if (this._vp && p0) {
+          // 시작 노드를 뷰포트 중앙 상단쯤에 오도록 pan 계산 (zoom=1)
+          this.setState({ zoom: 1, pan: { x: Math.round(this._vp.clientWidth / 2 - (p0.x || 0) - NODE_W / 2), y: Math.round(140 - (p0.y || 0)) } });
+        } else {
+          this.setState({ zoom: 1, pan: { x: 264, y: 50 } });
+        }
+      } else {
+        this.fitToContent();
+      }
+    });
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._esc); if (this._tt) clearTimeout(this._tt); if (this._sv) { clearTimeout(this._sv); this.persistRoom(); } }
+
+  // ---- helpers ----
+  getSel() { return this.state.pages.find(p => p.id === this.state.selectedId) || this.state.pages[0]; }
+  setPage(id, patch) {
+    this.setState(s => ({ pages: s.pages.map(p => p.id === id ? { ...p, ...patch } : p) }));
+  }
+  patchSel(patch) { this.setPage(this.state.selectedId, patch); }
+  toast(msg, icon, color) {
+    if (this._tt) clearTimeout(this._tt);
+    this.setState({ toast: msg, toastIcon: icon || 'icon-check', toastColor: color || '#7fe3a0' });
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+  worldPt(cx, cy) {
+    const r = this._vp.getBoundingClientRect();
+    return { x: (cx - r.left - this.state.pan.x) / this.state.zoom, y: (cy - r.top - this.state.pan.y) / this.state.zoom };
+  }
+  hasAnswer(p) {
+    if (p.type === 'ending' || p.type === 'desc') return true;
+    if (p.lock === 'mc') return (p.choices || []).some(c => c.c);
+    if (p.lock === 'ox') return p.oxAnswer != null;
+    if (p.lock === 'short') return !!(p.answer && p.answer.trim());
+    return true; // order / hotspot assumed configured
+  }
+  reachable() {
+    const map = {}; this.state.pages.forEach(p => map[p.id] = p);
+    const start = this.state.pages.find(p => p.type === 'start');
+    const seen = new Set();
+    const stack = start ? [start.id] : [];
+    while (stack.length) {
+      const id = stack.pop(); if (seen.has(id)) continue; seen.add(id);
+      const p = map[id]; if (!p) continue;
+      [p.correctExit, p.wrongExit].forEach(t => { if (t && !seen.has(t)) stack.push(t); });
+    }
+    return seen;
+  }
+  computeIssues() {
+    const items = [];
+    const pages = this.state.pages;
+    const map = {}; pages.forEach(p => map[p.id] = p);
+    const seen = this.reachable();
+    const isQ = (p) => p.type === 'normal' || p.type === 'start';
+
+    // canEnd fixed-point: 어떤 경로로든 엔딩에 닿을 수 있는가
+    const canEnd = new Set();
+    pages.forEach(p => { if (p.type === 'ending') canEnd.add(p.id); });
+    let changed = true;
+    while (changed) {
+      changed = false;
+      pages.forEach(p => {
+        if (canEnd.has(p.id)) return;
+        const nexts = p.type === 'desc' ? [p.correctExit] : [p.correctExit, p.wrongExit];
+        if (nexts.some(t => t && canEnd.has(t))) { canEnd.add(p.id); changed = true; }
+      });
+    }
+
+    const hasEnding = pages.some(p => p.type === 'ending');
+
+    pages.forEach(p => {
+      const tag = `${p.num}. ${p.title}`;
+      const add = (level, code, short, desc) => items.push({ level, code, pageId:p.id, title:tag, short, desc });
+
+      // empty — 정답 비어 있음
+      if (!this.hasAnswer(p) && p.type !== 'ending' && p.type !== 'desc') {
+        add('error', 'empty', '정답 없음', '정답이 설정되지 않았어요. 자물쇠 정답을 지정해 주세요.');
+      }
+      // deadend — 설명 페이지인데 다음 미지정
+      if (p.type === 'desc' && !p.correctExit) {
+        add('error', 'deadend', '다음 없음', '다음 페이지가 지정되지 않았어요. 설명 페이지의 다음 연결을 지정해 주세요.');
+      }
+      // noexit — 문제 노드인데 정답 출구 없음
+      if (isQ(p) && !p.correctExit) {
+        add('error', 'noexit', '출구 없음', '정답 출구가 없어요. 맞혔을 때 이동할 다음 페이지를 연결해 주세요.');
+      }
+      // selfloop — 출구가 자기 자신을 가리킴
+      if ((p.correctExit && p.correctExit === p.id) || (p.wrongExit && p.wrongExit === p.id)) {
+        add('error', 'selfloop', '자기 연결', '출구가 자기 자신을 가리켜요. 다른 페이지로 연결해 주세요.');
+      }
+      // dupexit — 정답/오답 출구가 동일
+      if (p.correctExit && p.wrongExit && p.correctExit === p.wrongExit) {
+        add('error', 'dupexit', '출구 중복', '정답과 오답 출구가 같은 페이지예요. 분기가 의미가 없어요.');
+      }
+      // dangling — 존재하지 않는 페이지로 연결
+      [p.correctExit, p.wrongExit].forEach(t => {
+        if (t && t !== p.id && !map[t]) {
+          add('error', 'dangling', '끊긴 연결', '존재하지 않는 페이지로 연결돼 있어요. 삭제된 페이지일 수 있어요.');
+        }
+      });
+      // unreach — 시작에서 도달 불가 (엔딩 제외)
+      if (p.type !== 'start' && p.type !== 'ending' && !seen.has(p.id)) {
+        add('warn', 'unreach', '도달 불가', '시작 페이지에서 도달할 수 없어요. 연결을 확인해 주세요.');
+      }
+      // loop — 도달은 되나 엔딩에 못 닿음
+      if (seen.has(p.id) && p.type !== 'ending' && !canEnd.has(p.id)) {
+        add('warn', 'loop', '엔딩 도달 불가', '어떤 경로로도 엔딩에 도달하지 못해요. 출구 연결을 확인해 주세요.');
+      }
+      // orphanend — 연결 안 된 엔딩
+      if (p.type === 'ending' && !seen.has(p.id)) {
+        add('warn', 'orphanend', '연결 없는 엔딩', '어느 페이지에서도 연결되지 않은 엔딩이에요.');
+      }
+    });
+
+    // noend — 엔딩 노드 자체가 없음 (전체 단위)
+    if (!hasEnding) {
+      const first = pages[0];
+      items.push({ level:'error', code:'noend', pageId: first ? first.id : null, title:'전체', short:'엔딩 없음', desc:'엔딩 페이지가 하나도 없어요. 성공/실패 엔딩을 추가해 주세요.' });
+    }
+
+    return items;
+  }
+
+  renderVals() {
+    const S = this.state;
+    const map = {}; S.pages.forEach(p => map[p.id] = p);
+    const sel = this.getSel();
+    const issues = this.computeIssues();
+    const problemIds = new Set(issues.filter(i => i.level === 'error').map(i => i.pageId));
+    const warnIds = new Set(issues.filter(i => i.level === 'warn').map(i => i.pageId));
+    const badgeByPage = {};
+    issues.forEach(i => {
+      if (!i.pageId) return;
+      const cur = badgeByPage[i.pageId];
+      if (!cur || (cur.level === 'warn' && i.level === 'error')) badgeByPage[i.pageId] = i;
+    });
+
+    // ---------- status ----------
+    const statusMap = {
+      pre:  { label:'진행 전', bg:'#eef0f2', fg:'#6b7280' },
+      ing:  { label:'진행 중', bg:'#e6f7ee', fg:'#1faf6a' },
+      done: { label:'종료',   bg:'#fdeaea', fg:'#c0392b' },
+    };
+    const st = statusMap[S.status];
+
+    // ---------- nodes ----------
+    const chipMap = {
+      start:  { label:'시작', bg:'#fff0e5', fg:'#c85400', num:'#ff6800' },
+      normal: { label:'일반', bg:'#eaf5ff', fg:'#1e6ba8', num:'#4a92d6' },
+      desc:   { label:'설명', bg:'#fff6e0', fg:'#9a6b00', num:'#e0a92b' },
+    };
+    const lockOf = k => LOCKS.find(l => l.key === k) || LOCKS[0];
+
+    const nodes = S.pages.map(p => {
+      const selected = p.id === S.selectedId;
+      const problem = problemIds.has(p.id);
+      const nodeBadge = badgeByPage[p.id] || null;
+      const isEnd = p.type === 'ending';
+      const chip = isEnd
+        ? (p.endingType === 'success' ? { label:'엔딩 · 성공', bg:'#e5fbf3', fg:'#0a8560', num:'#12b57e' } : { label:'엔딩 · 실패', bg:'#fdeaea', fg:'#c0392b', num:'#d9534f' })
+        : ((p.type === 'desc' || ((p.type==='start'||p.type==='normal') && !p.lock)) ? chipMap.desc : chipMap[p.type]);
+      const border = problem ? 'var(--tag-red)' : selected ? 'var(--main-color)' : 'var(--border)';
+      const shadow = selected ? '0 14px 34px -10px rgba(255,104,0,0.45)' : '0 6px 18px -8px rgba(0,0,0,0.20)';
+      const style = `position:absolute; left:0; top:0; width:${NODE_W}px; height:${NODE_H}px; box-sizing:border-box; transform:translate(${p.x}px,${p.y}px); background:#fff; border:2px solid ${border}; border-radius:16px; box-shadow:${shadow}; cursor:grab; user-select:none; z-index:${selected?6:3}; touch-action:none;`;
+
+      const isQ = p.type === 'start' || p.type === 'normal';
+      const hasP = isQ && !!p.lock;          // 문제 있는 일반/시작
+      const descLike = p.type === 'desc' || (isQ && !p.lock); // 설명형(문제 없음)
+      const hasLock = hasP;
+      const lk = hasP ? lockOf(p.lock) : null;
+
+      // exit text
+      let exitText = '', showExit = false;
+      if (hasP) {
+        const cor = p.correctExit ? map[p.correctExit] : null;
+        exitText = '정답→' + (cor ? cor.num : '—');
+        if (p.wrongExit && map[p.wrongExit]) exitText += '  오답→' + map[p.wrongExit].num;
+        showExit = true;
+      } else if (descLike) {
+        const nx = p.correctExit ? map[p.correctExit] : null;
+        exitText = '다음→' + (nx ? nx.num : '—'); showExit = true;
+      }
+
+      // warn badge = any issue on this node (error 우선, 없으면 warn)
+      const warn = !!nodeBadge;
+      const warnText = nodeBadge ? nodeBadge.short : '';
+      const warnLevel = nodeBadge ? nodeBadge.level : 'error';
+
+      // handles
+      const hasCorrectHandle = p.type !== 'ending';
+      const hasWrongHandle = hasP;           // 문제 있을 때만 오답 핸들
+      const cx = descLike ? 0.5 : 0.34;      // 설명형은 출구 핸들 가운데
+      const handleBase = 'position:absolute; bottom:-9px; width:17px; height:17px; border-radius:50%; border:3px solid #fff; cursor:crosshair; z-index:8; box-shadow:0 2px 5px rgba(0,0,0,0.2);';
+      const correctHandleStyle = handleBase + `left:calc(${cx*100}% - 8.5px); background:#1faf6a;`;
+      const wrongHandleStyle = handleBase + `left:calc(66% - 8.5px); background:#9a9a9a;`;
+
+      return {
+        id: p.id, num: p.num, style,
+        numBg: chip.num, chipBg: chip.bg, chipFg: chip.fg, chipLabel: chip.label,
+        hasLock, lockIcon: lk ? lk.icon : '', lockLabel: lk ? lk.label : '',
+        title: p.title, summary: (p.summary && p.summary.trim()) ? p.summary : (p.body || ''),
+        warn, warnText, showExit, exitText,
+        warnBg: warnLevel === 'warn' ? '#fff6e0' : '#fdeaea',
+        warnFg: warnLevel === 'warn' ? '#c07b12' : 'var(--tag-red)',
+        warnIcon: warnLevel === 'warn' ? 'icon-help' : 'icon-attention-alt-1',
+        hasCorrectHandle, hasWrongHandle, correctHandleStyle, wrongHandleStyle,
+        onDown: (e) => this.startNodeDrag(e, p.id),
+        onLinkCorrect: (e) => this.startLink(e, p.id, 'correct'),
+        onLinkWrong: (e) => this.startLink(e, p.id, 'wrong'),
+      };
+    });
+
+    // ---------- edges ----------
+    const edgePath = (s, t) => {
+      const sx = s.x + NODE_W * ((s.type === 'desc' || ((s.type==='start'||s.type==='normal') && !s.lock)) ? 0.5 : 0.34), sy = s.y + NODE_H;
+      const tx = t.x + NODE_W * 0.5, ty = t.y - 6;
+      const dy = Math.max(40, Math.abs(ty - sy) * 0.5);
+      return `M ${sx} ${sy} C ${sx} ${sy+dy}, ${tx} ${ty-dy}, ${tx} ${ty}`;
+    };
+    const edgePathWrong = (s, t) => {
+      const sx = s.x + NODE_W * 0.66, sy = s.y + NODE_H;
+      const tx = t.x + NODE_W * 0.5, ty = t.y - 6;
+      const dy = Math.max(40, Math.abs(ty - sy) * 0.5);
+      return `M ${sx} ${sy} C ${sx} ${sy+dy}, ${tx} ${ty-dy}, ${tx} ${ty}`;
+    };
+    const edges = [];
+    S.pages.forEach(p => {
+      if (p.type === 'ending') return;
+      if (p.correctExit && map[p.correctExit]) {
+        edges.push({ d: edgePath(p, map[p.correctExit]), stroke:'#1faf6a', dash:'', marker:'url(#arw-g)', onDelete:(e)=>this.deleteEdge(e, p.id, 'correct') });
+      }
+      if ((p.type === 'normal' || p.type === 'start') && p.wrongExit && map[p.wrongExit]) {
+        edges.push({ d: edgePathWrong(p, map[p.wrongExit]), stroke:'#9a9a9a', dash:'6 5', marker:'url(#arw-x)', onDelete:(e)=>this.deleteEdge(e, p.id, 'wrong') });
+      }
+    });
+    const edgeCount = edges.length;
+
+    // ---------- temp link ----------
+    let tempD = '', tempStroke = '#1faf6a', tempDash = '';
+    if (S.linking) {
+      const s = map[S.linking.fromId];
+      const kx = S.linking.kind === 'wrong' ? 0.66 : ((s.type === 'desc' || ((s.type==='start'||s.type==='normal') && !s.lock)) ? 0.5 : 0.34);
+      const sx = s.x + NODE_W * kx, sy = s.y + NODE_H;
+      tempD = `M ${sx} ${sy} L ${S.linking.tx} ${S.linking.ty}`;
+      if (S.linking.kind === 'wrong') { tempStroke = '#9a9a9a'; tempDash = '6 5'; }
+    }
+
+    // ---------- panel: selected ----------
+    const isEndingSel = sel.type === 'ending';
+    const showQuestion = sel.type === 'start' || sel.type === 'normal';
+    const hasProblem = showQuestion && !!sel.lock;   // 문제(자물쇠) 있는 일반/시작
+    const showLockGrid = hasProblem;
+    const isMc = hasProblem && sel.lock === 'mc';
+    const isOx = hasProblem && sel.lock === 'ox';
+    const selWarnings = issues.filter(i => i.pageId === sel.id).map(i => i.desc);
+    const _isEnd = sel.type === 'ending';
+    const _lockLabel = (LOCKS.find(l => l.key === sel.lock) || {}).label || '객관식';
+    const _cx = (sel.correctExit && map[sel.correctExit]) ? map[sel.correctExit].num : null;
+    const _wx = (sel.wrongExit && map[sel.wrongExit]) ? map[sel.wrongExit].num : null;
+    const contentBadge = _isEnd ? '엔딩 화면' : (hasProblem ? ('문제 · ' + _lockLabel) : '대화만 (문제 없음)');
+    const bodySnippet = (sel.body || '').trim() ? (sel.body.slice(0, 62) + (sel.body.length > 62 ? '…' : '')) : '아직 내용이 없어요';
+    const scoreSummary = hasProblem ? ((sel.points || 0) + '점' + (S.hintPolicy === 'deduct' ? (' · 차감 ' + (sel.hintDeduct || 0)) : '')) : '채점 없음';
+    const flowSummary = _isEnd ? '엔딩 (출구 없음)' : (hasProblem ? ('정답 →' + (_cx || '—') + ' · 오답 ' + (_wx ? ('→' + _wx) : '재시도')) : ('다음 →' + (_cx || '—')));
+    // panel tabs
+    const _tabDefs = [ {k:'basic',l:'기본',i:'icon-edit'}, {k:'content',l:'내용',i:'icon-quiz'} ];
+    if (showQuestion) _tabDefs.push({k:'score',l:'점수·힌트',i:'icon-chart'});
+    if (!_isEnd) _tabDefs.push({k:'flow',l:'연결',i:'icon-link'});
+    let _tab = S.panelTab || 'basic';
+    if (!_tabDefs.some(t => t.k === _tab)) _tab = 'basic';
+    const panelTabs = _tabDefs.map(t => {
+      const active = t.k === _tab;
+      return { key:t.k, label:t.l, icon:t.i,
+        style: `flex:1; display:flex; align-items:center; justify-content:center; gap:5px; height:34px; border:none; border-radius:8px; cursor:pointer; font-family:var(--font-kr); font-size:12px; font-weight:${active?'800':'600'}; background:${active?'#fff':'transparent'}; color:${active?'var(--main-color)':'var(--fg-sub)'}; box-shadow:${active?'0 1px 4px rgba(0,0,0,0.08)':'none'};`,
+        onClick: () => this.setState({ panelTab:t.k }) };
+    });
+    // hint policies (show all types)
+    const _pol = S.hintPolicy;
+    const hintPolicies = [
+      {k:'free',l:'무료 공개',d:'요청 즉시 힌트를 보여줘요.'},
+      {k:'count',l:'횟수 제한',d:'전체 힌트 사용 횟수를 제한해요.'},
+      {k:'deduct',l:'점수 차감',d:'힌트를 쓰면 점수가 깎여요.'},
+    ].map(p => {
+      const active = p.k === _pol;
+      return { key:p.k, label:p.l, desc:p.d, active, isCount:p.k==='count', isDeduct:p.k==='deduct',
+        rowStyle: `display:flex; align-items:center; gap:11px; padding:10px 12px; border:1.5px solid ${active?'var(--main-color)':'var(--border)'}; border-radius:11px; background:${active?'var(--bg-light-color)':'#fff'}; margin-bottom:8px; cursor:pointer; transition:all .15s;`,
+        radioStyle: `width:20px; height:20px; flex:none; border-radius:50%; border:2px solid ${active?'var(--main-color)':'var(--border)'}; background:${active?'var(--main-color)':'#fff'}; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer;`,
+        checkOpacity: active?1:0,
+        onPick: () => this.setState({ hintPolicy:p.k }) };
+    });
+
+    const segStyle = (active) => `flex:1; height:34px; border:none; border-radius:8px; background:${active?'#fff':'transparent'}; color:${active?'var(--main-color)':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:12.5px; font-weight:${active?700:600}; cursor:pointer; box-shadow:${active?'0 1px 4px rgba(0,0,0,0.12)':'none'};`;
+    const typeCards = [
+      { key:'normal', icon:'icon-mission', title:'일반', desc:'대화·문제', color:'var(--main-color)', bg:'var(--bg-light-color)' },
+      { key:'desc',   icon:'icon-text',    title:'설명', desc:'대화만',    color:'#e0a92b',          bg:'#fff6e0' },
+      { key:'ending', icon:'icon-studio',  title:'엔딩', desc:'성공·실패',  color:'#12b57e',          bg:'#e7f8f0' },
+    ].map(t => {
+      const active = sel.type === t.key || (t.key==='normal' && sel.type==='start');
+      return { icon:t.icon, title:t.title, desc:t.desc,
+        cardStyle: `display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:11px 10px; border-radius:12px; cursor:pointer; text-align:left; transition:all .15s; border:1.5px solid ${active?t.color:'var(--border)'}; background:${active?t.bg:'#fff'};`,
+        titleStyle: `display:flex; align-items:center; gap:5px; font-family:var(--font-kr); font-size:13px; font-weight:800; color:${active?t.color:'var(--fg)'};`,
+        onPick: () => this.changeType(t.key) };
+    });
+
+    const endBtn = (active, color) => `flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:1.5px solid ${active?color:'var(--border)'}; border-radius:10px; background:${active?color:'#fff'}; color:${active?'#fff':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:pointer;`;
+    const endingSeg = [
+      { key:'success', label:'성공', icon:'icon-check', color:'#12b57e' },
+      { key:'fail',    label:'실패', icon:'icon-close', color:'#d9534f' },
+    ].map(e => ({ label:e.label, icon:e.icon, style: endBtn(sel.endingType === e.key, e.color), onPick: () => this.patchSel({ endingType:e.key }) }));
+
+    const lockTypes = LOCKS.map(l => {
+      const active = sel.lock === l.key;
+      return { icon:l.icon, label:l.label, style: `display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; height:56px; border:1.5px solid ${active?'var(--main-color)':'var(--border)'}; border-radius:11px; background:${active?'var(--bg-light-color)':'#fafafa'}; color:${active?'var(--main-color)':'var(--fg-sub)'}; cursor:pointer;`, onPick: () => this.patchSel({ lock:l.key }) };
+    });
+
+    // choices (mc)
+    const choices = isMc ? (sel.choices || []).map((c, i) => ({
+      text: c.t,
+      checkOpacity: c.c ? 1 : 0,
+      rowStyle: `display:flex; align-items:center; gap:8px; padding:4px 6px 4px 4px; border:1.5px solid ${c.c?'var(--main-color)':'var(--border)'}; border-radius:10px; background:${c.c?'var(--bg-light-color)':'#fff'};`,
+      radioStyle: `display:flex; align-items:center; justify-content:center; width:24px; height:24px; flex:none; border:none; border-radius:7px; background:${c.c?'var(--main-color)':'var(--border)'}; color:#fff; cursor:pointer;`,
+      onPick: () => this.pickCorrect(i),
+      onText: (e) => this.setChoiceText(i, e.target.value),
+      onRemove: () => this.removeChoice(i),
+    })) : [];
+
+    // ox seg
+    const oxSeg = isOx ? [
+      { key:'O', label:'O' }, { key:'X', label:'X' },
+    ].map(o => ({ label:o.label, style: `flex:1; height:52px; border:1.5px solid ${sel.oxAnswer===o.key?'var(--main-color)':'var(--border)'}; border-radius:12px; background:${sel.oxAnswer===o.key?'var(--bg-light-color)':'#fafafa'}; color:${sel.oxAnswer===o.key?'var(--main-color)':'var(--fg-sub)'}; font-family:var(--font-en); font-size:22px; font-weight:800; cursor:pointer;`, onPick: () => this.patchSel({ oxAnswer:o.key }) })) : [];
+
+    // exits
+    const showExits = sel.type !== 'ending';
+    const showWrongExit = hasProblem;                          // 문제 있을 때만 오답 출구
+    const correctExitLabel = hasProblem ? '정답 출구' : '다음 페이지'; // 설명형은 '다음 페이지'
+    const opts = (excludeVal) => {
+      const arr = [{ value:'', label:'— 연결 없음 —' }];
+      S.pages.forEach(p => { if (p.id !== sel.id) arr.push({ value:p.id, label:`${p.num}. ${p.title}` }); });
+      return arr;
+    };
+
+    // ---------- settings ----------
+    const isImg = (v) => !!v && /^(data:|https?:|\/|uploads\/)/.test(v);
+    const presetImg = (v) => { try { const t = window.RoomStore && window.RoomStore.THUMBS && window.RoomStore.THUMBS[v]; return t && t.img ? t.img : ''; } catch (e) { return ''; } };
+    const thumbImg = isImg(S.thumb) ? S.thumb : presetImg(S.thumb);
+    const hasThumbImg = !!thumbImg;
+    const THUMBS = (window.RoomStore && window.RoomStore.THUMBS) || {};
+    const tpPresets = [
+      { name:'실험실', key:'lab' }, { name:'우주', key:'space' },
+      { name:'도서관', key:'book' }, { name:'항해', key:'ship' },
+    ].filter(p => THUMBS[p.key] && THUMBS[p.key].img).map(p => ({
+      name:p.name,
+      imgEl: React.createElement('img', { src:THUMBS[p.key].img, style:{ width:'100%', height:'70px', objectFit:'cover', display:'block' } }),
+      onPick: () => this.tpApply(THUMBS[p.key].img),
+    }));
+    const hintDef = [
+      { k:'free',   icon:'icon-help', iconBg:'#e6f7ee', iconFg:'#1e9e5a', label:'무제한', desc:'힌트를 횟수 제한 없이 자유롭게 볼 수 있어요.' },
+      { k:'count',  icon:'icon-mission', iconBg:'#eaf5ff', iconFg:'#1e6ba8', label:'횟수 제한', desc:'정해진 횟수만큼만 힌트를 사용해요.' },
+      { k:'deduct', icon:'icon-minus-circle', iconBg:'#fff0e5', iconFg:'var(--main-color)', label:'점수 차감', desc:'힌트를 볼 때마다 점수가 차감돼요.' },
+    ];
+    const hintChoices = hintDef.map(h => { const on = S.hintPolicy === h.k; return { ...h, selected:on, showCount: on && h.k==='count',
+      style:`display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:1.5px solid ${on?'var(--main-color)':'var(--border-2)'}; border-radius:13px; background:${on?'var(--bg-light-color)':'#fff'}; cursor:pointer; transition:all .15s;`,
+      radioStyle:`display:flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; border:2px solid ${on?'var(--main-color)':'var(--border)'}; background:${on?'var(--main-color)':'#fff'}; flex:none; transition:all .15s;`,
+      onPick:()=>this.setState({ hintPolicy:h.k }) }; });
+
+    const shareToggleStyle = `position:relative; width:46px; height:26px; flex:none; border:none; border-radius:50px; background:${S.share?'var(--main-color)':'var(--border)'}; cursor:pointer; transition:background .18s;`;
+    const shareKnobStyle = `position:absolute; top:3px; left:${S.share?'23px':'3px'}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .18s; box-shadow:0 1px 3px rgba(0,0,0,0.2);`;
+
+    // ---------- media modal ----------
+    const mtabDefs = [
+      { key:'upload', label:'업로드',   icon:'icon-download' },
+      { key:'url',    label:'이미지 URL', icon:'icon-link' },
+      { key:'yt',     label:'유튜브',    icon:'icon-youtube-play' },
+    ];
+    const mediaTabs = mtabDefs.map(m => ({ label:m.label, icon:m.icon, style: `display:flex; align-items:center; gap:6px; height:38px; padding:0 15px; border:none; border-bottom:2.5px solid ${S.mediaTab===m.key?'var(--main-color)':'transparent'}; background:transparent; color:${S.mediaTab===m.key?'var(--main-color)':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:13px; font-weight:${S.mediaTab===m.key?700:600}; cursor:pointer;`, onPick: () => this.setState({ mediaTab:m.key, mediaValid:false }) }));
+    const presetDefs = [
+      { key:'p1', icon:'icon-mission' }, { key:'p2', icon:'icon-location' }, { key:'p3', icon:'icon-globe' }, { key:'p4', icon:'icon-blank-page' },
+    ];
+    const mediaPresets = presetDefs.map(p => ({ icon:p.icon, style:`display:flex; align-items:center; justify-content:center; height:64px; border:1.5px solid ${S.mediaValid&&S._preset===p.key?'var(--main-color)':'var(--border)'}; border-radius:11px; background:${S.mediaValid&&S._preset===p.key?'var(--bg-light-color)':'#fafafa'}; color:${S.mediaValid&&S._preset===p.key?'var(--main-color)':'var(--fg-mute)'}; cursor:pointer;`, onPick: () => this.setState({ mediaValid:true, _preset:p.key }) }));
+    const mediaApplyStyle = `height:42px; padding:0 24px; border:none; border-radius:10px; background:${S.mediaValid?'var(--main-color)':'var(--border)'}; color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:700; cursor:${S.mediaValid?'pointer':'not-allowed'}; opacity:${S.mediaValid?1:0.7};`;
+
+    // ---------- validation dropdown ----------
+    const levelMap = {
+      error: { icon:'icon-attention-alt-1', color:'#c0392b', bg:'#fdeaea', border:'#f5c6c6' },
+      warn:  { icon:'icon-help',             color:'#c07b12', bg:'#fff6e0', border:'#f0dca0' },
+      info:  { icon:'icon-dot',              color:'#6b7280', bg:'#f4f5f7', border:'#e4e6ea' },
+    };
+    const valItems = issues.map(it => {
+      const lm = levelMap[it.level];
+      return { icon:lm.icon, color:lm.color, bg:lm.bg, border:lm.border, title:it.title, desc:it.desc, onGo: () => this.goToPage(it.pageId) };
+    });
+    const errCount = issues.filter(i => i.level === 'error').length;
+    const warnCount = issues.filter(i => i.level === 'warn').length;
+    const valCount = issues.length;
+    const valClean = issues.length === 0;
+    const valSummary = errCount ? `오류 ${errCount} · 주의 ${issues.length-errCount}` : (issues.length ? `주의 ${issues.length}` : '이상 없음');
+    const problemTotal = errCount + warnCount;
+    const valBadgeBg = errCount ? 'var(--tag-red)' : (warnCount ? '#c07b12' : '#1faf6a');
+    const valBtnBorder = S.validationOpen ? 'var(--main-color)' : 'var(--border)';
+    const valBtnBg = S.validationOpen ? 'var(--bg-light-color)' : '#fff';
+    const valBtnFg = S.validationOpen ? 'var(--main-color)' : 'var(--fg-sub)';
+
+    // ---------- preview (chat-bubble participant screen) ----------
+    const pv = sel;
+    const pvFull = S.previewMode === 'full';
+    const pvFrame = S.previewOpen
+      ? React.createElement('iframe', {
+          key: 'pvframe-' + this._roomId + '-' + (pvFull ? 'full' : (pv && pv.id)),
+          src: '모바일/참여자 플레이 - 모바일.dc.html?id=' + this._roomId + (!pvFull && pv && pv.id ? '&p=' + pv.id : '') + '&reveal=0',
+          style: { width:'100%', height:'100%', border:'none', display:'block', borderRadius:'34px' },
+        })
+      : null;
+
+    const anyDropdown = S.validationOpen || S.settingsOpen;
+    const canvasCursor = S.panning ? 'grabbing' : (S.linking ? 'crosshair' : 'default');
+
+    return {
+      // toolbar
+      sTitle: S.title, sPin: S.pin, sStatus: st.label, sStatusBg: st.bg, sStatusFg: st.fg,
+      // 진행상태 배지 드롭다운
+      statusMenuOpen: S.statusMenuOpen,
+      statusChevron: S.statusMenuOpen ? 'icon-up-open' : 'icon-down-open',
+      statusMenu: ['pre','ing','done'].map(k => {
+        const sm = statusMap[k]; const on = S.status === k;
+        return { label: sm.label,
+          style: `display:flex; align-items:center; gap:8px; width:100%; padding:9px 10px; border:none; border-radius:8px; background:${on?sm.bg:'transparent'}; cursor:pointer; text-align:left; font-family:var(--font-kr); font-size:13px; font-weight:${on?700:600}; color:${on?sm.fg:'var(--fg)'};`,
+          dotStyle: `width:7px; height:7px; border-radius:50%; background:${sm.fg};`,
+          onPick: () => this.setState({ status:k, statusMenuOpen:false }) };
+      }),
+      onToggleStatusMenu: () => this.setState(s => ({ statusMenuOpen: !s.statusMenuOpen, settingsOpen:false, validationOpen:false })),
+      onCloseStatusMenu: () => this.setState({ statusMenuOpen:false }),
+      valCount, valIcon: valClean ? 'icon-check' : 'icon-attention-alt-1', valBadgeBg, valBtnBorder, valBtnBg, valBtnFg,
+      onBack: () => { this.persistRoom(); location.href = 'My 방탈출 - 웹.dc.html'; },
+      onToggleValidation: () => this.setState(s => ({ validationOpen: !s.validationOpen, settingsOpen:false, statusMenuOpen:false })),
+      onToggleSettings: () => this.setState(s => ({ settingsOpen: !s.settingsOpen, validationOpen:false, statusMenuOpen:false })),
+      onOpenPreview: () => { this.persistRoom(); this.setState({ previewOpen:true, previewMode:'full' }); },
+      previewHref: '참여자 플레이 - 웹.dc.html?id=' + this._roomId,
+
+      // canvas
+      setVp: (el) => { this._vp = el; },
+      vpStyle: `position:absolute; inset:0; overflow:hidden; cursor:${canvasCursor}; background-color:#f4f3ef; background-image:radial-gradient(rgba(0,0,0,0.055) 1.4px, transparent 1.4px); background-size:${(26*S.zoom).toFixed(2)}px ${(26*S.zoom).toFixed(2)}px; background-position:${S.pan.x}px ${S.pan.y}px;`,
+      worldStyle: `position:absolute; left:0; top:0; width:0; height:0; transform:translate(${S.pan.x}px,${S.pan.y}px) scale(${S.zoom}); transform-origin:0 0; overflow:visible;`,
+      canvasCursor,
+      onCanvasDown: (e) => this.startPan(e),
+      onCanvasMove: (e) => this.onMove(e),
+      onCanvasUp: (e) => this.onUp(e),
+      nodes, edges, edgeCount,
+      linking: !!S.linking, tempD, tempStroke, tempDash,
+      pageCount: S.pages.length,
+      zoomPct: Math.round(S.zoom * 100),
+      onZoomIn: () => this.setState(s => ({ zoom: Math.min(1.6, +(s.zoom+0.1).toFixed(2)) })),
+      onZoomOut: () => this.setState(s => ({ zoom: Math.max(0.28, +(s.zoom-0.1).toFixed(2)) })),
+      onFit: () => this.fitToContent(),
+      onAddPage: () => this.addPage(),
+
+      // panel
+      selNum: sel.num, selNumBg: _isEnd ? '#12b57e' : (((sel.type==='start'||sel.type==='normal') && !sel.lock) ? chipMap.desc.num : (chipMap[sel.type]||chipMap.desc).num),
+      selHasWarn: selWarnings.length > 0, selWarnings,
+      selTitle: sel.title, onSelTitle: (e) => this.patchSel({ title:e.target.value }),
+      typeCards, isEnding: isEndingSel, endingSeg,
+      selBody: sel.body || '', onSelBody: (e) => this.patchSel({ body:e.target.value }),
+      showQuestion, showLockGrid, lockTypes, isMc, choices, onAddChoice: () => this.addChoice(),
+      isOx, oxSeg,
+      selPoints: sel.points || 0, onPoints: (e) => this.patchSel({ points: parseInt(e.target.value)||0 }),
+      hintIsDeduct: S.hintPolicy === 'deduct',
+      selDeduct: sel.hintDeduct || 0, onDeduct: (e) => this.patchSel({ hintDeduct: parseInt(e.target.value)||0 }),
+      selHint: sel.hint || '', onHint: (e) => this.patchSel({ hint:e.target.value }),
+      showExits, showWrongExit, correctExitLabel,
+      selCorrectExit: sel.correctExit || '', onCorrectExit: (e) => this.patchSel({ correctExit:e.target.value }),
+      selWrongExit: sel.wrongExit || '', onWrongExit: (e) => this.patchSel({ wrongExit:e.target.value }),
+      exitOptions: opts(), exitOptionsWrong: opts(),
+      onPanelPreview: () => { this.persistRoom(); this.setState({ previewOpen:true, previewMode:'page', pvChoice:null, pvSubmitted:false }); },
+      onDup: () => this.duplicatePage(),
+      onDel: () => this.deletePage(),
+      delTitle: sel.type === 'start' ? '시작 페이지는 삭제할 수 없어요' : '페이지 삭제',
+      delBorder: sel.type === 'start' ? 'var(--border-2)' : '#f3c9c9',
+      delBg: sel.type === 'start' ? '#fafafa' : '#fff5f5',
+      delFg: sel.type === 'start' ? 'var(--fg-mute)' : 'var(--tag-red)',
+      delCursor: sel.type === 'start' ? 'not-allowed' : 'pointer',
+      onOpenMediaBg: () => this.setState({ mediaOpen:true, mediaFor:'bg', mediaTab:'url', mediaValid:false }),
+      onOpenMediaQ: () => this.setState({ mediaOpen:true, mediaFor:'q', mediaTab:'url', mediaValid:false }),
+      // panel accordion summaries
+      contentBadge, bodySnippet, scoreSummary, flowSummary, accOpen:true,
+      editContentHref: '문제 대화 편집.dc.html?id=' + this._roomId + '&page=' + this.state.selectedId,
+      onEditContent: () => { this.persistRoom(); },
+      panelTabs, hintPolicies,
+      tabBasic: _tab==='basic', tabContent: _tab==='content', tabScore: _tab==='score', tabFlow: _tab==='flow',
+      bgName: sel.bgName || '기본 배경',
+      showScoreGroup: showQuestion, showEndingContent: _isEnd,
+
+      // dropdown catcher
+      anyDropdown, onCloseDropdowns: () => this.setState({ validationOpen:false, settingsOpen:false }),
+
+      // validation
+      validationOpen: S.validationOpen, valItems, valClean, valSummary,
+
+      // settings
+      settingsOpen: S.settingsOpen,
+      onSetTitle: (e) => this.setState({ title:e.target.value }),
+      hasThumbImg, noThumbImg: !hasThumbImg,
+      thumbImgEl: hasThumbImg ? React.createElement('img', { src:thumbImg, alt:'썸네일', style:{ display:'block', width:'100%', maxHeight:'160px', objectFit:'cover' } }) : null,
+      onThumbPick: () => this.setState({ tp:{ open:true, tab:'upload', url:'', drag:false } }),
+      onThumbClear: () => this.setState({ thumb: '' }),
+      onThumbDragOver: (e) => e.preventDefault(),
+      onThumbDrop: (e) => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) this.tpReadFile(f); },
+      // ---- 썸네일 이미지 등록 팝업 (전용) ----
+      tpOpen: S.tp.open,
+      onTpClose: () => this.setState({ tp:{...S.tp, open:false} }),
+      tpStop: (e) => e.stopPropagation(),
+      tpTabUpload: S.tp.tab === 'upload',
+      tpTabUrl: S.tp.tab === 'url',
+      tpTabs: [ {key:'upload',label:'가져오기',icon:'icon-download'}, {key:'url',label:'이미지 링크',icon:'icon-link'} ].map(t => ({
+        label:t.label, icon:t.icon,
+        onPick: () => this.setState(s => ({ tp:{...s.tp, tab:t.key} })),
+        style:`display:flex; align-items:center; gap:6px; height:36px; padding:0 15px; border:none; border-bottom:2.5px solid ${S.tp.tab===t.key?'var(--main-color)':'transparent'}; background:none; cursor:pointer; font-family:var(--font-kr); font-size:13px; font-weight:${S.tp.tab===t.key?'800':'600'}; color:${S.tp.tab===t.key?'var(--main-color)':'var(--fg-mute)'};`,
+      })),
+      setTpFile: (el) => { this._tpFile = el; },
+      onTpFakePick: () => { if (this._tpFile) this._tpFile.click(); },
+      onTpFile: (e) => { const f = e.target && e.target.files && e.target.files[0]; if (f) this.tpReadFile(f); if (e.target) e.target.value=''; },
+      onTpDragOver: (e) => { e.preventDefault(); if (!S.tp.drag) this.setState(s => ({ tp:{...s.tp, drag:true} })); },
+      onTpDragLeave: (e) => { e.preventDefault(); if (S.tp.drag) this.setState(s => ({ tp:{...s.tp, drag:false} })); },
+      onTpDrop: (e) => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; this.setState(s => ({ tp:{...s.tp, drag:false} })); if (f) this.tpReadFile(f); },
+      tpDropStyle:`width:100%; height:150px; border:2px dashed ${S.tp.drag?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${S.tp.drag?'var(--bg-light-color)':'#fafafa'}; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; cursor:pointer; margin-bottom:18px; transition:all .12s;`,
+      tpUrl: S.tp.url,
+      onTpUrl: (e) => this.setState(s => ({ tp:{...s.tp, url:e.target.value} })),
+      onTpApplyUrl: () => this.tpApply((this.state.tp.url||'').trim()),
+      tpUrlPreview: !!(S.tp.url && S.tp.url.trim()),
+      tpUrlPreviewEl: (S.tp.url && S.tp.url.trim()) ? React.createElement('img', { src:S.tp.url.trim(), style:{ display:'block', width:'100%', maxHeight:'180px', objectFit:'contain', background:'#fff' } }) : null,
+      tpPresets: tpPresets,
+      hintChoices, policyIsCount: S.hintPolicy === 'count',
+      hintCount: S.hintCount, onHintCount: (e) => this.setState({ hintCount: parseInt(e.target.value)||0 }),
+      shareToggleStyle, shareKnobStyle, onToggleShare: () => this.setState(s => ({ share: !s.share })),
+
+      // media
+      mediaOpen: S.mediaOpen, mediaTitle: S.mediaFor === 'bg' ? '배경 이미지 선택' : '문제 미디어 선택',
+      mediaTabs, mediaTabUpload: S.mediaTab==='upload', mediaTabUrl: S.mediaTab==='url', mediaTabYt: S.mediaTab==='yt',
+      mediaPresets, mediaApplyStyle,
+      onMediaTab: (k) => this.setState({ mediaTab:k }),
+      onMediaUrl: (e) => this.setState({ mediaValid: !!(e.target.value && e.target.value.trim().length > 6) }),
+      onMediaFakePick: () => this.setState({ mediaValid:true }),
+      onMediaApply: () => { if (S.mediaValid) { this.setState({ mediaOpen:false }); this.toast('미디어가 적용되었어요'); } },
+      onMediaClose: () => this.setState({ mediaOpen:false }),
+      stop: (e) => e.stopPropagation(),
+
+      // preview
+      previewOpen: S.previewOpen, pvFrame,
+      onPreviewClose: () => this.setState({ previewOpen:false }),
+
+      // toast
+      toastOpen: !!S.toast, toast: S.toast, toastIcon: S.toastIcon, toastColor: S.toastColor,
+    };
+  }
+
+  // ---------- interactions ----------
+  fitToContent() {
+    if (!this._vp) return;
+    const vw = this._vp.clientWidth, vh = this._vp.clientHeight;
+    const ps = this.state.pages;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    ps.forEach(p => {
+      minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x + NODE_W); maxY = Math.max(maxY, p.y + NODE_H);
+    });
+    const cw = maxX - minX, ch = maxY - minY;
+    const padX = 70, padTop = 66, padBottom = 74; // leave room for hint chip + legend
+    const zoom = Math.max(0.28, Math.min(1.4, Math.min((vw - padX*2) / cw, (vh - padTop - padBottom) / ch)));
+    const panX = (vw - cw * zoom) / 2 - minX * zoom;
+    const panY = (vh - padTop - padBottom - ch * zoom) / 2 + padTop - minY * zoom;
+    this.setState({ zoom: +zoom.toFixed(3), pan: { x: Math.round(panX), y: Math.round(panY) } });
+  }
+  goToPage(id) { this.setState({ selectedId:id, validationOpen:false }); }
+  addPage() {
+    const S = this.state;
+    // center of current viewport in world coords, offset so node centers there
+    let wx = 300, wy = 300;
+    if (this._vp) {
+      const r = this._vp.getBoundingClientRect();
+      wx = (r.width / 2 - S.pan.x) / S.zoom - NODE_W / 2;
+      wy = (r.height / 2 - S.pan.y) / S.zoom - NODE_H / 2;
+    }
+    // avoid exact overlap with an existing node
+    const occupied = (x, y) => S.pages.some(p => Math.abs(p.x - x) < 24 && Math.abs(p.y - y) < 24);
+    while (occupied(wx, wy)) { wx += 28; wy += 28; }
+    const maxNum = S.pages.reduce((m, p) => Math.max(m, p.num || 0), 0);
+    const id = 'p' + (Date.now().toString(36));
+    // 새 페이지는 문제 없는 설명형(desc)으로 시작 (내용 편집에서 문제를 추가하면 일반으로 전환)
+    const page = {
+      id, num: maxNum + 1, type: 'desc',
+      title: '새 페이지', body: '', summary: '',
+      x: Math.round(wx), y: Math.round(wy),
+      correctExit: null, wrongExit: null, points: 100, hint: '', hintDeduct: 50,
+    };
+    this.setState(s => ({ pages: [...s.pages, page], selectedId: id, validationOpen:false, settingsOpen:false }));
+    this.toast('새 페이지가 추가되었어요', 'icon-plus-circle');
+  }
+  duplicatePage() {
+    const S = this.state;
+    const sel = this.getSel(); if (!sel) return;
+    const maxNum = S.pages.reduce((m, p) => Math.max(m, p.num || 0), 0);
+    const id = 'p' + (Date.now().toString(36));
+    const copy = JSON.parse(JSON.stringify(sel));
+    copy.id = id; copy.num = maxNum + 1;
+    copy.title = (sel.title || '페이지') + ' (복사본)';
+    copy.x = (sel.x || 0) + 40; copy.y = (sel.y || 0) + 40;
+    if (copy.type === 'start') copy.type = 'normal'; // 시작 페이지는 하나만
+    this.setState(s => ({ pages: [...s.pages, copy], selectedId: id }), () => this.persistRoom());
+    this.toast('페이지를 복제했어요', 'icon-005-copy');
+  }
+  deletePage() {
+    const S = this.state;
+    const sel = this.getSel(); if (!sel) return;
+    if (sel.type === 'start') { this.toast('시작 페이지는 삭제할 수 없어요', 'icon-help', '#ffd27f'); return; }
+    if (S.pages.length <= 1) { this.toast('마지막 페이지는 삭제할 수 없어요', 'icon-help', '#ffd27f'); return; }
+    const delId = sel.id;
+    const remaining = S.pages.filter(p => p.id !== delId).map(p => ({
+      ...p,
+      correctExit: p.correctExit === delId ? null : p.correctExit,
+      wrongExit: p.wrongExit === delId ? null : p.wrongExit,
+    }));
+    const nextSel = (remaining.find(p => p.type === 'start') || remaining[0]).id;
+    this.setState({ pages: remaining, selectedId: nextSel, validationOpen:false, settingsOpen:false }, () => this.persistRoom());
+    this.toast('페이지를 삭제했어요', 'icon-trash', '#ffb3b3');
+  }
+  changeType(key) {
+    const sel = this.getSel();
+    const patch = { type: key };
+    if (key === 'ending') { patch.endingType = sel.endingType || 'success'; patch.wrongExit = null; }
+    if (key === 'desc') { patch.wrongExit = null; }         // 설명형은 오답 출구 없음
+    if (key === 'normal' && !sel.lock) { patch.lock = 'mc'; } // 일반 전환 시 자물쇠 기본값
+    this.patchSel(patch);
+  }
+  pickCorrect(i) { const sel = this.getSel(); this.patchSel({ choices: sel.choices.map((c,idx)=>({ ...c, c: idx===i })) }); }
+  setChoiceText(i, v) { const sel = this.getSel(); this.patchSel({ choices: sel.choices.map((c,idx)=> idx===i ? { ...c, t:v } : c) }); }
+  addChoice() { const sel = this.getSel(); this.patchSel({ choices: [...(sel.choices||[]), { t:'', c:false }] }); }
+  removeChoice(i) { const sel = this.getSel(); if ((sel.choices||[]).length <= 2) { this.toast('선택지는 최소 2개가 필요해요', 'icon-help', '#ffd27f'); return; } this.patchSel({ choices: sel.choices.filter((_,idx)=>idx!==i) }); }
+
+  startNodeDrag(e, id) {
+    e.stopPropagation();
+    const w = this.worldPt(e.clientX, e.clientY);
+    const p = this.state.pages.find(x => x.id === id);
+    this.setState({ selectedId:id, dragging:{ id, offX: w.x - p.x, offY: w.y - p.y }, moved:false, validationOpen:false, settingsOpen:false });
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch(_) {}
+  }
+  startLink(e, id, kind) {
+    e.stopPropagation();
+    const w = this.worldPt(e.clientX, e.clientY);
+    this.setState({ linking:{ fromId:id, kind, tx:w.x, ty:w.y } });
+  }
+  startPan(e) {
+    this.setState({ panning:{ sx:e.clientX, sy:e.clientY, ox:this.state.pan.x, oy:this.state.pan.y }, validationOpen:false, settingsOpen:false });
+  }
+  onMove(e) {
+    const S = this.state;
+    if (S.dragging) {
+      const w = this.worldPt(e.clientX, e.clientY);
+      let nx = Math.max(-4000, Math.min(4000, w.x - S.dragging.offX));
+      let ny = Math.max(-4000, Math.min(4000, w.y - S.dragging.offY));
+      this.setPage(S.dragging.id, { x:nx, y:ny });
+      if (!S.moved) this.setState({ moved:true });
+    } else if (S.linking) {
+      const w = this.worldPt(e.clientX, e.clientY);
+      this.setState({ linking: { ...S.linking, tx:w.x, ty:w.y } });
+    } else if (S.panning) {
+      this.setState({ pan: { x: S.panning.ox + (e.clientX - S.panning.sx), y: S.panning.oy + (e.clientY - S.panning.sy) } });
+    }
+  }
+  onUp(e) {
+    const S = this.state;
+    if (S.linking) {
+      const w = this.worldPt(e.clientX, e.clientY);
+      const tgt = this.state.pages.find(p => p.id !== S.linking.fromId && w.x >= p.x && w.x <= p.x + NODE_W && w.y >= p.y && w.y <= p.y + NODE_H);
+      if (tgt) {
+        const key = S.linking.kind === 'wrong' ? 'wrongExit' : 'correctExit';
+        this.setPage(S.linking.fromId, { [key]: tgt.id });
+        this.toast(`${S.linking.kind==='wrong'?'오답':'정답'} 출구를 ${tgt.num}번에 연결했어요`);
+      }
+      this.setState({ linking:null });
+    }
+    if (S.dragging) this.setState({ dragging:null });
+    if (S.panning) this.setState({ panning:null });
+  }
+  deleteEdge(e, id, kind) {
+    e.stopPropagation();
+    const key = kind === 'wrong' ? 'wrongExit' : 'correctExit';
+    this.setPage(id, { [key]: null });
+    this.toast('연결을 삭제했어요', 'icon-trash', '#ffb3b3');
+  }
+}
+</script>
+</body>
+</html>

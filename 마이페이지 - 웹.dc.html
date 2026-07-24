@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing:border-box; }
+    a { color: var(--main-color); text-decoration:none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes qnMenu { from{ transform:translateY(-6px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    .qn-tab:hover { color: var(--main-color) !important; }
+    .qn-cta:hover { background: var(--btn-hover-color) !important; }
+    .qn-nav-item:hover { background: var(--bg-warm) !important; }
+    .qn-dd-item:hover { background: var(--bg-warm-2) !important; }
+    .qn-dd-item.danger:hover { background:#fdeaea !important; }
+    .qn-input:focus { border-color: var(--main-color) !important; background:#fff !important; box-shadow:0 0 0 3px var(--bg-light-color); }
+    .qn-ghost:hover { border-color: var(--main-color) !important; color: var(--main-color) !important; }
+    .qn-profile:hover { background: var(--bg-warm) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="마이페이지 · 웹" style="min-height:100vh; background:#f4f3ef; font-family:var(--font-kr);">
+
+  <!-- top app bar -->
+  <header style="position:sticky; top:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:16px 40px; background:rgba(255,255,255,0.9); border-bottom:1px solid var(--border-2); backdrop-filter:blur(8px);">
+    <div style="display:flex; align-items:center; gap:32px;">
+      <div style="font-family:var(--font-kr); font-size:22px; font-weight:900; letter-spacing:-1px; color:var(--fg);">방탈출<span style="color:var(--main-color);">N</span></div>
+      <nav style="display:flex; gap:26px;">
+        <a class="qn-tab" href="My 방탈출 - 웹.dc.html" style="font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg-sub);">My 방탈출</a>
+        <a class="qn-tab" href="#" style="font-family:var(--font-kr); font-size:15px; font-weight:600; color:var(--fg-sub);">탐색</a>
+      </nav>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+            <button title="알림" style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border:none; border-radius:50%; background:var(--bg-light-color); color:var(--main-color); cursor:pointer;"><i class="icon-megaphone" style="font-size:16px;"></i><span style="position:absolute; top:-2px; right:-2px; min-width:17px; height:17px; padding:0 4px; border-radius:50px; background:var(--tag-red); color:#fff; font-family:var(--font-en); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">3</span></button>
+      <!-- profile + dropdown -->
+      <div style="position:relative;">
+        <button class="qn-profile" onClick="{{ onToggleDd }}" style="display:flex; align-items:center; gap:9px; height:48px; padding:0 8px 0 9px; border:none; border-radius:12px; background:transparent; cursor:pointer; transition:background .15s;">
+          <img src="uploads/character01/profile_Kay.png" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);">
+          <div style="line-height:1.3; text-align:left;"><div style="font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:var(--fg);">{{ name }}</div><span style="display:inline-flex; align-items:center; gap:4px; margin-top:2px; padding:2px 8px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-small); font-size:10px; font-weight:700;">{{ plan }}</span></div>
+          <i class="{{ ddCaret }}" style="font-size:11px; color:var(--fg-mute); margin-left:2px;"></i>
+        </button>
+        <sc-if value="{{ ddOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; right:0; top:56px; z-index:50; width:236px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:0 18px 44px -16px rgba(0,0,0,0.3); overflow:hidden; animation:qnMenu .16s ease;">
+          <div style="display:flex; align-items:center; gap:11px; padding:16px; background:var(--bg-warm); border-bottom:1px solid var(--border-2);">
+            <img src="uploads/character01/profile_Kay.png" style="width:44px; height:44px; border-radius:50%; object-fit:cover;">
+            <div style="min-width:0;"><div style="font-family:var(--font-kr); font-size:14.5px; font-weight:800; color:var(--fg);">{{ name }}</div><div style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ email }}</div></div>
+          </div>
+          <div style="padding:6px;">
+            <button class="qn-dd-item" onClick="{{ onGoMypage }}" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-user" style="font-size:15px; color:var(--fg-mute);"></i> 마이페이지</button>
+            <div style="height:1px; background:var(--border-2); margin:5px 4px;"></div>
+            <button class="qn-dd-item danger" onClick="{{ onLogout }}" style="display:flex; align-items:center; gap:11px; width:100%; padding:11px 12px; border:none; border-radius:9px; background:transparent; font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--tag-red); cursor:pointer; text-align:left;"><i class="icon-export" style="font-size:15px;"></i> 로그아웃</button>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <div style="max-width:1160px; margin:0 auto; padding:36px 40px 64px;">
+    <h1 style="margin:0 0 24px; font-family:var(--font-kr); font-size:30px; font-weight:900; letter-spacing:-1.2px; color:var(--fg);">마이페이지</h1>
+
+    <div style="display:flex; gap:26px; align-items:flex-start;">
+      <!-- left nav -->
+      <aside style="flex:none; width:250px; position:sticky; top:96px;">
+        <div style="background:#fff; border:1px solid var(--border-2); border-radius:18px; padding:8px;">
+          <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+            <button class="qn-nav-item" onClick="{{ n.onPick }}" style="{{ n.style }}"><i class="{{ n.icon }}" style="font-size:16px; width:18px; text-align:center;"></i> {{ n.label }}</button>
+          </sc-for>
+        </div>
+      </aside>
+
+      <!-- right content -->
+      <main style="flex:1; min-width:0; background:#fff; border:1px solid var(--border-2); border-radius:18px; padding:32px;">
+
+        <!-- PROFILE -->
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">프로필</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub); margin-top:5px;">수업에서 학생들에게 보여지는 정보예요.</div>
+          <div style="display:flex; align-items:center; gap:18px; margin:24px 0; padding:20px; border:1px solid var(--border-2); border-radius:14px; background:var(--bg-soft);">
+            <img src="uploads/character01/profile_Kay.png" style="width:72px; height:72px; border-radius:50%; object-fit:cover;">
+            <div style="flex:1;"><div style="font-family:var(--font-kr); font-size:15px; font-weight:700; color:var(--fg);">프로필 사진</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-top:3px;">JPG·PNG, 최대 5MB</div></div>
+            <button class="qn-ghost" style="height:40px; padding:0 18px; border:1.5px solid var(--border); border-radius:10px; background:#fff; color:var(--fg); font-family:var(--font-kr); font-size:13.5px; font-weight:700; cursor:pointer; transition:all .15s;">아바타 변경</button>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:18px;">
+            <div>
+              <label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">이름</label>
+              <input class="qn-input" value="김선생" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-kr); font-size:14.5px; color:var(--fg); outline:none; transition:all .15s;">
+            </div>
+            <div>
+              <label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">학교 / 기관</label>
+              <input class="qn-input" value="햇살초등학교" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-kr); font-size:14.5px; color:var(--fg); outline:none; transition:all .15s;">
+            </div>
+            <div>
+              <label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">이메일</label>
+              <input class="qn-input" value="kim.teacher@haetsal.sc.kr" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-small); font-size:14px; color:var(--fg); outline:none; transition:all .15s;">
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:26px;">
+            <button class="qn-ghost" style="height:46px; padding:0 22px; border:1.5px solid var(--border); border-radius:11px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:600; cursor:pointer; transition:all .15s;">취소</button>
+            <button class="qn-cta" onClick="{{ onSave }}" style="height:46px; padding:0 26px; border:none; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:700; cursor:pointer; transition:background .15s;">변경사항 저장</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ACCOUNT -->
+        <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">계정 설정</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub); margin-top:5px;">로그인과 보안에 관련된 설정이에요.</div>
+          <div style="margin-top:22px; display:flex; flex-direction:column; gap:16px;">
+            <div>
+              <label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">현재 비밀번호</label>
+              <input class="qn-input" type="password" value="password" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-kr); font-size:14.5px; color:var(--fg); outline:none; transition:all .15s;">
+            </div>
+            <div style="display:flex; gap:14px;">
+              <div style="flex:1;"><label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">새 비밀번호</label><input class="qn-input" type="password" placeholder="8자 이상" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-kr); font-size:14.5px; color:var(--fg); outline:none; transition:all .15s;"></div>
+              <div style="flex:1;"><label style="display:block; font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub); margin-bottom:7px;">새 비밀번호 확인</label><input class="qn-input" type="password" placeholder="다시 입력" style="width:100%; height:46px; padding:0 14px; border:1.5px solid var(--border); border-radius:11px; background:#fafafa; font-family:var(--font-kr); font-size:14.5px; color:var(--fg); outline:none; transition:all .15s;"></div>
+            </div>
+            <div style="display:flex; justify-content:flex-end;"><button class="qn-cta" onClick="{{ onSave }}" style="height:44px; padding:0 22px; border:none; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:700; cursor:pointer;">비밀번호 변경</button></div>
+          </div>
+          <div style="margin-top:14px; padding-top:22px; border-top:1px solid var(--border-2);">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #f5c6c6; border-radius:14px; background:#fdf3f2;">
+              <div><div style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:var(--tag-red);">계정 삭제</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:3px;">모든 방탈출과 데이터가 영구 삭제됩니다.</div></div>
+              <button style="height:40px; padding:0 16px; border:1.5px solid var(--tag-red); border-radius:10px; background:#fff; color:var(--tag-red); font-family:var(--font-kr); font-size:13.5px; font-weight:700; cursor:pointer;">계정 삭제</button>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- NOTIFICATIONS -->
+        <sc-if value="{{ isNoti }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">알림 설정</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub); margin-top:5px;">받아볼 알림을 선택하세요.</div>
+          <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+            <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border:1px solid var(--border-2); border-radius:13px;">
+                <div><div style="font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg);">{{ t.title }}</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-top:2px;">{{ t.desc }}</div></div>
+                <button onClick="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- THEME -->
+        <sc-if value="{{ isTheme }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">테마 / 표시 설정</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub); margin-top:5px;">화면 표시 방식을 골라요.</div>
+          <div style="margin-top:20px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg-sub);">테마 색상</div>
+          <div style="display:flex; gap:12px; margin-top:12px;">
+            <sc-for list="{{ themes }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onPick }}" title="{{ t.label }}" style="{{ t.style }}"><span style="width:28px; height:28px; border-radius:50%; background:{{ t.color }};"></span><span style="font-family:var(--font-small); font-size:12px; font-weight:700;">{{ t.label }}</span></button>
+            </sc-for>
+          </div>
+          <div style="margin-top:24px; display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border:1px solid var(--border-2); border-radius:13px;">
+            <div><div style="font-family:var(--font-kr); font-size:14px; font-weight:600; color:var(--fg);">다크 모드</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-top:2px;">어두운 배경으로 표시합니다.</div></div>
+            <button onClick="{{ onDark }}" style="{{ darkTrackStyle }}"><span style="{{ darkKnobStyle }}"></span></button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- PLAN -->
+        <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);">구독 / 요금제</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub); margin-top:5px;">현재 이용 중인 요금제예요.</div>
+          <div style="margin-top:20px; display:flex; align-items:center; justify-content:space-between; padding:22px 24px; border-radius:16px; background:linear-gradient(120deg,#ff8a3d,#ff6800 70%,#db5800); color:#fff;">
+            <div><div style="font-family:var(--font-small); font-size:12.5px; font-weight:600; opacity:0.9;">현재 요금제</div><div style="font-family:var(--font-kr); font-size:24px; font-weight:900; margin-top:4px;">스튜디오 Pro</div><div style="font-family:var(--font-small); font-size:12.5px; opacity:0.9; margin-top:4px;">다음 결제일 2026.08.10</div></div>
+            <button style="height:44px; padding:0 20px; border:none; border-radius:11px; background:#fff; color:var(--main-color); font-family:var(--font-kr); font-size:14px; font-weight:800; cursor:pointer;">요금제 관리</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px;">
+            <div style="padding:16px; border:1px solid var(--border-2); border-radius:13px; text-align:center;"><div style="font-family:var(--font-en); font-size:22px; font-weight:800; color:var(--fg);">무제한</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">방탈출 제작</div></div>
+            <div style="padding:16px; border:1px solid var(--border-2); border-radius:13px; text-align:center;"><div style="font-family:var(--font-en); font-size:22px; font-weight:800; color:var(--fg);">200<span style="font-size:14px;">명</span></div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">동시 참여</div></div>
+            <div style="padding:16px; border:1px solid var(--border-2); border-radius:13px; text-align:center;"><div style="font-family:var(--font-en); font-size:22px; font-weight:800; color:var(--fg);">상세</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">결과 리포트</div></div>
+          </div>
+        </div>
+        </sc-if>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:9px; height:46px; padding:0 22px; border-radius:50px; background:rgba(30,26,22,0.92); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:600; box-shadow:0 12px 30px -10px rgba(0,0,0,0.4);"><i class="icon-check" style="font-size:15px; color:#7fe3a0;"></i> {{ toast }}</div>
+  </sc-if>
+
+  <!-- click-away for dropdown -->
+  <sc-if value="{{ ddOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onCloseDd }}" style="position:fixed; inset:0; z-index:35;"></div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1160,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    ddOpen:false, section:(()=>{ try{ const s=new URLSearchParams(location.search).get('sec'); return ['profile','account','noti','theme','plan'].includes(s)?s:'profile'; }catch(e){ return 'profile'; } })(), dark:false,
+    noti:{ result:true, comment:true, marketing:false, weekly:true },
+    theme:'show',
+    toast:'',
+  };
+  componentWillUnmount(){ if(this._t) clearTimeout(this._t); }
+  toast(m){ if(this._t)clearTimeout(this._t); this.setState({toast:m}); this._t=setTimeout(()=>this.setState({toast:''}),2000); }
+  go(sec){ this.setState({ section:sec, ddOpen:false }); }
+
+  renderVals(){
+    const S=this.state;
+    const navDef=[
+      {k:'profile', l:'프로필',        icon:'icon-user'},
+      {k:'account', l:'계정 설정',      icon:'icon-cog-1'},
+      {k:'noti',    l:'알림 설정',      icon:'icon-megaphone'},
+      {k:'theme',   l:'테마 / 표시',    icon:'icon-palette'},
+      {k:'plan',    l:'구독 / 요금제',  icon:'icon-studio'},
+    ];
+    const navItems=navDef.map(n=>{ const on=S.section===n.k; return { label:n.l, icon:n.icon,
+      style:`display:flex; align-items:center; gap:11px; width:100%; padding:12px 13px; border:none; border-radius:10px; background:${on?'var(--bg-light-color)':'transparent'}; color:${on?'var(--main-color)':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:14px; font-weight:${on?700:600}; cursor:pointer; text-align:left; transition:all .15s;`,
+      onPick:()=>this.go(n.k) }; });
+
+    const notiDef=[
+      {k:'result',    title:'플레이 결과 알림', desc:'학생이 방탈출을 완료하면 알려드려요.'},
+      {k:'comment',   title:'댓글·문의 알림',   desc:'공유한 방탈출에 반응이 있을 때.'},
+      {k:'weekly',    title:'주간 리포트',      desc:'매주 활동 요약을 메일로 받아요.'},
+      {k:'marketing', title:'마케팅 정보 수신', desc:'새 기능·이벤트 소식.'},
+    ];
+    const toggleStyle=(on)=>`position:relative; width:46px; height:26px; flex:none; border:none; border-radius:50px; background:${on?'var(--main-color)':'var(--border)'}; cursor:pointer; transition:background .18s;`;
+    const knobStyle=(on)=>`position:absolute; top:3px; left:${on?'23px':'3px'}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .18s; box-shadow:0 1px 3px rgba(0,0,0,0.2);`;
+    const toggles=notiDef.map(n=>{ const on=S.noti[n.k]; return { title:n.title, desc:n.desc, trackStyle:toggleStyle(on), knobStyle:knobStyle(on), onToggle:()=>this.setState(s=>({noti:{...s.noti,[n.k]:!s.noti[n.k]}})) }; });
+
+    const themeDef=[ {k:'show',l:'오렌지',c:'#ff6800'}, {k:'sky',l:'블루',c:'#2a6fdb'}, {k:'mint',l:'민트',c:'#12b57e'}, {k:'lilac',l:'라일락',c:'#8a5cf6'} ];
+    const themes=themeDef.map(t=>{ const on=S.theme===t.k; return { label:t.l, color:t.c,
+      style:`display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px 16px; border:1.5px solid ${on?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${on?'var(--bg-light-color)':'#fff'}; color:${on?'var(--main-color)':'var(--fg-sub)'}; cursor:pointer; transition:all .15s;`,
+      onPick:()=>this.setState({theme:t.k}) }; });
+
+    return {
+      name:'김선생', school:'햇살초등학교', email:'kim.teacher@haetsal.sc.kr', plan:'스튜디오 Pro',
+      ddOpen:S.ddOpen, ddCaret: S.ddOpen?'icon-up-open':'icon-down-open',
+      onToggleDd:()=>this.setState(s=>({ddOpen:!s.ddOpen})), onCloseDd:()=>this.setState({ddOpen:false}),
+      onGoMypage:()=>this.go('profile'), onGoAccount:()=>this.go('account'),
+      onLogout:()=>{ this.setState({ddOpen:false}); this.toast('로그아웃되었어요'); },
+      navItems,
+      isProfile:S.section==='profile', isAccount:S.section==='account', isNoti:S.section==='noti', isTheme:S.section==='theme', isPlan:S.section==='plan',
+      toggles, themes,
+      darkTrackStyle:toggleStyle(S.dark), darkKnobStyle:knobStyle(S.dark), onDark:()=>this.setState(s=>({dark:!s.dark})),
+      onSave:()=>this.toast('변경사항을 저장했어요'),
+      toastOpen:!!S.toast, toast:S.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    .scr-open:hover { background: var(--main-color) !important; color:#fff !important; }
+    .scr-card:hover { box-shadow: 0 20px 44px -20px rgba(0,0,0,0.28) !important; transform: translateY(-3px); }
+  </style>
+</helmet>
+
+<div style="min-height:100%; background:#e5e3dc; padding:56px 60px 80px; box-sizing:border-box; font-family:var(--font-kr);">
+
+  <!-- title -->
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; max-width:1720px; margin:0 auto 40px; flex-wrap:wrap;">
+    <div>
+      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 15px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-size:12.5px; font-weight:700;"><i class="icon-all" style="font-size:13px;"></i> 방탈출N · 전체 화면</div>
+      <h1 style="margin:18px 0 0; font-family:var(--font-kr); font-size:40px; font-weight:900; letter-spacing:-1.5px; color:var(--fg);">화면 모음 <span style="color:var(--main-color);">Overview</span></h1>
+      <p style="margin:10px 0 0; font-family:var(--font-small); font-size:15px; font-weight:300; line-height:1.65; color:var(--fg-sub);">지금까지 만든 모든 화면을 한 곳에서 확인하세요. 카드를 확대해 살펴보거나 <b style="font-weight:600; color:var(--fg);">열기</b>로 실제 화면을 여세요.</p>
+    </div>
+    <div style="display:flex; gap:22px;">
+      <div style="text-align:center;"><div style="font-family:var(--font-en); font-size:30px; font-weight:800; color:var(--main-color); line-height:1;">19</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">화면</div></div>
+      <div style="width:1px; background:var(--divider);"></div>
+      <div style="text-align:center;"><div style="font-family:var(--font-en); font-size:30px; font-weight:800; color:var(--fg); line-height:1;">20</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-sub); margin-top:4px;">파일</div></div>
+    </div>
+  </div>
+
+  <div style="max-width:1720px; margin:0 auto; display:flex; flex-direction:column; gap:28px;">
+
+    <!-- ===== 랜딩 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-home-menu" style="font-size:17px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">랜딩 페이지</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">서비스 소개 · 첫 진입 화면</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <!-- web -->
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="랜딩 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:640px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="랜딩 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1400px; height:875px; border:0; transform:scale(0.4571); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <!-- mobile -->
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일</span>
+            <a class="scr-open" href="모바일/랜딩 - 모바일.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/랜딩 - 모바일.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 로그인 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-user" style="font-size:17px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">로그인</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">이메일 · 소셜 로그인</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="로그인 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:640px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="로그인 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1280px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일</span>
+            <a class="scr-open" href="모바일/로그인 - 모바일.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/로그인 - 모바일.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 회원가입 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-pen-user-01" style="font-size:17px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">회원가입</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">계정 생성 · 약관 동의</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="회원가입 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:640px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="회원가입 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1280px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일</span>
+            <a class="scr-open" href="모바일/회원가입 - 모바일.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/회원가입 - 모바일.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 비밀번호 찾기 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-lock-filled" style="font-size:16px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">비밀번호 찾기</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">재설정 링크 발송</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="비밀번호 찾기 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:640px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="비밀번호 찾기 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1280px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일</span>
+            <a class="scr-open" href="모바일/비밀번호 찾기 - 모바일.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/비밀번호 찾기 - 모바일.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 방탈출 편집 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-mission" style="font-size:16px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">방탈출 편집 화면</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">무한 캔버스 · 노드 편집 (PC 전용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 데스크톱</span>
+            <a class="scr-open" href="방탈출 편집 화면.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:900px; height:504px; overflow:hidden; background:#fff;">
+            <iframe src="방탈출 편집 화면.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1680px; height:940px; border:0; transform:scale(0.5357); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-quiz" style="font-size:16px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">문제 대화 편집</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">말풍선 블록 에디터 + 실시간 참여자 프리뷰 (PC 전용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 데스크톱</span>
+            <a class="scr-open" href="문제 대화 편집.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:900px; height:504px; overflow:hidden; background:#fff;">
+            <iframe src="문제 대화 편집.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1680px; height:940px; border:0; transform:scale(0.5357); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 참여자 · 입장 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-qr-code" style="font-size:15px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">참여자 · 입장</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">PIN(7자리) 입력 → 닉네임 입력 (학생용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div style="width:100%; margin:2px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>1단계 · PIN 입력</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · PIN</span>
+            <a class="scr-open" href="참여자 입장 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:440px; height:360px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 입장 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1100px; height:900px; border:0; transform:scale(0.4); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · PIN</span>
+            <a class="scr-open" href="모바일/참여자 입장 - 모바일.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:200px; height:360px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 입장 - 모바일.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:828px; border:0; transform:scale(0.4348); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>2단계 · 닉네임 입력</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · 닉네임</span>
+            <a class="scr-open" href="참여자 입장 - 웹.dc.html?step=name" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:440px; height:360px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 입장 - 웹.dc.html?step=name" scrolling="no" style="position:absolute; top:0; left:0; width:1100px; height:900px; border:0; transform:scale(0.4); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · 닉네임</span>
+            <a class="scr-open" href="모바일/참여자 입장 - 모바일.dc.html?step=name" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:200px; height:360px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 입장 - 모바일.dc.html?step=name" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:828px; border:0; transform:scale(0.4348); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 참여자 · 플레이 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-play" style="font-size:15px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">참여자 · 플레이</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">말풍선 나레이션 · 자물쇠 5종 · 힌트 · 성공/실패 엔딩 (학생용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div style="width:100%; margin:2px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>자물쇠 · 객관식 (다지선다)</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · 객관식</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p1" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p1" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · 객관식</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p1" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p1" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>자물쇠 · OX</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · OX</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p2" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p2" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · OX</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p2" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p2" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>자물쇠 · 주관식 (단답)</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · 주관식</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p3" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p3" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · 주관식</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p3" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p3" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>자물쇠 · 순서 맞추기</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · 순서 맞추기</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p4" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p4" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · 순서 맞추기</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p4" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p4" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>자물쇠 · 이미지 핫스팟</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹 · 이미지 핫스팟</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p5" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p5" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:var(--fg-mute);"></i> 모바일 · 이미지 핫스팟</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p5" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p5" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>힌트 (차감 확인)</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-help" style="font-size:13px; color:#c07b12;"></i> 웹 · 힌트 (차감)</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p1&hint=ask" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p1&hint=ask" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-help" style="font-size:13px; color:#c07b12;"></i> 모바일 · 힌트 (차감)</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p1&hint=ask" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p1&hint=ask" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>엔딩 · 탈출 성공</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:#1f9e5a;"></i> 웹 · 성공 엔딩</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p7" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p7" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:#1f9e5a;"></i> 모바일 · 성공 엔딩</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p7" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p7" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div style="width:100%; margin:14px 0 -4px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg-sub); display:flex; align-items:center; gap:8px;"><span style="width:7px; height:7px; border-radius:50%; background:var(--main-color);"></span>엔딩 · 탈출 실패</div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:#c0392b;"></i> 웹 · 실패 엔딩</span>
+            <a class="scr-open" href="참여자 플레이 - 웹.dc.html?p=p8" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:520px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="참여자 플레이 - 웹.dc.html?p=p8" scrolling="no" style="position:absolute; top:0; left:0; width:1040px; height:800px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-standby" style="font-size:13px; color:#c0392b;"></i> 모바일 · 실패 엔딩</span>
+            <a class="scr-open" href="모바일/참여자 플레이 - 모바일.dc.html?p=p8" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:220px; height:400px; overflow:hidden; background:#fff;">
+            <iframe src="모바일/참여자 플레이 - 모바일.dc.html?p=p8" scrolling="no" style="position:absolute; top:0; left:0; width:460px; height:836px; border:0; transform:scale(0.4783); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== My 방탈출 · 목록 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-th-large" style="font-size:15px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">My 방탈출 · 목록</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">내가 만든 방탈출 카드 그리드 (교사용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="My 방탈출 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:760px; height:420px; overflow:hidden; background:#fff;">
+            <iframe src="My 방탈출 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1520px; height:840px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 결과 리포트 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-chart" style="font-size:15px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">결과 리포트</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">상세(탭3) → 개인별 상세 · My방탈출 ⏮더보기에서 진입 (교사용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 상세</span>
+            <a class="scr-open" href="리포트 상세 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:500px; height:340px; overflow:hidden; background:#fff;">
+            <iframe src="리포트 상세 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1160px; height:789px; border:0; transform:scale(0.431); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 개인별</span>
+            <a class="scr-open" href="리포트 개인별 상세 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:500px; height:340px; overflow:hidden; background:#fff;">
+            <iframe src="리포트 개인별 상세 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:940px; height:789px; border:0; transform:scale(0.5319); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 마이페이지 ===== -->
+    <div style="background:#fff; border-radius:22px; padding:26px 28px; box-shadow:0 8px 24px -14px rgba(0,0,0,0.12);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:#fff0e5; color:var(--main-color);"><i class="icon-user" style="font-size:15px;"></i></span>
+        <div><div style="font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">마이페이지</div><div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">프로필 드롭다운 + 좌측메뉴 설정(교사용)</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+        <div class="scr-card" style="border:1px solid var(--border-2); border-radius:16px; overflow:hidden; transition:all .2s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border-2);">
+            <span style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);"><i class="icon-service" style="font-size:13px; color:var(--fg-mute);"></i> 웹</span>
+            <a class="scr-open" href="마이페이지 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 12px; border-radius:50px; border:1px solid var(--border); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub); transition:all .15s ease;">열기 <i class="icon-right-open" style="font-size:9px;"></i></a>
+          </div>
+          <div style="position:relative; width:760px; height:420px; overflow:hidden; background:#fff;">
+            <iframe src="마이페이지 - 웹.dc.html" scrolling="no" style="position:absolute; top:0; left:0; width:1520px; height:840px; border:0; transform:scale(0.5); transform-origin:top left; pointer-events:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- add-new note -->
+    <div style="border:2px dashed var(--border); border-radius:22px; padding:30px; display:flex; align-items:center; gap:14px; justify-content:center; color:var(--fg-mute);">
+      <i class="icon-plus-circle" style="font-size:22px;"></i>
+      <span style="font-family:var(--font-kr); font-size:14.5px; font-weight:600;">새 화면이 만들어지면 이 자리에 카드로 추가됩니다.</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

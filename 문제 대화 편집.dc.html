@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <style>
+    a { color: var(--main-color); text-decoration:none; }
+    a:hover { color: var(--btn-hover-color); }
+    * { box-sizing:border-box; }
+    textarea.qn-ta { font-family:var(--font-kr); font-size:14px; line-height:1.55; color:var(--fg); width:100%; border:none; outline:none; resize:none; background:transparent; padding:0; }
+    .qn-blk:hover .qn-handle { color:var(--fg-mute); }
+    .qn-menu-item:hover { background:var(--bg-warm-2) !important; }
+    .qn-menu-item.danger:hover { background:#fdeaea !important; color:#d64545 !important; }
+    .qn-add:hover { background:var(--bg-light-color) !important; border-color:var(--main-color) !important; color:var(--main-color) !important; }
+    .qn-chip-del:hover { background:#fdeaea !important; color:#d64545 !important; }
+    .qn-lock:hover { border-color:var(--main-color) !important; }
+    @keyframes qnBub { from{ transform:translateY(10px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes qnDot { 0%,60%,100%{ transform:translateY(0); opacity:.4; } 30%{ transform:translateY(-4px); opacity:1; } }
+    .qn-blk[data-drag="1"] { opacity:.4; }
+    .qn-spk:hover { filter:brightness(0.98); transform:translateY(-1px); }
+    .qn-spk:active { transform:translateY(0); }
+    .qn-spk-opt:hover { background:var(--bg-warm-2) !important; }
+    button:disabled { opacity:.38; cursor:not-allowed; pointer-events:none; }
+  </style>
+</helmet>
+
+<div data-screen-label="문제 대화 편집 · 웹" style="display:flex; height:100vh; overflow:hidden; font-family:var(--font-kr); background:var(--bg-warm);">
+
+  <!-- ============ LEFT · EDITOR ============ -->
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column; background:#faf8f4;">
+
+    <!-- header -->
+    <div style="flex:none; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 30px; background:#fff; border-bottom:1px solid var(--border-2);">
+      <div style="flex:1 1 auto; display:flex; align-items:center; gap:12px; min-width:0;">
+        <a href="{{ backHref }}" onClick="{{ onSave }}" style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; border:1px solid var(--border); color:var(--fg-sub); flex:none;"><i class="icon-left-open" style="font-size:13px;"></i></a>
+        <div style="min-width:0;">
+          <div style="font-family:var(--font-kr); font-size:19px; font-weight:900; letter-spacing:-0.6px; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">페이지 내용 · 대화 구성</div>
+          <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">배경 · 대화 · 문제를 한 순서로 조립하면, 참여자에게 그대로 보여집니다.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex:none;">
+        <a href="{{ backHref }}" onClick="{{ onSave }}" style="display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 18px; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; box-shadow:0 8px 18px -10px var(--main-color);"><i class="icon-check" style="font-size:12px;"></i> 저장</a>
+      </div>
+    </div>
+
+    <!-- scroll body -->
+    <div style="flex:1; overflow-y:auto; padding:24px 30px 60px;">
+      <div style="max-width:640px; margin:0 auto;">
+
+        <!-- empty state -->
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:56px 20px; border:2px dashed var(--border); border-radius:20px; background:#fff;">
+          <div style="width:70px; height:70px; border-radius:20px; background:var(--bg-light-color); display:flex; align-items:center; justify-content:center; margin-bottom:16px;"><i class="icon-quiz" style="font-size:30px; color:var(--main-color);"></i></div>
+          <div style="font-family:var(--font-kr); font-size:17px; font-weight:800; color:var(--fg); margin-bottom:6px;">첫 메시지를 추가하세요</div>
+          <div style="font-family:var(--font-small); font-size:13px; color:var(--fg-mute); margin-bottom:20px;">호스트의 인사말이나 상황 설명으로 대화를 시작해요.</div>
+          <button onClick="{{ addText }}" style="display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 22px; border:none; border-radius:12px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 10px 22px -10px var(--main-color);"><i class="icon-plus" style="font-size:13px;"></i> 메시지 추가</button>
+        </div>
+        </sc-if>
+
+        <!-- block list -->
+        <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="0">
+        <div class="qn-blk" data-drag="{{ b.dragging }}" draggable="false" onDragOver="{{ b.onDragOver }}" onDrop="{{ b.onDrop }}" style="{{ b.cardStyle }}">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <span class="qn-handle" draggable="true" onDragStart="{{ b.onDragStart }}" onDragEnd="{{ b.onDragEnd }}" title="끌어서 순서 변경" style="cursor:grab; color:var(--border); font-size:15px; display:flex; align-items:center; flex:none;"><i class="icon-move-arrows"></i></span>
+            <div style="position:relative; flex:none;">
+              <button class="qn-spk" onClick="{{ b.onSpkToggle }}" title="화자 바꾸기" style="{{ b.spkBtnStyle }}">
+                <span style="display:flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:{{ b.spAvatarBg }}; color:#fff;"><i class="{{ b.spIcon }}" style="font-size:11px;"></i></span>
+                <span style="font-family:var(--font-small); font-size:11.5px; font-weight:800; color:{{ b.spColor }};">{{ b.spName }}</span>
+                <i class="{{ b.spkChevron }}" style="font-size:8px; color:{{ b.spColor }}; opacity:.7;"></i>
+              </button>
+              <sc-if value="{{ b.spkMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ b.onSpkToggle }}" style="position:fixed; inset:0; z-index:19;"></div>
+              <div style="position:absolute; top:34px; left:0; z-index:20; width:132px; background:#fff; border:1px solid var(--border-2); border-radius:14px; box-shadow:var(--shadow-pop); padding:6px; animation:qnBub .14s ease;">
+                <sc-for list="{{ b.spkOpts }}" as="so" hint-placeholder-count="3">
+                <button class="qn-spk-opt" onClick="{{ so.onPick }}" style="{{ so.rowStyle }}">
+                  <span style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; flex:none; border-radius:50%; background:{{ so.avatarBg }}; color:#fff;"><i class="{{ so.icon }}" style="font-size:12px;"></i></span>
+                  <span style="{{ so.nameStyle }}">{{ so.name }}</span>
+                </button>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+            <span style="display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 9px; border-radius:6px; background:var(--bg-warm-2); font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-sub);"><i class="{{ b.typeIcon }}" style="font-size:11px;"></i> {{ b.typeLabel }}</span>
+            <span style="flex:1;"></span>
+            <span style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute); font-variant-numeric:tabular-nums;">{{ b.orderLabel }}</span>
+            <div style="position:relative;">
+              <button onClick="{{ b.onMenu }}" style="width:28px; height:28px; border:none; border-radius:7px; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--fg-mute);">
+                <span style="display:flex; flex-direction:column; gap:2.5px;"><span style="width:3px;height:3px;border-radius:50%;background:currentColor;"></span><span style="width:3px;height:3px;border-radius:50%;background:currentColor;"></span><span style="width:3px;height:3px;border-radius:50%;background:currentColor;"></span></span>
+              </button>
+              <sc-if value="{{ b.menuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:32px; right:0; z-index:20; width:150px; background:#fff; border:1px solid var(--border-2); border-radius:12px; box-shadow:var(--shadow-pop); padding:6px; animation:qnBub .14s ease;">
+                <button class="qn-menu-item" onClick="{{ b.onDup }}" style="display:flex; align-items:center; gap:9px; width:100%; height:34px; padding:0 10px; border:none; border-radius:8px; background:transparent; cursor:pointer; font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg); text-align:left;"><i class="icon-005-copy" style="font-size:13px; color:var(--fg-mute);"></i> 복제</button>
+                <button class="qn-menu-item danger" onClick="{{ b.onDelete }}" style="display:flex; align-items:center; gap:9px; width:100%; height:34px; padding:0 10px; border:none; border-radius:8px; background:transparent; cursor:pointer; font-family:var(--font-kr); font-size:13px; font-weight:600; color:var(--fg); text-align:left;"><i class="icon-trash" style="font-size:13px; color:var(--fg-mute);"></i> 삭제</button>
+              </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <sc-if value="{{ b.isText }}" hint-placeholder-val="{{ true }}">
+          <textarea class="qn-ta" rows="{{ b.rows }}" value="{{ b.text }}" onInput="{{ b.onInput }}" onFocus="{{ b.onFocus }}" placeholder="말풍선에 담길 내용을 입력하세요…"></textarea>
+          </sc-if>
+
+          <sc-if value="{{ b.isImage }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ b.hasImg }}" hint-placeholder-val="{{ false }}">
+          <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border-2);">
+            {{ b.imgEl }}
+            <div style="position:absolute; top:8px; right:8px; display:flex; gap:6px;">
+              <button onClick="{{ b.onImgPick }}" style="height:28px; padding:0 11px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:700; cursor:pointer;">변경</button>
+              <button onClick="{{ b.onImgClear }}" style="width:28px; height:28px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer;"><i class="icon-close" style="font-size:11px;"></i></button>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ b.noImg }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ b.onImgPick }}" onDragOver="{{ b.onImgDragOver }}" onDrop="{{ b.onImgDrop }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:100%; height:120px; border:2px dashed var(--border); border-radius:12px; background:#fff; cursor:pointer; color:var(--fg-mute);">
+            <i class="icon-camera" style="font-size:24px; color:var(--main-color);"></i>
+            <span style="font-family:var(--font-small); font-size:12.5px; font-weight:600;">이미지를 끌어놓거나 클릭해 선택</span>
+          </button>
+          </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ b.isDelay }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:var(--bg-warm); border:1px dashed var(--border);">
+            <i class="icon-time" style="font-size:18px; color:var(--fg-mute);"></i>
+            <span style="font-family:var(--font-small); font-size:13px; color:var(--fg-sub);">다음 말풍선까지 잠깐 멈춤</span>
+            <span style="flex:1;"></span>
+            <input type="number" step="0.5" min="0" value="{{ b.delay }}" onInput="{{ b.onDelay }}" style="width:64px; height:34px; border:1px solid var(--border); border-radius:8px; text-align:center; font-family:var(--font-small); font-size:13px; font-weight:700; color:var(--fg); outline:none;">
+            <span style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">초</span>
+          </div>
+          </sc-if>
+        </div>
+        </sc-for>
+
+        <!-- add bar -->
+        <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="qn-add" onClick="{{ addText }}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:44px; border:1.5px dashed var(--border); border-radius:11px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:pointer; transition:all .15s ease;"><i class="icon-text" style="font-size:12px;"></i> 메시지</button>
+          <button class="qn-add" onClick="{{ addImage }}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:44px; border:1.5px dashed var(--border); border-radius:11px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:pointer; transition:all .15s ease;"><i class="icon-album" style="font-size:12px;"></i> 이미지</button>
+          <button class="qn-add" onClick="{{ addDelay }}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:44px; border:1.5px dashed var(--border); border-radius:11px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:pointer; transition:all .15s ease;"><i class="icon-time" style="font-size:12px;"></i> 딜레이</button>
+          <sc-if value="{{ showProblemBtn }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onAddProblem }}" style="{{ addProblemStyle }}"><i class="icon-lock-filled" style="font-size:12px;"></i> {{ addProblemLabel }}</button>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ===== 문제 블록 (페이지당 1개 · 항상 마지막) ===== -->
+        <sc-if value="{{ hasProblem }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:26px; background:#fff; border:1.5px solid var(--main-color); border-radius:18px; overflow:hidden; box-shadow:0 8px 26px -16px var(--main-color);">
+          <div style="display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--bg-light-color); border-bottom:1px solid #ffe0c6;">
+            <span style="display:inline-flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--theme-deep);"><i class="icon-lock-filled" style="font-size:13px;"></i> 문제 · 자물쇠</span>
+            <span style="font-family:var(--font-small); font-size:11px; color:var(--fg-mute);">이 페이지의 마지막 단계예요.</span>
+            <span style="flex:1;"></span>
+            <button class="qn-chip-del" onClick="{{ onRemoveProblem }}" style="display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 10px; border:none; border-radius:7px; background:transparent; cursor:pointer; color:var(--fg-mute); font-family:var(--font-small); font-size:11.5px; font-weight:700;"><i class="icon-trash" style="font-size:11px;"></i> 문제 삭제</button>
+          </div>
+
+          <div style="padding:16px;">
+            <!-- lock type grid -->
+            <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:18px;">
+              <sc-for list="{{ lockTypes }}" as="lt" hint-placeholder-count="5">
+              <button class="qn-lock" onClick="{{ lt.onClick }}" style="{{ lt.style }}">
+                <i class="{{ lt.icon }}" style="font-size:16px;"></i>
+                <span style="font-family:var(--font-small); font-size:11px; font-weight:700;">{{ lt.label }}</span>
+              </button>
+              </sc-for>
+            </div>
+
+            <!-- 문제 질문 (참여자에게 자물쇠 위 말풍선으로 표시) -->
+            <div style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:6px;">질문</div>
+            <textarea rows="2" value="{{ problemQ }}" onInput="{{ onProblemQ }}" placeholder="예: 물질이 기체로 변하는 현상은 무엇일까?" style="width:100%; padding:10px 12px; margin-bottom:16px; border:1.5px solid var(--border); border-radius:10px; background:#fafafa; font-family:var(--font-kr); font-size:14px; line-height:1.55; color:var(--fg); outline:none; resize:vertical;"></textarea>
+
+            <!-- MC editor -->
+            <sc-if value="{{ pIsMc }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-bottom:10px;">보기를 입력하고, 왼쪽 동그라미로 정답을 지정하세요.</div>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ mcOpts }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid {{ c.borderColor }}; border-radius:11px; background:{{ c.bg }};">
+                <button onClick="{{ c.onToggle }}" title="정답으로 지정" style="width:22px; height:22px; flex:none; border-radius:50%; border:2px solid {{ c.ringColor }}; background:{{ c.dotBg }}; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;"><i class="icon-check" style="font-size:10px; color:#fff; opacity:{{ c.checkOpacity }};"></i></button>
+                <input value="{{ c.text }}" onInput="{{ c.onText }}" placeholder="보기 내용" style="flex:1; height:30px; border:none; outline:none; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">
+                <button class="qn-chip-del" onClick="{{ c.onDelete }}" style="width:26px; height:26px; flex:none; border:none; border-radius:7px; background:transparent; cursor:pointer; color:var(--fg-mute); display:flex; align-items:center; justify-content:center;"><i class="icon-trash" style="font-size:11px;"></i></button>
+              </div>
+              </sc-for>
+            </div>
+            <button class="qn-add" onClick="{{ addMc }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border:1.5px dashed var(--border); border-radius:9px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:12.5px; font-weight:700; cursor:pointer; transition:all .15s ease;"><i class="icon-plus" style="font-size:11px;"></i> 보기 추가</button>
+            </sc-if>
+
+            <!-- SHORT editor -->
+            <sc-if value="{{ pIsShort }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-bottom:10px;">정답 문자열을 입력하세요. 여러 정답은 슬래시(/)로 구분해요. (대소문자·공백 무시)</div>
+            <input value="{{ shortAns }}" onInput="{{ onShort }}" placeholder="예: 3245 / 삼이사오" style="width:100%; height:44px; padding:0 14px; border:1.5px solid var(--main-color); border-radius:11px; background:var(--bg-light-color); font-family:var(--font-kr); font-size:15px; font-weight:700; color:var(--fg); outline:none;">
+            </sc-if>
+
+            <!-- OX editor -->
+            <sc-if value="{{ pIsOx }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-bottom:10px;">정답을 선택하세요.</div>
+            <div style="display:flex; gap:12px;">
+              <button onClick="{{ onOxO }}" style="{{ oxOStyle }}">O</button>
+              <button onClick="{{ onOxX }}" style="{{ oxXStyle }}">X</button>
+            </div>
+            </sc-if>
+
+            <!-- ORDER editor -->
+            <sc-if value="{{ pIsOrder }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-bottom:10px;">항목을 <b style="color:var(--fg-sub);">정답 순서대로</b> 입력하세요. 참여자에게는 섞여서 나옵니다.</div>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ orderItems }}" as="o" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--border); border-radius:11px; background:#fff;">
+                <span style="width:22px; height:22px; flex:none; border-radius:7px; background:var(--main-color); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-small-en); font-size:11px; font-weight:800;">{{ o.n }}</span>
+                <input value="{{ o.text }}" onInput="{{ o.onText }}" placeholder="항목 내용" style="flex:1; height:30px; border:none; outline:none; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">
+                <button class="qn-chip-del" onClick="{{ o.onDelete }}" style="width:26px; height:26px; flex:none; border:none; border-radius:7px; background:transparent; cursor:pointer; color:var(--fg-mute); display:flex; align-items:center; justify-content:center;"><i class="icon-trash" style="font-size:11px;"></i></button>
+              </div>
+              </sc-for>
+            </div>
+            <button class="qn-add" onClick="{{ addOrder }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border:1.5px dashed var(--border); border-radius:9px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:12.5px; font-weight:700; cursor:pointer; transition:all .15s ease;"><i class="icon-plus" style="font-size:11px;"></i> 항목 추가</button>
+            </sc-if>
+
+            <!-- HOTSPOT editor -->
+            <sc-if value="{{ pIsHotspot }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-small); font-size:12px; color:var(--fg-mute); margin-bottom:10px;">이미지를 올린 뒤, <b style="color:var(--fg-sub);">정답 위치를 클릭</b>해 지정하세요.</div>
+            <sc-if value="{{ hsHasImg }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onHsImgClick }}" style="position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border-2); margin-bottom:10px; cursor:crosshair;">
+              {{ hsImgEl }}
+              {{ hsMarkerEl }}
+              <div style="position:absolute; top:8px; right:8px; display:flex; gap:6px;">
+                <button onClick="{{ onHsPickStop }}" style="height:28px; padding:0 11px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:700; cursor:pointer;">변경</button>
+                <button onClick="{{ onHsClearStop }}" style="width:28px; height:28px; border:none; border-radius:7px; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer;"><i class="icon-close" style="font-size:11px;"></i></button>
+              </div>
+            </div>
+            <div style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute); margin:-4px 0 10px;">{{ hsCoordLabel }}</div>
+            </sc-if>
+            <sc-if value="{{ hsNoImg }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ onHsPick }}" onDragOver="{{ onHsDragOver }}" onDrop="{{ onHsDrop }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:100%; height:120px; border:2px dashed var(--border); border-radius:12px; background:#fff; cursor:pointer; color:var(--fg-mute); margin-bottom:10px;"><i class="icon-camera" style="font-size:24px; color:var(--main-color);"></i><span style="font-family:var(--font-small); font-size:12.5px; font-weight:600;">이미지를 끌어놓거나 클릭해 선택</span></button>
+            </sc-if>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT · PREVIEW ============ -->
+  <div style="flex:none; width:392px; display:flex; flex-direction:column; background:#f0ece4; border-left:1px solid var(--border-2);">
+    <div style="flex:none; display:flex; align-items:center; justify-content:space-between; padding:20px 24px 14px;">
+      <span style="font-family:var(--font-kr); font-size:13px; font-weight:800; color:var(--fg-sub);">참여자 미리보기</span>
+      <button onClick="{{ onPlay }}" style="display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 15px; border:none; border-radius:50px; background:{{ playBtnBg }}; color:{{ playBtnColor }}; font-family:var(--font-small); font-size:12.5px; font-weight:800; cursor:pointer; transition:all .15s ease;">
+        <i class="{{ playIcon }}" style="font-size:12px;"></i> {{ playLabel }}
+      </button>
+    </div>
+
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:0 24px 26px; min-height:0;">
+      <div style="position:relative; width:300px; height:100%; max-height:620px; background:radial-gradient(130% 90% at 50% -10%, #fff4ea 0%, #fbf3e9 45%, #f2efe7 100%); border-radius:34px; border:9px solid #1c1b1a; box-shadow:0 22px 50px -20px rgba(0,0,0,0.4); overflow:hidden; display:flex; flex-direction:column;">
+        <!-- top bar (참여자 화면과 동일) -->
+        <div style="flex:none; display:flex; align-items:center; gap:9px; padding:12px 14px; background:rgba(255,255,255,0.85); border-bottom:1px solid var(--border-2);">
+          <div style="font-family:var(--font-kr); font-size:14px; font-weight:900; letter-spacing:-0.5px; color:var(--fg); white-space:nowrap;">방탈출<span style="color:var(--main-color);">N</span></div>
+          <span style="flex:none; font-family:var(--font-small); font-size:10.5px; font-weight:600; color:var(--fg-mute); white-space:nowrap;">{{ pvStepLabel }}</span>
+          <div style="flex:1; height:7px; border-radius:50px; background:var(--bg-warm-2); overflow:hidden;"><div style="width:{{ pvProgress }}%; height:100%; border-radius:50px; background:linear-gradient(90deg,#ffc91b,#ff6800);"></div></div>
+          <span style="flex:none; display:inline-flex; align-items:center; gap:4px; height:26px; padding:0 9px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-en); font-size:12px; font-weight:800;"><i class="icon-heart" style="font-size:10px; color:var(--main-color);"></i> 1000</span>
+        </div>
+
+        <div style="flex:1; overflow-y:auto; padding:18px 14px; background:transparent; display:flex; flex-direction:column; gap:14px;">
+          <sc-for list="{{ preview }}" as="p" hint-placeholder-count="0">
+          <div style="{{ p.rowStyle }}">
+            <sc-if value="{{ p.isDelay }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:40px; height:40px; flex:none; border-radius:50%; background:var(--bg-light-color); display:flex; align-items:center; justify-content:center; overflow:hidden;"><img src="uploads/character01/my.png" style="width:38px; height:38px;"></div>
+              <div style="display:flex; gap:4px; padding:12px 14px; background:#fff; border:1px solid var(--border-2); border-radius:16px; border-top-left-radius:4px; box-shadow:0 4px 14px -8px rgba(0,0,0,0.14);">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--fg-mute); animation:qnDot 1s infinite;"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--fg-mute); animation:qnDot 1s infinite .15s;"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--fg-mute); animation:qnDot 1s infinite .3s;"></span>
+              </div>
+            </div>
+            </sc-if>
+            <sc-if value="{{ p.isMsg }}" hint-placeholder-val="{{ true }}">
+            <sc-if value="{{ p.isNarrator }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:3px 14px;">
+              <sc-if value="{{ p.isText }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ p.bubbleStyle }}">{{ p.text }}</div>
+              </sc-if>
+              <sc-if value="{{ p.isImage }}" hint-placeholder-val="{{ false }}">
+              <div style="max-width:220px; margin:0 auto; border-radius:16px; overflow:hidden; box-shadow:0 4px 14px -8px rgba(0,0,0,0.18);">{{ p.imgEl }}</div>
+              </sc-if>
+            </div>
+            </sc-if>
+            <sc-if value="{{ p.isBubble }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ p.msgRowStyle }}">
+              <sc-if value="{{ p.showAvatar }}" hint-placeholder-val="{{ true }}">
+              <div style="width:40px; height:40px; flex:none; border-radius:50%; background:{{ p.avatarBg }}; display:flex; align-items:center; justify-content:center; overflow:hidden;"><i class="{{ p.avatarIcon }}" style="font-size:15px; color:#fff;"></i></div>
+              </sc-if>
+              <div style="{{ p.bubbleWrapStyle }}">
+                <sc-if value="{{ p.isText }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ p.bubbleStyle }}">{{ p.text }}</div>
+                </sc-if>
+                <sc-if value="{{ p.isImage }}" hint-placeholder-val="{{ false }}">
+                <div style="border-radius:16px; overflow:hidden; box-shadow:0 4px 14px -8px rgba(0,0,0,0.18);">{{ p.imgEl }}</div>
+                </sc-if>
+              </div>
+            </div>
+            </sc-if>
+            </sc-if>
+          </div>
+          </sc-for>
+
+          <!-- question bubble + answer area (참여자 화면과 동일) -->
+          <sc-if value="{{ showProblem }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:14px; animation:qnBub .3s ease;">
+            <div style="width:100%; box-sizing:border-box; text-align:center; background:var(--bg-light-color); border:1.5px solid var(--main-color); border-radius:16px; padding:13px 16px; font-family:var(--font-kr); font-size:15px; font-weight:700; line-height:1.5; color:var(--theme-deep);">{{ pvQuestion }}</div>
+
+            <sc-if value="{{ pIsMc }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ pvMc }}" as="pc" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:12px 13px; border:1.5px solid {{ pc.border }}; border-radius:13px; background:{{ pc.bg }}; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:{{ pc.color }};">
+                <span style="width:24px; height:24px; flex:none; border-radius:8px; background:{{ pc.numBg }}; color:{{ pc.numColor }}; display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:12px; font-weight:800;">{{ pc.n }}</span>
+                <span style="flex:1; text-align:left;">{{ pc.text }}</span>
+                <sc-if value="{{ pc.isAnswer }}" hint-placeholder-val="{{ false }}"><span style="flex:none; font-family:var(--font-small); font-size:10px; font-weight:800; color:var(--main-color);">정답</span></sc-if>
+              </div>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ pIsOx }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:12px;">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; height:104px; border:2px solid {{ pvOStyleBorder }}; background:{{ pvOStyleBg }}; border-radius:16px;">
+                <span style="font-family:var(--font-en); font-size:38px; font-weight:800; line-height:1; color:#1e9e5a; opacity:{{ pvOOpacity }};">O</span>
+                <span style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:{{ pvOStyleColor }};">맞다</span>
+              </div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; height:104px; border:2px solid {{ pvXStyleBorder }}; background:{{ pvXStyleBg }}; border-radius:16px;">
+                <span style="font-family:var(--font-en); font-size:38px; font-weight:800; line-height:1; color:#c0392b; opacity:{{ pvXOpacity }};">X</span>
+                <span style="font-family:var(--font-kr); font-size:12px; font-weight:700; color:{{ pvXStyleColor }};">틀리다</span>
+              </div>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ pIsShort }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="height:50px; border:1.5px solid var(--border); border-radius:13px; display:flex; align-items:center; padding:0 15px; font-family:var(--font-kr); font-size:14px; color:var(--fg-mute); background:#fff;">정답을 입력하세요</div>
+              <sc-if value="{{ pvShowAns }}" hint-placeholder-val="{{ false }}"><div style="font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--main-color);">정답: {{ pvShortAns }}</div></sc-if>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ pIsOrder }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ pvOrder }}" as="po" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:12px 13px; border:1.5px solid var(--border); border-radius:13px; background:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">
+                <span style="width:24px; height:24px; flex:none; border-radius:8px; background:{{ po.badgeBg }}; color:{{ po.badgeColor }}; display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:12px; font-weight:800;">{{ po.n }}</span>
+                <span style="flex:1; text-align:left;">{{ po.text }}</span>
+              </div>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ pIsHotspot }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative; height:180px; border-radius:16px; overflow:hidden; border:1.5px solid var(--border-2);">
+              {{ pvHsImgEl }}
+              <div style="position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.28));"></div>
+              <sc-if value="{{ pvShowAns }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ pvHsMarkerStyle }}"></div>
+              </sc-if>
+            </div>
+            <div style="margin-top:7px; text-align:center; font-family:var(--font-small); font-size:11px; color:var(--fg-mute);">이미지에서 정답 위치를 눌러 주세요</div>
+            </sc-if>
+
+            <!-- hint (참여자 화면과 동일) -->
+            <sc-if value="{{ pvHasHint }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ pvShowAns }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:9px; padding:12px 14px; border-radius:13px; background:#fff7e0; border:1px solid #f0dca0;">
+              <i class="icon-help" style="font-size:14px; color:#c07b12; margin-top:1px;"></i>
+              <span style="font-family:var(--font-small); font-size:12px; line-height:1.55; color:var(--fg-sub);">{{ pvHintText }}</span>
+            </div>
+            </sc-if>
+            <sc-if value="{{ pvHintHidden }}" hint-placeholder-val="{{ true }}">
+            <button style="align-self:flex-start; display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 16px; border:1px solid var(--border); border-radius:50px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:12.5px; font-weight:600; cursor:default;"><i class="icon-help" style="font-size:12px; color:#c07b12;"></i> {{ pvHintBtnLabel }}</button>
+            </sc-if>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ pvEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--fg-mute); padding:40px 20px;">
+            <i class="icon-quiz" style="font-size:34px; color:var(--border); margin-bottom:12px;"></i>
+            <div style="font-family:var(--font-small); font-size:12.5px;">왼쪽에서 말풍선을 추가하면<br>여기에 대화가 나타나요.</div>
+          </div>
+          </sc-if>
+        </div>
+
+        <!-- footer: 제출 + 정답표시 (참여자 화면과 동일한 제출 버튼) -->
+        <div style="flex:none; padding:12px 14px 14px; background:linear-gradient(0deg, rgba(0,0,0,0.04), transparent);">
+          <sc-if value="{{ showProblem }}" hint-placeholder-val="{{ true }}">
+          <button style="width:100%; height:48px; border:none; border-radius:13px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:15px; font-weight:700; cursor:default; margin-bottom:9px;">제출하기</button>
+          </sc-if>
+          <label style="display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--fg-sub);">
+            <input type="checkbox" checked="{{ revealAnswer }}" onChange="{{ onRevealAnswer }}" style="accent-color:var(--main-color); width:14px; height:14px;">
+            미리보기에서 정답 표시
+          </label>
+        </div>
+
+        <!-- 엔딩 페이지 미리보기 — 참여자 결과 화면 -->
+        <sc-if value="{{ isEndingPage }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 22px; background:{{ endBg }};">
+          <div style="animation:qnPop .5s ease;">{{ endImgEl }}</div>
+          <div style="margin-top:8px; display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:50px; background:rgba(255,255,255,0.2); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:700;">{{ endBadge }}</div>
+          <h1 style="margin:12px 0 0; font-family:var(--font-kr); font-size:24px; font-weight:900; color:#fff; letter-spacing:-0.8px;">{{ endTitle }}</h1>
+          <p style="margin:10px 0 0; font-family:var(--font-small); font-size:12.5px; font-weight:300; line-height:1.6; color:rgba(255,255,255,0.9);">{{ endBody }}</p>
+          <div style="display:flex; gap:9px; margin-top:20px; width:100%;">
+            <div style="flex:1; padding:12px 0; border-radius:14px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:20px; font-weight:800; color:#fff;">1000</div><div style="font-family:var(--font-small); font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:2px;">최종 점수</div></div>
+            <div style="flex:1; padding:12px 0; border-radius:14px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:20px; font-weight:800; color:#fff;">03:24</div><div style="font-family:var(--font-small); font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:2px;">소요 시간</div></div>
+          </div>
+          <div style="width:100%; margin-top:18px; height:46px; border-radius:13px; background:#fff; color:var(--main-color); display:flex; align-items:center; justify-content:center; gap:6px; font-family:var(--font-kr); font-size:14px; font-weight:800;"><i class="icon-ccw" style="font-size:13px;"></i> 다시 하기</div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<sc-if value="{{ mediaOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ onMediaClose }}" style="position:fixed; inset:0; z-index:100; background:rgba(20,18,16,0.5); display:flex; align-items:center; justify-content:center; padding:24px; font-family:var(--font-kr);">
+  <div onClick="{{ mediaStop }}" style="width:440px; max-width:100%; background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px -20px rgba(0,0,0,0.5);">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border-2);">
+      <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:var(--fg);">{{ mediaTitle }}</span>
+      <button onClick="{{ onMediaClose }}" style="width:30px; height:30px; border:none; border-radius:8px; background:var(--bg-warm-2); color:var(--fg-mute); cursor:pointer;"><i class="icon-close" style="font-size:12px;"></i></button>
+    </div>
+    <div style="display:flex; gap:4px; padding:12px 20px 0;">
+      <sc-for list="{{ mediaTabs }}" as="mt" hint-placeholder-count="2">
+        <button onClick="{{ mt.onPick }}" style="{{ mt.style }}"><i class="{{ mt.icon }}" style="font-size:13px;"></i> {{ mt.label }}</button>
+      </sc-for>
+    </div>
+    <div style="padding:20px;">
+      <sc-if value="{{ mediaTabUpload }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onMediaFakePick }}" onDragOver="{{ onMediaDragOver }}" onDragLeave="{{ onMediaDragLeave }}" onDrop="{{ onMediaDrop }}" style="{{ mediaDropStyle }}">
+          <span style="display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:var(--bg-light-color); color:var(--main-color);"><i class="icon-download" style="font-size:20px;"></i></span>
+          <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);">파일을 끌어다 놓거나 클릭해 업로드</span>
+          <span style="font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">JPG · PNG · GIF (최대 20MB)</span>
+        </button>
+        <input ref="{{ setMediaFile }}" type="file" accept="image/*" onChange="{{ onMediaFile }}" style="display:none;">
+        <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">프리셋</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+          <sc-for list="{{ mediaPresets }}" as="mp" hint-placeholder-count="3">
+          <button onClick="{{ mp.onPick }}" style="border:1px solid var(--border-2); border-radius:11px; overflow:hidden; background:#fff; cursor:pointer; padding:0; text-align:left;">
+            {{ mp.imgEl }}
+            <div style="padding:7px 9px; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--fg-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ mp.name }}</div>
+          </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ mediaTabUrl }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family:var(--font-small); font-size:12px; font-weight:700; color:var(--fg-sub); margin-bottom:9px;">이미지 링크</div>
+        <div style="display:flex; gap:8px;">
+          <input value="{{ mediaUrl }}" onInput="{{ onMediaUrl }}" placeholder="https://..." style="flex:1; height:42px; padding:0 13px; border:1.5px solid var(--border); border-radius:10px; font-family:var(--font-small); font-size:13px; color:var(--fg); outline:none;">
+          <button onClick="{{ onMediaApplyUrl }}" style="flex:none; height:42px; padding:0 18px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; cursor:pointer;">적용</button>
+        </div>
+        <sc-if value="{{ mediaUrlPreview }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; border:1px solid var(--border-2); border-radius:12px; overflow:hidden; background:#fafafa;">
+          <div style="font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-mute); padding:8px 12px; border-bottom:1px solid var(--border-2);">미리보기</div>
+          {{ mediaUrlPreviewEl }}
+        </div>
+        </sc-if>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if></x-dc>
+<script type="text/x-dc" data-dc-script>
+const SPK = {
+  host:{ name:'호스트', icon:'icon-megaphone', color:'#ff6800', bg:'#fff2e8', avatarBg:'linear-gradient(135deg,#ff8533,#ff6800)' },
+  narrator:{ name:'내레이터', icon:'icon-mission', color:'#6b5bd2', bg:'#f1eefb', avatarBg:'linear-gradient(135deg,#8b7be8,#6b5bd2)' },
+  char:{ name:'캐릭터', icon:'icon-user', color:'#1e9e7a', bg:'#e8f7f1', avatarBg:'linear-gradient(135deg,#3fc79a,#1e9e7a)' },
+};
+const TYPE = {
+  text:{ label:'텍스트', icon:'icon-text' },
+  image:{ label:'이미지', icon:'icon-album' },
+  delay:{ label:'딜레이', icon:'icon-time' },
+};
+const LOCKS = {
+  mc:{ label:'객관식', icon:'icon-quiz' },
+  short:{ label:'주관식', icon:'icon-text' },
+  ox:{ label:'OX', icon:'icon-check' },
+  order:{ label:'순서', icon:'icon-align-low' },
+  hotspot:{ label:'핫스팟', icon:'icon-location' },
+};
+const SAMPLE_IMG = [
+  'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=700&q=80',
+  'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=700&q=80',
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=700&q=80',
+];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let roomId='r1', pageId=null;
+    try{ const u=new URLSearchParams(location.search); if(u.get('id')) roomId=u.get('id'); pageId=u.get('page'); }catch(e){}
+    this._roomId=roomId;
+    const room=(window.RoomStore && window.RoomStore.get(roomId))||null;
+    let page=null;
+    if(room && room.pages){ page = pageId ? room.pages.find(p=>p.id===pageId) : room.pages.find(p=>p.type==='start'||p.type==='normal'); }
+    this._pageId = page ? page.id : (pageId||'p1');
+    this._pageType = page ? page.type : 'normal';
+    // 엔딩 페이지 미리보기용 원본 데이터
+    this._endSuccess = (page ? page.endingType : 'success') === 'success';
+    this._endTitle = (page && page.title) || (this._endSuccess ? '탈출 성공!' : '탈출 실패');
+    this._endBody = (page && page.body) || '';
+    const seed = this.seedFromPage(page);
+    this.state = Object.assign({
+      editingId: seed.blocks[0] ? seed.blocks[0].id : null, menuId:null, spkMenuId:null, dragId:null,
+      media:{ open:false, target:null, url:'', tab:'upload' },
+      play:false, reveal:0, revealAnswer:true,
+      seq: seed.blocks.length, imgSeq:1, mcSeq:(seed.problem&&seed.problem.mc?seed.problem.mc.length:2), orderSeq:(seed.problem&&seed.problem.order?seed.problem.order.length:2),
+      pageTitle: page ? page.title : '새 페이지',
+    }, seed);
+  }
+
+  // 스토어 페이지 → 대화편집 상태(blocks/problem/bg)
+  seedFromPage(page){
+    if(page && page.dialog){ return { bg:page.dialog.bg||{name:'',img:''}, blocks:JSON.parse(JSON.stringify(page.dialog.blocks||[])), problem:page.dialog.problem?JSON.parse(JSON.stringify(page.dialog.problem)):null }; }
+    // dialog 없으면 페이지 본문·자물쇠에서 파생
+    const lines=((page&&page.body)||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    const blocks = lines.length ? lines.map((t,i)=>({ id:'b'+(i+1), speaker:i%2?'narrator':'host', type:'text', text:t, img:'', delay:1 }))
+      : [{ id:'b1', speaker:'host', type:'text', text:'', img:'', delay:1 }];
+    let problem=null;
+    if(page && (page.type==='start'||page.type==='normal') && page.lock){
+      problem={ lock:page.lock,
+        q:page.summary||'', // 질문: 페이지 summary 에서 seed
+        mc:(page.choices||[{t:'',c:true},{t:'',c:false}]).map((c,i)=>({id:'m'+(i+1),text:c.t,correct:!!c.c})),
+        short:page.answer||'',
+        ox:page.oxAnswer||'O',
+        order:(page.orderItems||['','']).map((t,i)=>({id:'o'+(i+1),text:t})),
+        hotspot:(function(){ var h=(page.hotspots||[]).find(function(x){return x.c;})||{}; return { img:page.img||SAMPLE_IMG[0], label:h.label||'', x:(h.x!=null?h.x:46), y:(h.y!=null?h.y:47) }; })() };
+    }
+    return { bg:{ name:'', img:'' }, blocks, problem };
+  }
+
+  // 대화편집 상태 → 스토어 페이지 저장
+  persistPage(){
+    if(!window.RoomStore) return;
+    const S=this.state; const room=window.RoomStore.get(this._roomId);
+    if(!room || !room.pages) return;
+    const idx=room.pages.findIndex(p=>p.id===this._pageId);
+    if(idx<0) return;
+    const page=Object.assign({}, room.pages[idx]);
+    page.dialog={ bg:S.bg, blocks:JSON.parse(JSON.stringify(S.blocks)), problem:S.problem?JSON.parse(JSON.stringify(S.problem)):null };
+    page.body=S.blocks.filter(b=>b.type==='text'&&b.text).map(b=>b.text).join('\n');
+    // 설명형·엔딩 페이지는 문제(자물쇠)를 갖지 않음 — 저장 시에도 잠금을 쓰지 않는다
+    const P=(this._pageType==='desc'||this._pageType==='ending')?null:S.problem;
+    if(P){
+      page.lock=P.lock;
+      page.summary=P.q; // 문제 질문 → summary (노드 카드 미리보기 표시용)
+      if(P.lock==='mc') page.choices=(P.mc||[]).map(m=>({t:m.text,c:!!m.correct}));
+      else if(P.lock==='short') page.answer=P.short;
+      else if(P.lock==='ox') page.oxAnswer=P.ox;
+      else if(P.lock==='order'){ page.orderItems=(P.order||[]).map(o=>o.text); page.orderAnswer=(P.order||[]).map((o,i)=>i); }
+      else if(P.lock==='hotspot'){ page.img=P.hotspot&&P.hotspot.img; var hsx=(P.hotspot&&P.hotspot.x!=null)?P.hotspot.x:46, hsy=(P.hotspot&&P.hotspot.y!=null)?P.hotspot.y:47; page.hotspots=[{x:hsx,y:hsy,c:true,label:(P.hotspot&&P.hotspot.label)||''}]; }
+      // 정답/오답 출구는 편집화면 우측 사이드바에서 관리 — 여기서 덮어쓰지 않음
+    } else { page.lock=null; page.summary=page.body; }
+    const pages=room.pages.slice(); pages[idx]=page;
+    window.RoomStore.save(Object.assign({}, room, { pages }));
+  }
+  gotoPage(id){ if(this._sv){ clearTimeout(this._sv); } this.persistPage(); location.href='문제 대화 편집.dc.html?id='+this._roomId+'&page='+id; }
+  scheduleSave(){ if(this._sv) clearTimeout(this._sv); this._sv=setTimeout(()=>this.persistPage(),400); }
+  componentDidUpdate(pp, ps){ const s=this.state; if(s.blocks!==ps.blocks||s.problem!==ps.problem||s.bg!==ps.bg) this.scheduleSave(); }
+
+  componentWillUnmount(){ this._clear(); if(this._sv){ clearTimeout(this._sv); this.persistPage(); } }
+  _clear(){ (this._timers||[]).forEach(t=>clearTimeout(t)); this._timers=[]; }
+
+  set(id, patch){ this.setState(s=>({ blocks: s.blocks.map(b=> b.id===id ? {...b, ...patch} : b) })); }
+  setP(patch){ this.setState(s=>({ problem: {...s.problem, ...patch}, play:false })); }
+
+  addBlock(type){
+    const id = 'b'+(this.state.seq+1);
+    const nb = { id, speaker:'host', type, text:'', img:'', delay:1 };
+    this.setState(s=>({ blocks:[...s.blocks, nb], seq:s.seq+1, editingId:id, menuId:null, play:false }));
+  }
+
+  openMedia(target){ this.setState({ media:{ open:true, target, url:'', tab:'upload', drag:false } }); }
+  closeMedia(){ this.setState({ media:{ open:false, target:null, url:'', tab:'upload', drag:false } }); }
+  readMediaFile(file){ if(!file) return; const reader=new FileReader(); reader.onload=()=>this.applyMedia(reader.result); reader.readAsDataURL(file); }
+  applyMedia(url){
+    if(!url) return;
+    const t = this.state.media.target;
+    if(t==='bg'){ this.setState(s=>({ bg:{ ...s.bg, img:url } })); }
+    else if(t==='hs'){ this.setState(s=>({ problem:{ ...s.problem, hotspot:{ ...s.problem.hotspot, img:url } } })); }
+    else if(t && t.block){ this.set(t.block, { img:url }); }
+    this.setState({ media:{ open:false, target:null, url:'' }, play:false });
+  }
+
+  render(){}
+
+  renderVals(){
+    const S = this.state;
+    const play = S.play;
+    const P = S.problem;
+    const isStory = this._pageType === 'story' || this._pageType === 'desc';
+    const hasProblem = !!P && !isStory;
+
+    const blocks = S.blocks.map((b, i) => {
+      const sp = SPK[b.speaker] || SPK.host;
+      const tp = TYPE[b.type] || TYPE.text;
+      const editing = S.editingId === b.id;
+      const border = editing ? 'var(--main-color)' : 'var(--border-2)';
+      const shadow = editing ? '0 6px 20px -10px var(--main-color)' : '0 1px 3px rgba(0,0,0,0.04)';
+      const spkMenuOpen = S.spkMenuId === b.id;
+      const spkOpts = Object.keys(SPK).map(k => {
+        const s = SPK[k]; const on = b.speaker === k;
+        return { key:k, name:s.name, icon:s.icon, avatarBg:s.avatarBg,
+          rowStyle: `display:flex; align-items:center; gap:8px; width:100%; height:36px; padding:0 8px; border:none; border-radius:9px; background:${on?s.bg:'transparent'}; cursor:pointer; text-align:left; transition:background .12s;`,
+          nameStyle: `flex:1; font-family:var(--font-kr); font-size:12.5px; font-weight:${on?800:600}; color:${on?s.color:'var(--fg)'};`,
+          onPick:()=>{ this.set(b.id,{ speaker:k }); this.setState({ spkMenuId:null, editingId:b.id }); } };
+      });
+      return {
+        id:b.id, speaker:b.speaker, text:b.text, img:b.img, delay:b.delay,
+        spName:sp.name, spIcon:sp.icon, spColor:sp.color, spBg:sp.bg, spAvatarBg:sp.avatarBg,
+        spkMenuOpen, spkOpts,
+        spkChevron: spkMenuOpen ? 'icon-up-open' : 'icon-down-open',
+        spkBtnStyle: `display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 9px 0 5px; border:1.5px solid ${sp.color}22; border-radius:50px; background:${sp.bg}; cursor:pointer; transition:all .15s;`,
+        onSpkToggle:()=>this.setState(s=>({ spkMenuId: s.spkMenuId===b.id?null:b.id, editingId:b.id })),
+        typeLabel:tp.label, typeIcon:tp.icon,
+        isText:b.type==='text', isImage:b.type==='image', isDelay:b.type==='delay',
+        hasImg: b.type==='image' && !!b.img, noImg: b.type==='image' && !b.img,
+        imgEl: b.img ? React.createElement('img',{src:b.img, style:{display:'block',width:'100%',maxHeight:'220px',objectFit:'cover'}}) : null,
+        rows: Math.max(1, Math.min(6, (b.text||'').split('\n').length)),
+        orderLabel:'#'+(i+1),
+        menuOpen: S.menuId===b.id,
+        dragging: S.dragId===b.id ? '1' : '0',
+        cardStyle: `position:relative; background:#fff; border:1.5px solid ${border}; border-radius:16px; padding:14px 16px; margin-bottom:12px; box-shadow:${shadow}; transition:border-color .15s ease, box-shadow .15s ease;`,
+        onInput:(e)=>this.set(b.id,{ text:e.target.value }),
+        onFocus:()=>this.setState({ editingId:b.id }),
+        onSpeaker:(e)=>{ this.set(b.id,{ speaker:e.target.value }); this.setState({ editingId:b.id }); },
+        onDelay:(e)=>this.set(b.id,{ delay: Math.max(0, parseFloat(e.target.value)||0) }),
+        onMenu:()=>this.setState(s=>({ menuId: s.menuId===b.id?null:b.id })),
+        onDup:()=>{ const nid='b'+(S.seq+1); const idx=S.blocks.findIndex(x=>x.id===b.id); const copy={...b, id:nid}; const arr=[...S.blocks]; arr.splice(idx+1,0,copy); this.setState({ blocks:arr, seq:S.seq+1, menuId:null, editingId:nid, play:false }); },
+        onDelete:()=>this.setState(s=>({ blocks:s.blocks.filter(x=>x.id!==b.id), menuId:null, play:false })),
+        onImgPick:()=>{ this.setState({ editingId:b.id }); this.openMedia({ block:b.id }); },
+        onImgClear:()=>this.set(b.id,{ img:'' }),
+        onImgDragOver:(e)=>{ e.preventDefault(); e.stopPropagation(); },
+        onImgDrop:(e)=>{ e.preventDefault(); e.stopPropagation(); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>this.set(b.id,{ img:reader.result }); reader.readAsDataURL(f); },
+        onDragStart:(e)=>{ this.setState({ dragId:b.id, menuId:null }); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', b.id); }catch(err){} },
+        onDragEnd:()=>this.setState({ dragId:null }),
+        onDragOver:(e)=>{ e.preventDefault(); },
+        onDrop:(e)=>{ e.preventDefault(); const from=S.dragId; if(!from||from===b.id){ this.setState({dragId:null}); return; } const arr=[...S.blocks]; const fi=arr.findIndex(x=>x.id===from); const ti=arr.findIndex(x=>x.id===b.id); const [m]=arr.splice(fi,1); arr.splice(ti,0,m); this.setState({ blocks:arr, dragId:null, play:false }); },
+      };
+    });
+
+    // ---- problem editor bindings ----
+    const lock = P ? P.lock : 'mc';
+    const lockTypes = Object.keys(LOCKS).map(k=>{
+      const active = lock===k;
+      return { key:k, label:LOCKS[k].label, icon:LOCKS[k].icon, active,
+        style:`display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; height:60px; border-radius:12px; cursor:pointer; transition:all .15s ease; border:1.5px solid ${active?'var(--main-color)':'var(--border)'}; background:${active?'var(--bg-light-color)':'#fff'}; color:${active?'var(--theme-deep)':'var(--fg-mute)'}; font-weight:${active?'800':'600'};`,
+        onClick:()=>this.setP({ lock:k }) };
+    });
+
+    const mcOpts = P ? P.mc.map(c=>({
+      id:c.id, text:c.text,
+      borderColor:c.correct?'var(--main-color)':'var(--border)', bg:c.correct?'var(--bg-light-color)':'#fff',
+      ringColor:c.correct?'var(--main-color)':'var(--border)', dotBg:c.correct?'var(--main-color)':'#fff', checkOpacity:c.correct?1:0,
+      onToggle:()=>this.setP({ mc:P.mc.map(x=>({...x,correct:x.id===c.id})) }),
+      onText:(e)=>this.setP({ mc:P.mc.map(x=>x.id===c.id?{...x,text:e.target.value}:x) }),
+      onDelete:()=>this.setP({ mc:P.mc.filter(x=>x.id!==c.id) }),
+    })) : [];
+
+    const orderItems = P ? P.order.map((o,i)=>({
+      id:o.id, n:i+1, text:o.text,
+      onText:(e)=>this.setP({ order:P.order.map(x=>x.id===o.id?{...x,text:e.target.value}:x) }),
+      onDelete:()=>this.setP({ order:P.order.filter(x=>x.id!==o.id) }),
+    })) : [];
+
+    const oxSel = P ? P.ox : 'O';
+    const oxBtn = (v)=> oxSel===v
+      ? `flex:1; height:56px; border-radius:12px; border:2px solid var(--main-color); background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-en); font-size:22px; font-weight:800; cursor:pointer;`
+      : `flex:1; height:56px; border-radius:12px; border:2px solid var(--border); background:#fff; color:var(--fg-mute); font-family:var(--font-en); font-size:22px; font-weight:800; cursor:pointer;`;
+
+    const hsImg = P ? P.hotspot.img : '';
+
+    // ---- preview (참여자 화면과 동일) ----
+    const visN = play ? S.reveal : S.blocks.length;
+    const bubShadow = '0 4px 14px -8px rgba(0,0,0,0.14)';
+    let prevSpeaker = null;
+    const preview = S.blocks.slice(0, visN).map(b=>{
+      const isMsg = b.type!=='delay';
+      const isNarr = isMsg && b.speaker==='narrator';
+      const isChar = isMsg && b.speaker==='char';
+      const isBubble = isMsg && !isNarr;
+      const sameAsPrev = isMsg && prevSpeaker===b.speaker;
+      prevSpeaker = isMsg ? b.speaker : null;
+      const showAvatar = isBubble && !isChar && !sameAsPrev;
+      const sp = SPK[b.speaker] || SPK.host;
+
+      let msgRowStyle, bubbleStyle, bubbleWrapStyle;
+      if (isNarr) {
+        bubbleStyle = 'text-align:center; font-family:var(--font-small); font-size:12.5px; font-weight:300; font-style:italic; line-height:1.6; color:var(--fg-mute); white-space:pre-wrap; word-break:break-word;';
+      } else if (isChar) {
+        msgRowStyle = 'display:flex; flex-direction:row-reverse; align-items:flex-start; gap:10px;';
+        bubbleWrapStyle = 'max-width:200px;';
+        bubbleStyle = `background:#e8f7f1; border:1px solid #bfe6d6; border-radius:16px; ${showAvatar?'border-top-right-radius:4px;':''} padding:12px 15px; font-family:var(--font-small); font-size:13.5px; font-weight:300; line-height:1.6; color:#155e47; box-shadow:${bubShadow}; white-space:pre-wrap; word-break:break-word; text-align:left;`;
+      } else {
+        msgRowStyle = 'display:flex; align-items:flex-start; gap:10px;';
+        bubbleWrapStyle = 'max-width:200px;' + (showAvatar ? '' : 'margin-left:50px;');
+        bubbleStyle = `background:#fff; border:1px solid var(--border-2); border-radius:16px; ${showAvatar?'border-top-left-radius:4px;':''} padding:12px 15px; font-family:var(--font-small); font-size:13.5px; font-weight:300; line-height:1.6; color:var(--fg); box-shadow:${bubShadow}; white-space:pre-wrap; word-break:break-word;`;
+      }
+      return {
+        id:b.id, isDelay:b.type==='delay', isMsg, isNarrator:isNarr, isBubble,
+        isText:b.type==='text', isImage:b.type==='image',
+        text:b.text || '…',
+        imgEl: b.img ? React.createElement('img',{src:b.img, style:{display:'block',width:'100%',maxHeight:'160px',objectFit:'cover'}}) : null,
+        showAvatar, avatarBg: sp.avatarBg, avatarIcon: sp.icon,
+        msgRowStyle, bubbleStyle, bubbleWrapStyle,
+        rowStyle:'animation:qnBub .28s ease;',
+      };
+    });
+
+    const reveal = S.revealAnswer;
+    const showProblem = hasProblem && (!play || S.reveal>=S.blocks.length);
+    const pvQuestion = (P && P.q && P.q.trim()) ? P.q : ((P && P.hotspot && (P.hotspot.label||'').trim()) ? P.hotspot.label : '정답을 입력해 문을 열어 보세요.');
+
+    const pvMc = P ? P.mc.map((c,i)=>{
+      const showAns = reveal && c.correct;
+      return { text:c.text, n:i+1, isAnswer:showAns,
+        border:showAns?'var(--main-color)':'var(--border)', bg:showAns?'var(--bg-light-color)':'#fff',
+        color:showAns?'var(--theme-deep)':'var(--fg)',
+        numBg:showAns?'var(--main-color)':'var(--bg-warm-2)', numColor:showAns?'#fff':'var(--fg-sub)' };
+    }) : [];
+
+    const pvOrder = P ? P.order.map((o,i)=>({ n:i+1, text:o.text,
+      badgeBg: reveal?'var(--main-color)':'var(--bg-warm-2)', badgeColor: reveal?'#fff':'var(--fg-mute)' })) : [];
+
+    const oxCorrectO = oxSel==='O';
+    const oxAnsStyle = (isThis)=>({
+      border: (reveal&&isThis)?'var(--main-color)':'var(--border)',
+      bg: (reveal&&isThis)?'var(--bg-light-color)':'#fff',
+      color: (reveal&&isThis)?'var(--theme-deep)':'var(--fg-mute)',
+      opacity: (reveal&&isThis)?1:0.55,
+    });
+    const oO = oxAnsStyle(oxCorrectO), oX = oxAnsStyle(!oxCorrectO);
+
+    // 힌트 (편집화면 방 정책 참조)
+    const pvRoom = (window.RoomStore && window.RoomStore.get(this._roomId)) || null;
+    const pvPolicy = pvRoom ? pvRoom.hintPolicy : 'deduct';
+    const pvHint = (P && P.hint && P.hint.trim()) ? P.hint : '';
+    const pvHasHint = showProblem && !!pvHint;
+    let pvHintBtnLabel = '힌트 보기';
+    if (pvPolicy==='count') pvHintBtnLabel = `힌트 보기 (${pvRoom ? pvRoom.hintCount : 2}회 남음)`;
+    else if (pvPolicy==='deduct') pvHintBtnLabel = `힌트 보기 (−${(P && P.hintDeduct)||0}점)`;
+
+    // 진행바/단계 (편집화면 페이지 순서 기준)
+    const pvPgs = (pvRoom && pvRoom.pages) || [];
+    const pvIdx = pvPgs.findIndex(pp=>pp.id===this._pageId);
+    const pvProblemPgs = pvPgs.filter(pp=>pp.type==='start'||pp.type==='normal').length || 1;
+    const pvStepNum = pvIdx>=0 ? pvIdx+1 : 1;
+    const pvProgress = Math.round(((pvStepNum-1)/Math.max(1,pvPgs.length))*100);
+    const pvStepLabel = `미션 ${pvStepNum} / ${pvProblemPgs}`;
+
+    const room=(window.RoomStore && window.RoomStore.get(this._roomId))||null;
+    const pgs=(room&&room.pages)||[];
+    const curIdx=pgs.findIndex(p=>p.id===this._pageId);
+    const navTotal=pgs.length;
+    const navCur=curIdx>=0?curIdx+1:1;
+    const prevPage=curIdx>0?pgs[curIdx-1]:null;
+    const nextPage=(curIdx>=0&&curIdx<pgs.length-1)?pgs[curIdx+1]:null;
+
+    return {
+      blocks,
+      backHref:'방탈출 편집 화면.dc.html?id='+this._roomId+'&page='+this._pageId,
+      onSave:()=>{ this.persistPage(); },
+      navTotal, navCur,
+      navPrevDisabled: !prevPage,
+      navNextDisabled: !nextPage,
+      onNavPrev: prevPage ? ()=>this.gotoPage(prevPage.id) : null,
+      onNavNext: nextPage ? ()=>this.gotoPage(nextPage.id) : null,
+      pageTitle:S.pageTitle,
+      blockCount: S.blocks.length,
+      isEmpty: S.blocks.length===0,
+      notEmpty: S.blocks.length>0,
+      pvEmpty: S.blocks.length===0 && !hasProblem && this._pageType!=='ending',
+      // 엔딩 페이지 미리보기 (참여자 결과 화면)
+      isEndingPage: this._pageType==='ending',
+      endBadge: this._endSuccess ? '탈출 성공' : '탈출 실패',
+      endBg: this._endSuccess ? 'radial-gradient(120% 90% at 50% 0%, #1f9e5a 0%, #0f7a45 60%, #0b5a33 100%)' : 'radial-gradient(120% 90% at 50% 0%, #b5372f 0%, #8a2822 60%, #641c18 100%)',
+      endImgEl: React.createElement('img',{src:(this._endSuccess?'uploads/character01/play_team_ob.png':'uploads/character01/quiz_nodata_ob.png'), alt:'결과', style:{width:'128px', filter:'drop-shadow(0 12px 18px rgba(0,0,0,0.35))'}}),
+      endTitle: this._endTitle, endBody: this._endBody,
+      // stage bg
+      bgName: S.bg.name,
+      bgThumb: S.bg.img ? React.createElement('img',{src:S.bg.img, style:{width:'100%',height:'100%',objectFit:'cover'}}) : null,
+      stageBg: '#f4f1ec',
+      onBgChange:()=>this.openMedia('bg'),
+      mediaOpen: S.media.open,
+      mediaTitle: S.media.target==='bg' ? '무대 배경 선택' : (S.media.target==='hs' ? '핫스팟 이미지 선택' : '이미지 선택'),
+      mediaUrl: S.media.url,
+      onMediaUrl:(e)=>this.setState(s=>({ media:{ ...s.media, url:e.target.value } })),
+      onMediaApplyUrl:()=>this.applyMedia(this.state.media.url),
+      onMediaClose:()=>this.closeMedia(),
+      mediaStop:(e)=>e.stopPropagation(),
+      mediaTabUpload: S.media.tab==='upload',
+      mediaTabUrl: S.media.tab==='url',
+      mediaTabs: [ {key:'upload',label:'가져오기',icon:'icon-download'}, {key:'url',label:'이미지 링크',icon:'icon-link'} ].map(t=>({
+        label:t.label, icon:t.icon,
+        onPick:()=>this.setState(s=>({ media:{...s.media, tab:t.key} })),
+        style:`display:flex; align-items:center; gap:6px; height:36px; padding:0 15px; border:none; border-bottom:2.5px solid ${S.media.tab===t.key?'var(--main-color)':'transparent'}; background:none; cursor:pointer; font-family:var(--font-kr); font-size:13px; font-weight:${S.media.tab===t.key?'800':'600'}; color:${S.media.tab===t.key?'var(--main-color)':'var(--fg-mute)'};`,
+      })),
+      setMediaFile:(el)=>{ this._mediaFile=el; },
+      onMediaFakePick:()=>{ if(this._mediaFile) this._mediaFile.click(); },
+      onMediaFile:(e)=>{ const f=e.target&&e.target.files&&e.target.files[0]; if(f) this.readMediaFile(f); if(e.target) e.target.value=''; },
+      onMediaDragOver:(e)=>{ e.preventDefault(); if(!S.media.drag) this.setState(s=>({ media:{...s.media, drag:true} })); },
+      onMediaDragLeave:(e)=>{ e.preventDefault(); if(S.media.drag) this.setState(s=>({ media:{...s.media, drag:false} })); },
+      onMediaDrop:(e)=>{ e.preventDefault(); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; this.setState(s=>({ media:{...s.media, drag:false} })); if(f) this.readMediaFile(f); },
+      mediaDropStyle:`width:100%; height:150px; border:2px dashed ${S.media.drag?'var(--main-color)':'var(--border)'}; border-radius:14px; background:${S.media.drag?'var(--bg-light-color)':'#fafafa'}; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; cursor:pointer; margin-bottom:18px; transition:all .12s;`,
+      mediaUrlPreview: !!(S.media.url && S.media.url.trim()),
+      mediaUrlPreviewEl: (S.media.url && S.media.url.trim()) ? React.createElement('img',{src:S.media.url.trim(), style:{display:'block',width:'100%',maxHeight:'180px',objectFit:'contain',background:'#fff'}}) : null,
+      mediaPresets: [ {name:'실험실 전경',url:SAMPLE_IMG[0]}, {name:'밤하늘 관측실',url:SAMPLE_IMG[1]}, {name:'오래된 도서관',url:SAMPLE_IMG[2]} ].map(p=>({ name:p.name, imgEl:React.createElement('img',{src:p.url, style:{width:'100%',height:'70px',objectFit:'cover',display:'block'}}), onPick:()=>this.applyMedia(p.url) })),
+      // add
+      addText:()=>this.addBlock('text'),
+      addImage:()=>this.addBlock('image'),
+      addDelay:()=>this.addBlock('delay'),
+      // problem toggle
+      hasProblem,
+      showProblemBtn: !isStory,
+      addProblemLabel: hasProblem ? '문제 1개' : '문제',
+      addProblemStyle: `flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:44px; border-radius:11px; font-family:var(--font-kr); font-size:13px; font-weight:700; cursor:${hasProblem?'default':'pointer'}; transition:all .15s ease; border:1.5px ${hasProblem?'dashed var(--border)':'solid var(--main-color)'}; background:${hasProblem?'var(--bg-warm-2)':'var(--main-color)'}; color:${hasProblem?'var(--fg-mute)':'#fff'};`,
+      onAddProblem:()=>{ if(hasProblem) return; this.setState({ problem:{ lock:'mc', q:'', mc:[{id:'m1',text:'',correct:true},{id:'m2',text:'',correct:false}], short:'', ox:'O', order:[{id:'o1',text:''},{id:'o2',text:''}], hotspot:{img:'',label:'',x:46,y:47} }, play:false }); },
+      onRemoveProblem:()=>this.setState({ problem:null, play:false }),
+      // lock + editors
+      lockTypes,
+      pIsMc: lock==='mc', pIsShort: lock==='short', pIsOx: lock==='ox', pIsOrder: lock==='order', pIsHotspot: lock==='hotspot',
+      mcOpts,
+      addMc:()=>{ const id='m'+(S.mcSeq+1); this.setState(s=>({ problem:{...s.problem, mc:[...s.problem.mc,{id,text:'',correct:false}]}, mcSeq:s.mcSeq+1, play:false })); },
+      problemQ: P?(P.q||''):'', onProblemQ:(e)=>this.setP({ q:e.target.value }),
+      shortAns: P?P.short:'', onShort:(e)=>this.setP({ short:e.target.value }),
+      onOxO:()=>this.setP({ ox:'O' }), onOxX:()=>this.setP({ ox:'X' }),
+      oxOStyle: oxBtn('O'), oxXStyle: oxBtn('X'),
+      orderItems,
+      addOrder:()=>{ const id='o'+(S.orderSeq+1); this.setState(s=>({ problem:{...s.problem, order:[...s.problem.order,{id,text:''}]}, orderSeq:s.orderSeq+1, play:false })); },
+      hsHasImg: !!hsImg, hsNoImg: !hsImg,
+      hsImgEl: hsImg ? React.createElement('img',{src:hsImg, style:{display:'block',width:'100%',maxHeight:'200px',objectFit:'cover'}}) : null,
+      onHsPick:()=>this.openMedia('hs'),
+      onHsPickStop:(e)=>{ e.stopPropagation(); this.openMedia('hs'); },
+      onHsClear:()=>this.setState(s=>({ problem:{...s.problem, hotspot:{...s.problem.hotspot, img:''}}, play:false })),
+      onHsDragOver:(e)=>e.preventDefault(),
+      onHsDrop:(e)=>{ e.preventDefault(); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>this.setState(s=>({ problem:{...s.problem, hotspot:{...s.problem.hotspot, img:reader.result}}, play:false })); reader.readAsDataURL(f); },
+      onHsClearStop:(e)=>{ e.stopPropagation(); this.setState(s=>({ problem:{...s.problem, hotspot:{...s.problem.hotspot, img:''}}, play:false })); },
+      onHsImgClick:(e)=>{ const r=e.currentTarget.getBoundingClientRect(); if(!r.width||!r.height) return; const x=Math.round(Math.min(100,Math.max(0,((e.clientX-r.left)/r.width)*100))); const y=Math.round(Math.min(100,Math.max(0,((e.clientY-r.top)/r.height)*100))); this.setState(s=>({ problem:{...s.problem, hotspot:{...s.problem.hotspot, x, y}}, play:false })); },
+      hsMarkerEl: (P && hsImg) ? React.createElement('span',{ style:{ position:'absolute', left:(P.hotspot.x!=null?P.hotspot.x:46)+'%', top:(P.hotspot.y!=null?P.hotspot.y:47)+'%', width:'30px', height:'30px', marginLeft:'-15px', marginTop:'-15px', borderRadius:'50%', border:'3px solid #fff', background:'var(--main-color)', boxShadow:'0 2px 8px rgba(0,0,0,0.4)', pointerEvents:'none' } }) : null,
+      hsCoordLabel: (P && hsImg) ? `정답 지점 · 가로 ${P.hotspot.x!=null?P.hotspot.x:46}% · 세로 ${P.hotspot.y!=null?P.hotspot.y:47}% (이미지를 다시 클릭해 이동)` : '',
+      // preview
+      preview,
+      showProblem,
+      revealAnswer: reveal,
+      onRevealAnswer:()=>this.setState(s=>({ revealAnswer:!s.revealAnswer })),
+      pvQuestion,
+      pvStepLabel, pvProgress,
+      pvMc,
+      pvShowAns: reveal,
+      pvShortAns: P?P.short:'',
+      pvOrder,
+      pvOStyleBorder:oO.border, pvOStyleBg:oO.bg, pvOStyleColor:oO.color, pvOOpacity:oO.opacity,
+      pvXStyleBorder:oX.border, pvXStyleBg:oX.bg, pvXStyleColor:oX.color, pvXOpacity:oX.opacity,
+      pvHsImgEl: hsImg ? React.createElement('img',{src:hsImg, style:{display:'block',width:'100%',height:'100%',objectFit:'cover'}}) : React.createElement('div',{style:{height:'100%',background:'linear-gradient(160deg,#dff0ff,#eafaf2)'}}),
+      pvHsMarkerStyle: `position:absolute; top:${P&&P.hotspot&&P.hotspot.y!=null?P.hotspot.y:47}%; left:${P&&P.hotspot&&P.hotspot.x!=null?P.hotspot.x:46}%; transform:translate(-50%,-50%); width:40px; height:40px; border-radius:50%; border:3px solid #fff; background:var(--main-color); box-shadow:0 4px 12px rgba(0,0,0,0.3);`,
+      pvHasHint, pvHintText: pvHint, pvHintBtnLabel, pvHintHidden: !reveal,
+      // play
+      playLabel: play ? '정지' : '재생',
+      playIcon: play ? 'icon-close' : 'icon-play',
+      playBtnBg: play ? 'var(--fg)' : 'var(--main-color)',
+      playBtnColor: '#fff',
+      onPlay:()=>{
+        if(play){ this._clear(); this.setState({ play:false }); return; }
+        this._clear();
+        this.setState({ play:true, reveal:0 });
+        const arr = this.state.blocks;
+        let acc = 300;
+        arr.forEach((b, i)=>{
+          this._timers.push(setTimeout(()=>this.setState({ reveal:i+1 }), acc));
+          acc += b.type==='delay' ? Math.max(400, (b.delay||1)*1000) : (b.type==='image'?900:850);
+        });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>
