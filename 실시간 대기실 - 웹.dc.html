@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
+  <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes lbFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+    @keyframes lbPop { 0%{ transform:scale(0.6); opacity:0; } 60%{ transform:scale(1.08); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes lbBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+    @keyframes lbDrift { 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(18px); } }
+    .lb-btn:hover { filter:brightness(1.05); transform:translateY(-2px); }
+    .lb-ghost:hover { background:rgba(255,255,255,0.16) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="실시간 대기실 · 진행자" style="position:relative; height:100vh; box-sizing:border-box; display:flex; flex-direction:column; background:radial-gradient(120% 90% at 50% -10%, #3a2a1e 0%, #241a13 55%, #17110c 100%); font-family:var(--font-kr); overflow:hidden;">
+
+  <!-- ambient -->
+  <div style="position:absolute; width:620px; height:620px; border-radius:50%; background:rgba(255,104,0,0.10); top:-220px; left:-160px; animation:lbDrift 15s ease-in-out infinite;"></div>
+  <div style="position:absolute; width:420px; height:420px; border-radius:50%; background:rgba(255,104,0,0.07); bottom:-160px; right:-100px; animation:lbDrift 18s ease-in-out infinite;"></div>
+
+  <!-- ============ HEADER ============ -->
+  <header style="position:relative; flex:none; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; z-index:20;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="My 방탈출 - 웹.dc.html" class="lb-ghost" style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.08); color:#fff;"><i class="icon-left-open" style="font-size:13px;"></i></a>
+      <div style="font-family:var(--font-kr); font-size:17px; font-weight:900; letter-spacing:-0.5px; color:#fff;">방탈출<span style="color:var(--main-color);">N</span></div>
+      <span style="width:1px; height:18px; background:rgba(255,255,255,0.2);"></span>
+      <span style="display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 10px; border-radius:50px; background:rgba(224,72,61,0.2); color:#ff9a92; font-family:var(--font-small); font-size:11.5px; font-weight:800;"><span style="width:6px; height:6px; border-radius:50%; background:#ff6b60; animation:lbBlink 1.4s ease-in-out infinite;"></span>실시간 대기실</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button class="lb-ghost" onClick="{{ onCopyLink }}" style="display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border:1px solid rgba(255,255,255,0.22); border-radius:10px; background:rgba(255,255,255,0.08); color:#fff; font-family:var(--font-small); font-size:12.5px; font-weight:700; cursor:pointer;"><i class="icon-link" style="font-size:12px;"></i> 입장 링크 복사</button>
+      <a href="실시간 관제 - 웹.dc.html?sid={{ sid }}" class="lb-ghost" style="display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border:1px solid rgba(255,255,255,0.22); border-radius:10px; background:rgba(255,255,255,0.08); color:#fff; font-family:var(--font-small); font-size:12.5px; font-weight:700;"><i class="icon-eye" style="font-size:12px;"></i> 관제 화면</a>
+    </div>
+  </header>
+
+  <!-- ============ BODY ============ -->
+  <div style="position:relative; flex:1; display:flex; gap:26px; padding:8px 30px 26px; min-height:0; z-index:10;">
+
+    <!-- ---------- LEFT: PIN 안내 ---------- -->
+    <div style="flex:none; width:392px; display:flex; flex-direction:column; gap:16px; min-height:0;">
+
+      <!-- PIN 카드 -->
+      <div style="flex:none; border-radius:24px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); padding:24px; text-align:center; backdrop-filter:blur(8px);">
+        <div style="font-family:var(--font-kr); font-size:15px; font-weight:700; color:rgba(255,255,255,0.8);">{{ title }}</div>
+        <div style="margin-top:16px; font-family:var(--font-small); font-size:12.5px; font-weight:700; color:var(--main-color); letter-spacing:1px;">게임 PIN</div>
+        <div style="margin-top:8px; display:flex; justify-content:center; gap:7px;">
+          <sc-for list="{{ pinCells }}" as="c" hint-placeholder-count="6">
+            <span style="{{ c.style }}">{{ c.ch }}</span>
+          </sc-for>
+        </div>
+        <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.12); font-family:var(--font-small); font-size:12.5px; line-height:1.6; color:rgba(255,255,255,0.72);">
+          참여자는 <b style="color:#fff;">방탈출N 입장</b> 화면에서<br>이 PIN을 입력하면 들어옵니다.
+        </div>
+      </div>
+
+      <!-- 세션 옵션 -->
+      <div style="flex:none; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:16px 18px;">
+        <div style="display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:#fff;"><i class="icon-sliders" style="font-size:13px; color:var(--main-color);"></i> 세션 설정</div>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ optRows }}" as="o" hint-placeholder-count="3">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-family:var(--font-small); font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.9);">{{ o.label }}</div>
+                <div style="margin-top:1px; font-family:var(--font-small); font-size:11px; color:rgba(255,255,255,0.5);">{{ o.desc }}</div>
+              </div>
+              <button onClick="{{ o.onToggle }}" style="{{ o.switchStyle }}"><span style="{{ o.knobStyle }}"></span></button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- 시작 버튼 -->
+      <div style="flex:none; margin-top:auto;">
+        <button class="lb-btn" onClick="{{ onStart }}" style="{{ startStyle }}">
+          <i class="icon-play" style="font-size:14px;"></i> {{ startLabel }}
+        </button>
+        <div style="margin-top:10px; text-align:center; font-family:var(--font-small); font-size:11.5px; color:rgba(255,255,255,0.5);">{{ startHint }}</div>
+      </div>
+    </div>
+
+    <!-- ---------- RIGHT: 입장자 ---------- -->
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column; border-radius:24px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); overflow:hidden;">
+
+      <div style="flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 22px; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex; align-items:center; gap:9px;">
+          <i class="icon-user" style="font-size:15px; color:var(--main-color);"></i>
+          <span style="font-family:var(--font-kr); font-size:16px; font-weight:800; color:#fff;">입장한 참여자</span>
+          <span style="display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:24px; padding:0 9px; border-radius:50px; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:13px; font-weight:800; animation:lbPop .3s ease;">{{ count }}</span>
+        </div>
+        <button class="lb-ghost" onClick="{{ onSeedDemo }}" style="display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border:1px solid rgba(255,255,255,0.2); border-radius:9px; background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.8); font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;"><i class="icon-plus" style="font-size:11px;"></i> 가상 참여자</button>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; padding:20px 22px;">
+        <sc-if value="{{ hasPlayers }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+          <sc-for list="{{ players }}" as="p" hint-placeholder-count="8">
+            <div style="display:flex; align-items:center; gap:9px; padding:9px 14px 9px 10px; border-radius:50px; background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.14); animation:lbPop .3s ease;">
+              <span style="{{ p.avatarStyle }}">{{ p.initial }}</span>
+              <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:#fff;">{{ p.name }}</span>
+              <button onClick="{{ p.onKick }}" title="내보내기" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border:none; border-radius:50%; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); cursor:pointer; padding:0;"><i class="icon-cancel" style="font-size:9px;"></i></button>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- 빈 상태 -->
+        <sc-if value="{{ noPlayers }}" hint-placeholder-val="{{ false }}">
+        <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+          <img src="uploads/character01/play_loading_bg.png" alt="대기 중" style="width:230px; filter:drop-shadow(0 18px 26px rgba(0,0,0,0.45)); animation:lbFloat 6s ease-in-out infinite;">
+          <div style="margin-top:18px; font-family:var(--font-kr); font-size:18px; font-weight:800; color:#fff;">참여자를 기다리고 있어요</div>
+          <div style="margin-top:7px; font-family:var(--font-small); font-size:13px; line-height:1.6; color:rgba(255,255,255,0.6);">위의 PIN을 화면에 띄우거나 알려주세요.<br>참여자가 입장하면 여기에 나타납니다.</div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:50px; background:#fff; color:var(--fg); font-family:var(--font-kr); font-size:13.5px; font-weight:700; box-shadow:0 16px 34px -14px rgba(0,0,0,0.6);">
+    <i class="icon-check" style="font-size:12px; color:#1faf6a;"></i> {{ toastText }}
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+const AV_COLORS = ['#ff6800','#6b5bd2','#1e9e7a','#d6453f','#c07b12','#2f7fd0','#b0468f','#3f9e5a'];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let sid = null, roomId = 'r1';
+    try {
+      const u = new URLSearchParams(location.search);
+      sid = u.get('sid');
+      if (u.get('id')) roomId = u.get('id');
+    } catch(e){}
+
+    let session = null;
+    if (window.SessionStore) {
+      if (sid) session = window.SessionStore.get(sid);
+      // &new=1 이면 진행 중 회차가 있어도 새 회차를 만든다(한 방에서 여러 반 동시 진행)
+      var forceNew = false;
+      try { forceNew = new URLSearchParams(location.search).get('new') === '1'; } catch(e){}
+      if (!session && !forceNew) session = window.SessionStore.activeForRoom(roomId);
+      if (!session) session = window.SessionStore.create(roomId, {});
+    }
+    this._sid = session ? session.id : null;
+    this._roomId = session ? session.roomId : roomId;
+    this._room = window.RoomStore ? window.RoomStore.get(this._roomId) : null;
+
+    this.state = { toast:'', tick:0 };
+  }
+  componentDidMount(){
+    if (window.SessionStore) this._unsub = window.SessionStore.subscribe(()=>this.setState(s=>({tick:s.tick+1})));
+  }
+  componentWillUnmount(){ if (this._unsub) this._unsub(); if (this._tt) clearTimeout(this._tt); }
+
+  session(){
+    if (window.SessionStore && this._sid) {
+      const s = window.SessionStore.get(this._sid);
+      if (s) return s;
+    }
+    if (!this._demo) {
+      this._demo = {
+        id:'demo', roomId:this._roomId,
+        title:(this._room&&this._room.title)||'사라진 실험실의 비밀',
+        pin:(this._room&&this._room.pin)||'834 512',
+        state:'lobby', opts: window.SessionStore ? window.SessionStore.defaultOpts() : { lateJoin:true, revive:'both', speedBonus:true },
+        players:[], total:5,
+      };
+    }
+    return this._demo;
+  }
+  toast(t){ this.setState({toast:t}); if(this._tt) clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),1900); }
+  act(fn){ if (!window.SessionStore || !this._sid) { this.toast('데모 모드입니다'); return; } fn(window.SessionStore); this.setState(s=>({tick:s.tick+1})); }
+
+  renderVals(){
+    const S = this.state;
+    const sess = this.session();
+    const players = sess.players || [];
+    const opts = sess.opts || {};
+
+    // PIN 셀
+    const digits = String(sess.pin||'').replace(/\D/g,'').slice(0,6).split('');
+    const pinCells = digits.map(ch=>({
+      ch,
+      style:'display:flex; align-items:center; justify-content:center; width:42px; height:56px; border-radius:12px; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.2); font-family:var(--font-en); font-size:28px; font-weight:800; color:#fff;',
+    }));
+
+    const avatarOf = (p)=>{
+      const c = AV_COLORS[(p.name||'').charCodeAt(0) % AV_COLORS.length] || AV_COLORS[0];
+      return { initial:(p.name||'?').slice(0,1),
+        style:`display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:${c}; color:#fff; font-family:var(--font-kr); font-size:12px; font-weight:800;` };
+    };
+    const playerRows = players.map(p=>{
+      const av = avatarOf(p);
+      return { name:p.name, initial:av.initial, avatarStyle:av.style,
+        onKick: ()=>{ this.act(st=>st.kick(this._sid, p.id)); } };
+    });
+
+    // 옵션 스위치
+    const mkOpt = (key, label, desc)=>{
+      const on = !!opts[key];
+      return { label, desc,
+        switchStyle:`flex:none; position:relative; width:44px; height:25px; border:none; border-radius:50px; background:${on?'var(--main-color)':'rgba(255,255,255,0.22)'}; cursor:pointer; transition:background .18s; padding:0;`,
+        knobStyle:`position:absolute; top:3px; left:${on?22:3}px; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .18s; box-shadow:0 2px 5px rgba(0,0,0,0.25);`,
+        onToggle: ()=>{
+          if (!window.SessionStore || !this._sid) {
+            // 데모 폴백: 로컬 객체에만 반영
+            if (this._demo) { this._demo.opts[key] = !this._demo.opts[key]; this.setState(s=>({tick:s.tick+1})); }
+            return;
+          }
+          const patch = {}; patch[key] = !on;
+          window.SessionStore.setOpts(this._sid, patch);
+          this.setState(s=>({tick:s.tick+1}));
+        } };
+    };
+    const optRows = [
+      mkOpt('lateJoin','시작 후 입장 허용','늦게 온 참여자도 들어올 수 있어요'),
+      mkOpt('speedBonus','속도 보너스','빨리 풀면 추가 점수를 줍니다'),
+      mkOpt('nickApproval','닉네임 승인','부적절한 닉네임을 걸러냅니다'),
+    ];
+
+    const canStart = players.length > 0;
+    const startLabel = canStart ? `방탈출 시작 (${players.length}명)` : '참여자를 기다리는 중';
+    const startStyle = `display:flex; align-items:center; justify-content:center; gap:9px; width:100%; height:62px; border:none; border-radius:16px; background:${canStart?'var(--main-color)':'rgba(255,255,255,0.12)'}; color:${canStart?'#fff':'rgba(255,255,255,0.42)'}; font-family:var(--font-kr); font-size:18px; font-weight:800; cursor:${canStart?'pointer':'not-allowed'}; transition:all .18s; box-shadow:${canStart?'0 16px 36px -16px rgba(255,104,0,0.8)':'none'};`;
+
+    return {
+      sid: this._sid || '',
+      title: sess.title, pinCells, count: players.length,
+      players: playerRows, hasPlayers: players.length>0, noPlayers: players.length===0,
+      optRows,
+      canStart, startLabel, startStyle,
+      startHint: canStart ? '시작하면 참여자 화면이 첫 페이지로 전환됩니다.' : 'PIN을 알려주고 참여자가 들어오면 시작할 수 있어요.',
+      onStart: ()=>{
+        if (!canStart) return;
+        this.act(st=>st.start(this._sid));
+        try { location.href = '실시간 관제 - 웹.dc.html?sid=' + encodeURIComponent(this._sid||''); } catch(e){}
+      },
+      onCopyLink: ()=>{
+        const link = '참여자 입장 - 웹.dc.html';
+        try { if (navigator.clipboard) navigator.clipboard.writeText(location.origin + location.pathname.replace(/[^/]*$/, '') + encodeURI(link)); } catch(e){}
+        this.toast('입장 링크를 복사했어요');
+      },
+      onSeedDemo: ()=>{ this.act(st=>st.seedDemo(this._sid, 8)); },
+      hasToast: !!S.toast, toastText: S.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

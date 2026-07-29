@@ -9,16 +9,21 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
   <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
     * { box-sizing: border-box; }
     a { color: var(--main-color); text-decoration: none; }
     a:hover { color: var(--btn-hover-color); }
     @keyframes qnFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
     @keyframes qnMenu { from{ transform:translateY(-6px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes qnBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
     .qn-card:hover { box-shadow: 0 16px 34px -18px rgba(0,0,0,0.22) !important; border-color: var(--border) !important; }
     .qn-card:hover .qn-thumb-img { transform: scale(1.06); }
     .qn-cta:hover { background: var(--btn-hover-color) !important; transform:translateY(-2px); box-shadow:0 14px 26px -12px var(--main-color) !important; }
@@ -112,8 +117,15 @@
         <div class="qn-card" style="position:relative; background:#fff; border:1px solid var(--border-2); border-radius:18px; overflow:visible; box-shadow:0 4px 14px -10px rgba(0,0,0,0.14); transition:all .22s ease;">
           <!-- thumbnail banner -->
           <div style="position:relative; height:180px; border-radius:18px 18px 0 0; overflow:hidden; background:{{ c.thumbBg }};">{{ c.thumbEl }}
-            <span style="position:absolute; top:12px; left:12px; display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:{{ c.statusBg }}; color:{{ c.statusFg }}; font-family:var(--font-small); font-size:11.5px; font-weight:700;"><span style="width:6px; height:6px; border-radius:50%; background:{{ c.statusFg }};"></span>{{ c.statusLabel }}</span>
-            <span style="position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:4px; height:26px; padding:0 10px; border-radius:50px; background:rgba(20,16,12,0.5); color:#fff; font-family:var(--font-small); font-size:11px; font-weight:600; backdrop-filter:blur(4px);"><i class="{{ c.visIcon }}" style="font-size:10px;"></i>{{ c.visLabel }}</span>
+            <!-- 열려 있는 상태 배지 — 실시간 / 미션이 동시에 열려 있으면 둘 다 노출 -->
+            <div style="position:absolute; top:12px; left:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; max-width:calc(100% - 100px);">
+              <sc-if value="{{ c.isRealtime }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:var(--mode-realtime-bg); color:var(--mode-realtime); font-family:var(--font-small); font-size:11.5px; font-weight:800;"><span style="width:6px; height:6px; border-radius:50%; background:var(--mode-realtime); animation:qnBlink 1.4s ease-in-out infinite;"></span>실시간 {{ c.realtimeN }}건 진행 중</span>
+              </sc-if>
+              <sc-if value="{{ c.isMission }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:var(--mode-mission-bg); color:var(--mode-mission); font-family:var(--font-small); font-size:11.5px; font-weight:800;"><i class="icon-mission" style="font-size:11px;"></i>미션 {{ c.missionN }}건 진행 중</span>
+              </sc-if>
+            </div>
             <sc-if value="{{ c.hasIssues }}" hint-placeholder-val="{{ false }}">
             <a href="{{ c.editHref }}" title="{{ c.issueTitle }}" style="position:absolute; bottom:12px; left:12px; display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:{{ c.issueBg }}; color:#fff; font-family:var(--font-small); font-size:11.5px; font-weight:700; box-shadow:0 3px 10px -3px rgba(0,0,0,0.4);"><i class="{{ c.issueIcon }}" style="font-size:12px;"></i>{{ c.issueLabel }}</a>
             </sc-if>
@@ -125,8 +137,11 @@
               <div style="position:relative; flex:none;">
                 <button class="qn-iconbtn" onClick="{{ c.onToggleMenu }}" title="더보기" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:30px; height:30px; margin:-2px -4px 0 0; border:none; border-radius:8px; background:transparent; cursor:pointer; transition:all .15s;"><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span><span style="width:4px; height:4px; border-radius:50%; background:var(--fg-mute);"></span></button>
                 <sc-if value="{{ c.menuOpen }}" hint-placeholder-val="{{ false }}">
-                <div style="position:absolute; right:0; top:34px; z-index:20; width:178px; background:#fff; border:1px solid var(--border-2); border-radius:12px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:6px; animation:qnMenu .16s ease;">
-                  <button class="qn-menu-item" onClick="{{ c.onDup }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-005-copy" style="font-size:14px; color:var(--fg-mute);"></i> 복제하기</button>
+                <div style="position:absolute; right:0; top:34px; z-index:20; width:188px; background:#fff; border:1px solid var(--border-2); border-radius:12px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:6px; animation:qnMenu .16s ease;">
+                  <!-- 편집·미리보기 — 카드 하단은 열기 버튼이 차지하므로 메뉴에 둔다 -->
+                  <a class="qn-menu-item" href="{{ c.editHref }}" style="display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);"><i class="icon-edit" style="font-size:14px; color:var(--fg-mute);"></i> 편집하기</a>
+                  <a class="qn-menu-item" href="{{ c.playHref }}" style="display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);"><i class="icon-play" style="font-size:14px; color:var(--fg-mute);"></i> 미리보기</a>
+                  <button class="qn-menu-item" onClick="{{ c.onDup }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-005-copy" style="font-size:14px; color:var(--fg-mute);"></i> 복사하기</button>
                   <a class="qn-menu-item" href="{{ c.reportHref }}" style="display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:8px; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg);"><i class="icon-chart" style="font-size:14px; color:var(--fg-mute);"></i> 결과 리포트</a>
                   <button class="qn-menu-item" onClick="{{ c.onShare }}" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 11px; border:none; border-radius:8px; background:transparent; font-family:var(--font-kr); font-size:13.5px; font-weight:600; color:var(--fg); cursor:pointer; text-align:left;"><i class="icon-share" style="font-size:14px; color:var(--fg-mute);"></i> 공유하기</button>
                   <div style="height:1px; background:var(--border-2); margin:5px 0;"></div>
@@ -139,17 +154,26 @@
               <span style="display:inline-flex; align-items:center; gap:5px; white-space:nowrap;"><i class="icon-mission" style="font-size:12px; color:var(--main-color);"></i> 문제 {{ c.puzzleCount }}개</span>
               <span style="color:var(--border);">·</span>
               <span style="display:inline-flex; align-items:center; gap:5px; white-space:nowrap;"><i class="icon-time" style="font-size:11px; color:var(--fg-mute);"></i> {{ c.date }}</span>
+              <span title="{{ c.visLabel }}" style="display:inline-flex; align-items:center; color:var(--fg-mute);"><i class="{{ c.visIcon }}" style="font-size:11px;"></i></span>
             </div>
-            <button class="qn-iconbtn" onClick="{{ c.onCopyPin }}" title="PIN 복사" style="display:flex; align-items:center; gap:8px; width:100%; margin-top:12px; height:38px; padding:0 12px; border:1px solid var(--border-2); border-radius:10px; background:#fafafa; cursor:pointer; transition:all .15s;">
-              <i class="icon-qr-code" style="font-size:13px; color:var(--fg-mute);"></i>
-              <span style="font-family:var(--font-small); font-size:11.5px; font-weight:600; color:var(--fg-mute); white-space:nowrap;">입장 PIN</span>
-              <span style="font-family:var(--font-en); font-size:14px; font-weight:800; letter-spacing:1px; color:var(--fg); white-space:nowrap;">{{ c.pin }}</span>
-              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--main-color); white-space:nowrap;"><i class="{{ c.copyIcon }}" style="font-size:11px;"></i>{{ c.copyLabel }}</span>
+            <!-- 진행 중 세션이 여러 개일 수 있으므로 PIN 은 팝업에서 모아 보여준다 -->
+            <sc-if value="{{ c.hasOpen }}" hint-placeholder-val="{{ true }}">
+            <button class="qn-iconbtn" onClick="{{ c.onOpenPins }}" style="display:flex; align-items:center; gap:8px; width:100%; margin-top:12px; height:38px; padding:0 12px; border:1px solid #ffd0a6; border-radius:10px; background:var(--bg-light-color); cursor:pointer; transition:all .15s;">
+              <i class="icon-qr-code" style="font-size:13px; color:var(--main-color);"></i>
+              <span style="font-family:var(--font-small); font-size:11.5px; font-weight:700; color:var(--theme-deep); white-space:nowrap;">진행 중 {{ c.openN }}건</span>
+              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:11.5px; font-weight:700; color:var(--main-color); white-space:nowrap;">PIN 보기 <i class="icon-right-open" style="font-size:9px;"></i></span>
             </button>
-            <!-- action buttons row -->
+            </sc-if>
+            <sc-if value="{{ c.isClosed }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; width:100%; box-sizing:border-box; margin-top:12px; height:38px; padding:0 12px; border:1px dashed var(--border); border-radius:10px; background:var(--bg-soft);">
+              <i class="icon-qr-code" style="font-size:13px; color:var(--fg-mute);"></i>
+              <span style="font-family:var(--font-small); font-size:11.5px; font-weight:600; color:var(--fg-mute); white-space:nowrap;">진행중인 모드가 없습니다.</span>
+            </div>
+            </sc-if>
+            <!-- 열기 버튼 — 이 방을 어떻게 진행할지가 카드의 주 행동 -->
             <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-              <a href="{{ c.playHref }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:1.5px solid var(--border); border-radius:11px; background:#fff; color:var(--fg); font-family:var(--font-kr); font-size:13.5px; font-weight:700; transition:all .15s;"><i class="icon-play" style="font-size:12px; color:var(--main-color);"></i> 미리보기</a>
-              <a href="{{ c.editHref }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:none; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700; transition:all .15s;"><i class="icon-pen" style="font-size:12px;"></i> 편집</a>
+              <a href="{{ c.realtimeHref }}" title="{{ c.realtimeLabel }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:1.5px solid var(--mode-realtime-soft); border-radius:11px; background:var(--mode-realtime-bg); color:var(--mode-realtime); font-family:var(--font-kr); font-size:13.5px; font-weight:800;"><i class="icon-megaphone" style="font-size:13px;"></i> 실시간 시작</a>
+              <button onClick="{{ c.onToggleMission }}" title="{{ c.missionLabel }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:1.5px solid var(--mode-mission-soft); border-radius:11px; background:var(--mode-mission-bg); color:var(--mode-mission); font-family:var(--font-kr); font-size:13.5px; font-weight:800; cursor:pointer;"><i class="icon-mission" style="font-size:13px;"></i> {{ c.missionBtnLabel }}</button>
             </div>
           </div>
         </div>
@@ -310,6 +334,84 @@
   </div>
   </sc-if>
 
+  <!-- ===== 미션 생성: 기간 + 메모 ===== -->
+  <sc-if value="{{ missionOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onCancelMission }}" style="position:fixed; inset:0; z-index:75; background:rgba(30,26,22,0.5); display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(3px); animation:qnFadeIn .16s ease;">
+    <div onClick="{{ stopProp }}" style="width:100%; max-width:400px; background:#fff; border-radius:22px; padding:26px 24px; box-shadow:0 30px 70px -22px rgba(0,0,0,0.45); animation:qnPop .22s ease;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:12px; background:var(--mode-mission-bg); color:var(--mode-mission);"><i class="icon-mission" style="font-size:17px;"></i></span>
+        <div>
+          <div style="font-family:var(--font-kr); font-size:17px; font-weight:900; color:var(--fg);">미션 생성</div>
+          <div style="margin-top:2px; font-family:var(--font-small); font-size:12px; color:var(--fg-sub);">참여자가 아무 때나 들어와 혼자 풀어요.</div>
+        </div>
+      </div>
+      <div style="margin-top:18px;">
+        <label style="display:block; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);">언제까지 열어둘까요?</label>
+        <input type="date" value="{{ missionDue }}" onChange="{{ onMissionDue }}" style="width:100%; box-sizing:border-box; height:46px; margin-top:8px; padding:0 13px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg-soft); font-family:var(--font-small); font-size:13.5px; color:var(--fg); outline:none;">
+        <div style="margin-top:8px; display:flex; gap:6px;">
+          <sc-for list="{{ dueQuick }}" as="q" hint-placeholder-count="3">
+            <button onClick="{{ q.onPick }}" style="{{ q.style }}">{{ q.label }}</button>
+          </sc-for>
+        </div>
+        <div style="margin-top:10px; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">마감일이 지나면 PIN이 자동으로 만료돼요.</div>
+        <!-- 미션 메모 — 이 미션이 어떤 건지(반·과제명 등). 리포트 목록에 함께 보인다. -->
+        <label style="display:block; margin-top:16px; font-family:var(--font-kr); font-size:13px; font-weight:700; color:var(--fg);">메모 <span style="font-family:var(--font-small); font-size:11.5px; font-weight:400; color:var(--fg-mute);">(선택)</span></label>
+        <input value="{{ missionMemo }}" onInput="{{ onMissionMemo }}" placeholder="예: 3반 과제 · 1단원 마무리" style="width:100%; box-sizing:border-box; height:46px; margin-top:8px; padding:0 13px; border:1.5px solid var(--border-2); border-radius:12px; background:#fff; font-family:var(--font-small); font-size:13px; font-weight:400; color:var(--fg); outline:none;">
+        <div style="margin-top:7px; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">리포트 목록에서 이 미션을 구분하는 데 쓰여요.</div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:22px;">
+        <button onClick="{{ onCancelMission }}" style="flex:1; height:46px; border:1.5px solid var(--border); border-radius:13px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:700; cursor:pointer;">취소</button>
+        <button onClick="{{ onConfirmMission }}" style="flex:1; height:46px; border:none; border-radius:13px; background:var(--mode-mission); color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:800; cursor:pointer;">미션 생성</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== 진행 중 세션 PIN 팝업 ===== -->
+  <sc-if value="{{ pinsOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onClosePins }}" style="position:fixed; inset:0; z-index:70; background:rgba(30,26,22,0.5); display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(3px); animation:qnFadeIn .16s ease;">
+    <div onClick="{{ stopProp }}" style="width:100%; max-width:520px; max-height:80vh; display:flex; flex-direction:column; background:#fff; border-radius:22px; overflow:hidden; box-shadow:0 30px 70px -22px rgba(0,0,0,0.45); animation:qnPop .22s ease;">
+      <!-- 헤더 -->
+      <div style="flex:none; display:flex; align-items:flex-start; gap:12px; padding:20px 22px 16px; border-bottom:1px solid var(--border-2);">
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:var(--font-kr); font-size:18px; font-weight:900; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ pinsTitle }}</div>
+          <div style="margin-top:4px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-sub);">지금 진행 중인 {{ pinsCount }}건이에요. 참여자에게 PIN을 알려주세요.</div>
+        </div>
+        <button onClick="{{ onClosePins }}" style="flex:none; display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:9px; background:var(--bg-soft); color:var(--fg-sub); cursor:pointer;"><i class="icon-cancel" style="font-size:13px;"></i></button>
+      </div>
+      <!-- 목록 -->
+      <div style="flex:1; overflow-y:auto; padding:14px 22px 20px; display:flex; flex-direction:column; gap:10px;">
+        <sc-for list="{{ pinRows }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1px solid {{ r.border }}; border-radius:14px; background:{{ r.bg }};">
+            <!-- 모드 + 이름 -->
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                <span style="{{ r.kindStyle }}"><i class="{{ r.kindIcon }}" style="font-size:10px;"></i>{{ r.kindLabel }}</span>
+                <span style="font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg);">{{ r.name }}</span>
+              </div>
+              <div style="margin-top:4px; display:flex; align-items:center; gap:7px; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute); flex-wrap:wrap;">
+                <span><i class="icon-user" style="font-size:10px;"></i> {{ r.playerN }}명</span>
+                <span style="color:var(--border);">·</span>
+                <span>{{ r.since }}</span>
+                <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}">
+                <span style="{{ r.dueStyle }}">{{ r.dueLabel }}</span>
+                </sc-if>
+              </div>
+            </div>
+            <!-- PIN + 복사 -->
+            <button onClick="{{ r.onCopy }}" title="PIN 복사" style="flex:none; display:flex; align-items:center; gap:9px; height:40px; padding:0 13px; border:1px solid {{ r.border }}; border-radius:11px; background:#fff; cursor:pointer;">
+              <span style="font-family:var(--font-en); font-size:16px; font-weight:800; letter-spacing:1.5px; color:{{ r.fg }};">{{ r.pin }}</span>
+              <span style="display:inline-flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:11px; font-weight:700; color:{{ r.fg }};"><i class="{{ r.copyIcon }}" style="font-size:11px;"></i>{{ r.copyLabel }}</span>
+            </button>
+            <!-- 관제/닫기 -->
+            <a href="{{ r.href }}" style="flex:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:{{ r.fg }}; color:#fff;" title="{{ r.goTip }}"><i class="{{ r.goIcon }}" style="font-size:13px;"></i></a>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
   <!-- toast -->
   <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); z-index:60; display:flex; align-items:center; gap:9px; height:46px; padding:0 22px; border-radius:50px; background:rgba(30,26,22,0.92); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:600; box-shadow:0 12px 30px -10px rgba(0,0,0,0.4); backdrop-filter:blur(6px);"><i class="{{ toastIcon }}" style="font-size:15px; color:#7fe3a0;"></i> {{ toast }}</div>
@@ -329,11 +431,6 @@ const THUMBS = {
   space: { img:'uploads/character01/my.png',                bg:'linear-gradient(160deg,#efe4ff,#dcc9ff)' },
   book:  { img:'uploads/character01/play_single_ob.png',    bg:'linear-gradient(160deg,#e3f9ef,#c6f0dc)' },
 };
-const STATUS = {
-  pre:  { label:'진행 전', bg:'#eef0f2', fg:'#6b7280' },
-  ing:  { label:'진행 중', bg:'#e6f7ee', fg:'#1e9e5a' },
-  done: { label:'종료',   bg:'#fdeaea', fg:'#c0392b' },
-};
 // thumb 값이 이미지(data URL/URL/경로)면 그대로, 프리셋 키면 스토어/로컬 프리셋 이미지로 해석
 function isImgVal(v){ return !!v && /^(data:|https?:|\/|uploads\/)/.test(v); }
 function resolveThumbImg(thumb){
@@ -341,14 +438,29 @@ function resolveThumbImg(thumb){
   try { var t = window.RoomStore && window.RoomStore.THUMBS && window.RoomStore.THUMBS[thumb]; if (t && t.img) return t.img; } catch(e){}
   return (THUMBS[thumb]||{}).img || '';
 }
-function mapRoom(r){ var v=window.RoomStore.validate(r); return { id:r.id, title:r.title, thumb:r.thumb, img:resolveThumbImg(r.thumb), status:r.status, puzzles:r.puzzles, pin:r.pin, vis:r.vis, date:r.date, order:r.order, errors:v.errors, warns:v.warns }; }
+function mapRoom(r){
+  var v=window.RoomStore.validate(r);
+  // 열림 상태는 세션에서 계산 (room.status 없음).
+  // 실시간 과 미션은 동시에 열릴 수 있으므로 **독립 플래그**로 담는다(배지·필터 기준 동일).
+  // 한 방에 미션·실시간이 여러 개 동시에 열릴 수 있으므로 **목록 전체**를 담는다
+  var open = window.SessionStore ? window.SessionStore.openSessionsFor(r.id) : [];
+  var realtimeN = open.filter(function(x){ return x.kind !== 'mission'; }).length;
+  var missionN = open.filter(function(x){ return x.kind === 'mission'; }).length;
+  return { id:r.id, title:r.title, thumb:r.thumb, img:resolveThumbImg(r.thumb),
+           open:open, realtimeN:realtimeN, missionN:missionN,
+           openRealtime:realtimeN>0, openMission:missionN>0, openClosed:(open.length===0),
+           puzzles:r.puzzles, pin:r.pin, vis:r.vis,
+           memo:r.memo || '',
+           date:r.date, order:r.order, errors:v.errors, warns:v.warns };
+}
 class Component extends DCLogic {
   state = {
     forceEmpty: false,
     createOpen: false, newTitle: '', newThumb: '', newShare: true, newHint: 'deduct', newHintCount: 3,
     tp: { open:false, tab:'upload', url:'', drag:false },
     query: '', sort: 'recent', filter: 'all',
-    openMenuId: null, copiedId: null, ddOpen: false,
+    openMenuId: null, copiedId: null, ddOpen: false, pinsRoomId: null, missionRoomId: null, missionDue: '', 
+    missionMemo: '',
     toast: '', toastIcon: 'icon-check',
     items: (window.RoomStore ? window.RoomStore.all().map(mapRoom) : [
       { id:'r1', title:'사라진 실험실의 비밀', thumb:'lab',   img:'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', status:'ing',  puzzles:5, pin:'834 512', vis:'public',  date:'2026.07.10', order:6 },
@@ -356,6 +468,14 @@ class Component extends DCLogic {
   };
   componentDidMount(){ this._oc=(e)=>{ if(this.state.ddOpen && !e.target.closest('[data-profile-menu]')) this.setState({ddOpen:false}); }; document.addEventListener('click', this._oc); }
   componentWillUnmount(){ if(this._t) clearTimeout(this._t); document.removeEventListener('click', this._oc); }
+  // PIN 복사 — key 로 어느 줄을 눌렀는지 구분해 '복사됨' 표시를 그 줄에만 띄운다
+  copyPin(key, pin, label){
+    try { if (navigator.clipboard && pin) navigator.clipboard.writeText(pin); } catch(e){}
+    this.setState({ copiedId: key });
+    this.toast(label + ' PIN을 복사했어요');
+    if (this._c) clearTimeout(this._c);
+    this._c = setTimeout(()=>this.setState({ copiedId:null }), 1500);
+  }
   toast(msg, icon){ if(this._t) clearTimeout(this._t); this.setState({ toast:msg, toastIcon:icon||'icon-check' }); this._t=setTimeout(()=>this.setState({toast:''}), 2000); }
   readItems(){ return window.RoomStore ? window.RoomStore.all().map(mapRoom) : this.state.items; }
   createRoom(){ if(!window.RoomStore) return; const S=this.state; const room=window.RoomStore.create({ title:(S.newTitle||'').trim()||'새 방탈출', thumb:S.newThumb, hintPolicy:S.newHint, hintCount:S.newHintCount }); window.RoomStore.saveMeta(room.id,{ vis:S.newShare?'public':'private' }); location.href='방탈출 편집 화면.dc.html?id='+room.id; }
@@ -365,11 +485,18 @@ class Component extends DCLogic {
   renderVals(){
     const S = this.state;
     const all = S.items;
-    const counts = { all:all.length, pre:0, ing:0, done:0 };
-    all.forEach(i=>counts[i.status]++);
+    // 실시간·미션이 동시에 열린 방은 두 카운트에 모두 포함된다(배지가 둘 다 뜨므로 일관)
+    const counts = {
+      all: all.length,
+      realtime: all.filter(i=>i.openRealtime).length,
+      mission: all.filter(i=>i.openMission).length,
+      closed: all.filter(i=>i.openClosed).length,
+    };
 
     let list = all.slice();
-    if (S.filter !== 'all') list = list.filter(i=>i.status===S.filter);
+    if (S.filter === 'realtime')    list = list.filter(i=>i.openRealtime);
+    else if (S.filter === 'mission') list = list.filter(i=>i.openMission);
+    else if (S.filter === 'closed')  list = list.filter(i=>i.openClosed);
     const q = S.query.trim();
     if (q) list = list.filter(i=>i.title.includes(q));
     list.sort((a,b)=> S.sort==='name' ? a.title.localeCompare(b.title,'ko') : b.order-a.order);
@@ -382,20 +509,38 @@ class Component extends DCLogic {
     ];
     const stats = statDef.map((s,i)=>({ ...s, wrapStyle:`flex:1; display:flex; align-items:center; gap:11px; padding:12px 18px; ${i<statDef.length-1?'border-right:1px solid var(--border-2);':''}` }));
 
-    const tabDef = [ {k:'all',l:'전체'}, {k:'pre',l:'진행 전'}, {k:'ing',l:'진행 중'}, {k:'done',l:'종료'} ];
+    const tabDef = [ {k:'all',l:'전체'}, {k:'realtime',l:'실시간'}, {k:'mission',l:'미션'}, {k:'closed',l:'닫힘'} ];
     const filterTabs = tabDef.map(t=>{ const on=S.filter===t.k; return { label:t.l, count:counts[t.k],
       style:`display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 15px; border:none; border-radius:9px; background:${on?'var(--main-color)':'transparent'}; color:${on?'#fff':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:13.5px; font-weight:${on?700:600}; cursor:pointer; transition:all .15s;`,
       countStyle:`display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:50px; background:${on?'rgba(255,255,255,0.28)':'var(--bg-warm-2)'}; color:${on?'#fff':'var(--fg-mute)'}; font-family:var(--font-en); font-size:11px; font-weight:800;`,
       onPick:()=>this.setState({filter:t.k, openMenuId:null}) }; });
 
     const cards = list.map(it=>{
-      const th = THUMBS[it.thumb]||THUMBS.lab; const st = STATUS[it.status];
-      const menuOpen = S.openMenuId===it.id; const copied = S.copiedId===it.id;
+      const th = THUMBS[it.thumb]||THUMBS.lab;
+      const menuOpen = S.openMenuId===it.id;
       const thumbImgSrc = it.img || th.img;
+      const isRealtime = it.openRealtime;
+      const isMission = it.openMission;
+      const openN = (it.open || []).length;
       return {
+        isRealtime, isMission, isClosed: openN === 0,
+        hasOpen: openN > 0, openN,
+        realtimeN: it.realtimeN, missionN: it.missionN,
+        onOpenPins: ()=>this.setState({ pinsRoomId: it.id }),
+        // 미션은 여러 개 열 수 있으므로 항상 '새로 열기'
+        missionLabel: isMission ? ('미션 하나 더 만들기 (' + it.missionN + '건)') : '미션 생성',
+        // 미션은 기간(마감일)을 정해서 연다 → 모달로 날짜 입력
+        onToggleMission: ()=>{
+          const d = new Date(); d.setDate(d.getDate()+14);   // 기본 2주 뒤
+          const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          this.setState({ openMenuId:null, missionRoomId: it.id, missionDue: ymd, missionMemo: '' });
+        },
+        realtimeLabel: isRealtime ? ('실시간 회차 더 열기 (' + it.realtimeN + '건)') : '실시간으로 시작',
+        // 버튼 라벨은 짧게(카드 폭), 자세한 건 title 툴팁으로
+        missionBtnLabel: '미션 생성',      // 항상 '행동' 으로 읽히게 — 건수는 위 배지·PIN 팝업이 알려준다
+        realtimeHref: '실시간 대기실 - 웹.dc.html?id=' + it.id + '&new=1',
         title:it.title, thumbBg:th.bg,
         thumbEl: React.createElement('img', { className:'qn-thumb-img', src:thumbImgSrc, onError:(e)=>{ e.target.style.display='none'; }, style:{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform .3s ease' } }),
-        statusLabel:st.label, statusBg:st.bg, statusFg:st.fg,
         visIcon: it.vis==='public'?'icon-globe':'icon-lock-filled', visLabel: it.vis==='public'?'공개':'비공개',
         puzzleCount:it.puzzles, date:it.date, pin:it.pin,
         hasIssues: (it.errors||0) + (it.warns||0) > 0,
@@ -405,10 +550,8 @@ class Component extends DCLogic {
         issueTitle: (it.errors||0) > 0 ? ('검증 오류 '+it.errors+'건'+((it.warns||0)?(' · 주의 '+it.warns+'건'):'')+' — 편집에서 확인') : ('검증 주의 '+(it.warns||0)+'건 — 편집에서 확인'),
         playHref:'참여자 플레이 - 웹.dc.html?id='+it.id,
         editHref:'방탈출 편집 화면.dc.html?id='+it.id,
-        reportHref:'리포트 상세 - 웹.dc.html?id='+it.id,
-        copyIcon: copied?'icon-check':'icon-005-copy', copyLabel: copied?'복사됨':'복사',
+        reportHref:'리포트 회차 목록 - 웹.dc.html?id='+it.id,   // 회차가 여러 개라 목록을 먼저 거친다
         menuOpen,
-        onCopyPin:()=>{ this.setState({copiedId:it.id}); this.toast('PIN을 복사했어요'); if(this._c)clearTimeout(this._c); this._c=setTimeout(()=>this.setState({copiedId:null}),1500); },
         onToggleMenu:()=>this.setState({ openMenuId: menuOpen?null:it.id }),
         onDup:()=>{ const copy = window.RoomStore && window.RoomStore.duplicate(it.id); this.setState({openMenuId:null, items:this.readItems()}); this.toast('방탈출을 복제했어요'); },
         onShare:()=>{ this.setState({openMenuId:null}); this.toast('공유 링크를 복사했어요'); },
@@ -439,6 +582,116 @@ const hintDef = [
 
     return {
       stats, filterTabs, cards,
+
+      // ===== 진행 중 세션 PIN 팝업 =====
+      ...(()=>{
+        const rid = S.pinsRoomId;
+        if (!rid) return { pinsOpen:false, pinRows:[], pinsTitle:'', pinsCount:0 };
+        const room = all.filter(i=>i.id===rid)[0];
+        const open = room ? (room.open || []) : [];
+        const p2 = (n)=>String(n).padStart(2,'0');
+        // 실시간: 방금 시작했는지가 중요 → 경과 시간
+        const fmtSince = (ts)=>{
+          if (!ts) return '방금';
+          const m = Math.floor((Date.now()-ts)/60000);
+          if (m < 1) return '방금 시작';
+          if (m < 60) return m+'분 전 시작';
+          const h = Math.floor(m/60);
+          if (h < 24) return h+'시간 전 시작';
+          return Math.floor(h/24)+'일 전 시작';
+        };
+        // 미션: 며칠씩 열려 있으므로 기간(연 날짜·시간 ~ 마감)과 남은 일수가 중요
+        const fmtPeriod = (from, due)=>{
+          if (!from) return '';
+          const a = new Date(from);
+          let out = `${p2(a.getMonth()+1)}.${p2(a.getDate())} ${p2(a.getHours())}:${p2(a.getMinutes())}`;
+          if (due) {
+            const d = new Date(due);
+            out += ` ~ ${p2(d.getMonth()+1)}.${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+          }
+          return out;
+        };
+        // 마감까지 남은 기간 (D-n / 오늘 마감 / 마감 지남)
+        const fmtDue = (due)=>{
+          if (!due) return null;
+          const ms = due - Date.now();
+          if (ms <= 0) return { label:'마감 지남', urgent:true };
+          const d = Math.floor(ms/86400000);
+          if (d === 0) return { label:'오늘 마감', urgent:true };
+          if (d === 1) return { label:'내일 마감', urgent:true };
+          return { label:'D-'+d, urgent: d <= 3 };
+        };
+        return {
+          pinsOpen: true,
+          pinsTitle: room ? room.title : '',
+          pinsCount: open.length,
+          pinRows: open.map(x=>{
+            const mission = x.kind === 'mission';
+            const fg = mission ? 'var(--mode-mission)' : 'var(--mode-realtime)';
+            return {
+              kindLabel: mission ? '미션' : '실시간',
+              kindIcon: mission ? 'icon-mission' : 'icon-megaphone',
+              kindStyle: `display:inline-flex; align-items:center; gap:4px; height:19px; padding:0 8px; border-radius:6px; background:${mission?'var(--mode-mission-bg)':'var(--mode-realtime-bg)'}; color:${fg}; font-family:var(--font-small); font-size:10px; font-weight:800;`,
+              // 미션은 순번, 실시간은 회차 번호로 이름을 붙인다
+              name: mission ? ('미션 ' + (x.seq || 1)) : ((x.round || 1) + '회차'),
+              pin: x.pin, fg,
+              bg: mission ? '#f7fdfa' : '#fffbfa',
+              border: mission ? 'var(--mode-mission-soft)' : 'var(--mode-realtime-soft)',
+              playerN: (x.players || []).length,
+              // 실시간 = 경과 시간 / 미션 = 기간(날짜·시간)
+              since: mission
+                ? fmtPeriod(x.startedAt || x.createdAt, x.dueAt)
+                : fmtSince(x.startedAt || x.createdAt),
+              ...(()=>{
+                const du = mission ? fmtDue(x.dueAt) : null;
+                return du ? {
+                  hasDue: true, dueLabel: du.label,
+                  dueStyle: `display:inline-flex; align-items:center; height:18px; padding:0 7px; border-radius:5px; background:${du.urgent?'var(--state-done-bg)':'var(--bg-soft)'}; color:${du.urgent?'var(--state-done)':'var(--fg-sub)'}; font-family:var(--font-small); font-size:10px; font-weight:800;`,
+                } : { hasDue:false, dueLabel:'', dueStyle:'' };
+              })(),
+              copyIcon: S.copiedId === x.id ? 'icon-check' : 'icon-005-copy',
+              copyLabel: S.copiedId === x.id ? '복사됨' : '복사',
+              onCopy: ()=>this.copyPin(x.id, x.pin, mission ? '미션' : '실시간'),
+              // 실시간은 관제로, 미션은 리포트로 (진행자가 볼 화면이 다르다)
+              href: mission
+                ? ('리포트 상세 - 웹.dc.html?sid=' + encodeURIComponent(x.id))
+                : ((x.state === 'lobby' ? '실시간 대기실 - 웹.dc.html?sid=' : '실시간 관제 - 웹.dc.html?sid=') + encodeURIComponent(x.id)),
+              goIcon: mission ? 'icon-chart' : 'icon-eye',
+              goTip: mission ? '결과 보기' : '관제 화면',
+            };
+          }),
+        };
+      })(),
+      onClosePins: ()=>this.setState({ pinsRoomId:null }),
+
+      // ===== 미션 생성 모달 =====
+      missionMemo: S.missionMemo || '',
+      onMissionMemo: (e)=>this.setState({ missionMemo: (e.target.value||'').slice(0,60) }),
+      missionOpen: !!S.missionRoomId,
+      missionDue: S.missionDue || '',
+      onMissionDue: (e)=>this.setState({ missionDue: e.target.value }),
+      dueQuick: (()=>{
+        const ymd=(d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const mk=(n)=>{ const d=new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+        const btn=(on)=>`height:30px; padding:0 11px; border:1px solid ${on?'var(--mode-mission)':'var(--border-2)'}; border-radius:50px; background:${on?'var(--mode-mission-bg)':'#fff'}; color:${on?'var(--mode-mission)':'var(--fg-sub)'}; font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;`;
+        return [
+          { label:'1주', style:btn(S.missionDue===mk(7)),  onPick:()=>this.setState({missionDue:mk(7)}) },
+          { label:'2주', style:btn(S.missionDue===mk(14)), onPick:()=>this.setState({missionDue:mk(14)}) },
+          { label:'1개월', style:btn(S.missionDue===mk(30)), onPick:()=>this.setState({missionDue:mk(30)}) },
+        ];
+      })(),
+      onCancelMission: ()=>this.setState({ missionRoomId:null, missionMemo:'' }),
+      onConfirmMission: ()=>{
+        const rid = S.missionRoomId;
+        if (!rid || !window.SessionStore) return;
+        // 마감일은 그날 23:59:59 까지
+        let dueAt = 0;
+        if (S.missionDue) { const d = new Date(S.missionDue + 'T23:59:59'); if (!isNaN(d)) dueAt = d.getTime(); }
+        window.SessionStore.openMission(rid, { dueAt, memo: (S.missionMemo||'').trim() });
+        this.toast('미션을 만들었어요 · PIN이 발급됐어요');
+        this.setState({ missionRoomId:null, missionMemo:'', items:this.readItems() });
+      },
+      stopProp: (e)=>e.stopPropagation(),
       createOpen:S.createOpen,
       onOpenCreate:()=>this.setState({createOpen:true, openMenuId:null, ddOpen:false}),
       onCloseCreate:()=>this.setState({createOpen:false}),

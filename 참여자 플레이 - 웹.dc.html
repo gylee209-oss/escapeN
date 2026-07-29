@@ -9,11 +9,15 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
   <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
     a { color: var(--main-color); text-decoration: none; }
     a:hover { color: var(--btn-hover-color); }
     @keyframes qnBub { from{ transform:translateY(10px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
@@ -21,6 +25,8 @@
     @keyframes qnPop { 0%{ transform:scale(0.7); opacity:0; } 60%{ transform:scale(1.06); } 100%{ transform:scale(1); opacity:1; } }
     @keyframes qnShake { 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-8px); } 40%,80%{ transform:translateX(8px); } }
     @keyframes qnFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-7px); } }
+    @keyframes qnBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+    @keyframes qnDots { 0%,80%,100%{ transform:translateY(0); opacity:0.4; } 40%{ transform:translateY(-6px); opacity:1; } }
     .pt-opt:hover { border-color: var(--main-color) !important; background:var(--bg-light-color) !important; }
     .pt-primary:hover { filter:brightness(1.04); transform:translateY(-2px); box-shadow:0 14px 28px -12px var(--main-color); }
     .pt-ghost:hover { background: var(--bg-warm-2) !important; }
@@ -42,9 +48,28 @@
       <div style="flex:1; height:8px; border-radius:50px; background:var(--bg-warm-2); overflow:hidden;"><div style="width:{{ progressPct }}%; height:100%; border-radius:50px; background:linear-gradient(90deg,#ffc91b,#ff6800); transition:width .4s ease;"></div></div>
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
+      <!-- 실시간 모드: 실시간 배지 + 전체 진도 미니맵 -->
+      <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; align-items:center; gap:9px; height:34px; padding:0 12px; border-radius:50px; background:var(--mode-realtime-bg); border:1px solid var(--mode-realtime-soft);">
+        <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:11px; font-weight:800; color:var(--mode-realtime);"><span style="width:6px; height:6px; border-radius:50%; background:var(--mode-realtime); animation:qnBlink 1.4s ease-in-out infinite;"></span>실시간</span>
+        <span style="width:1px; height:14px; background:var(--mode-realtime-soft);"></span>
+        <span style="display:inline-flex; align-items:center; gap:4px; font-family:var(--font-small); font-size:11.5px; font-weight:700; color:var(--fg-sub);" title="{{ miniTip }}"><i class="icon-user" style="font-size:10px;"></i> {{ miniLabel }}</span>
+      </div>
+      </sc-if>
       <span style="display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-en); font-size:15px; font-weight:800;"><i class="icon-heart" style="font-size:13px; color:var(--main-color);"></i> {{ score }}</span>
     </div>
   </div>
+
+  <!-- 진행자 공지 배너 (실시간) -->
+  <sc-if value="{{ hasNotice }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:none; display:flex; align-items:flex-start; gap:11px; padding:13px 32px; background:linear-gradient(90deg,#fff4e4,#fff9f0); border-bottom:1px solid #ffd9bd; animation:qnRise .35s ease;">
+    <span style="flex:none; display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--main-color); color:#fff;"><i class="icon-megaphone" style="font-size:12px;"></i></span>
+    <div style="flex:1; min-width:0;">
+      <div style="font-family:var(--font-small); font-size:10.5px; font-weight:800; color:var(--main-color);">진행자 공지</div>
+      <div style="margin-top:2px; font-family:var(--font-kr); font-size:14px; font-weight:600; line-height:1.5; color:var(--theme-deep);">{{ noticeText }}</div>
+    </div>
+  </div>
+  </sc-if>
 
   <!-- CONTENT -->
   <div style="flex:1; overflow-y:auto; display:flex; justify-content:center; padding:36px 32px 20px;">
@@ -158,6 +183,47 @@
     </div>
   </div>
 
+  <!-- 실시간: 부활 대기 (실패 엔딩을 "탈락"이 아니라 "잠깐 멈춤"으로) -->
+  <sc-if value="{{ isRevivePending }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:14; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; background:radial-gradient(120% 90% at 50% 0%, #b5852f 0%, #8a5f22 60%, #64461a 100%);">
+    <img src="uploads/character01/quiz_nodata_ob.png" alt="멈춤" style="width:180px; filter:drop-shadow(0 16px 22px rgba(0,0,0,0.35)); animation:qnFloat 5s ease-in-out infinite;">
+    <div style="margin-top:12px; display:inline-flex; align-items:center; gap:6px; padding:6px 15px; border-radius:50px; background:rgba(255,255,255,0.22); color:#fff; font-family:var(--font-small); font-size:12.5px; font-weight:800;"><i class="icon-ccw" style="font-size:12px;"></i> 잠깐 멈췄어요</div>
+    <h1 style="margin:14px 0 0; font-family:var(--font-kr); font-size:32px; font-weight:900; color:#fff; letter-spacing:-1px;">{{ reviveTitle }}</h1>
+    <p style="margin:12px 0 0; font-family:var(--font-small); font-size:15px; font-weight:300; line-height:1.65; color:rgba(255,255,255,0.9); max-width:430px;">{{ reviveBody }}</p>
+
+    <div style="display:flex; gap:12px; margin-top:22px; width:100%; max-width:380px;">
+      <div style="flex:1; padding:14px 0; border-radius:15px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:23px; font-weight:800; color:#fff;">{{ score }}</div><div style="font-family:var(--font-small); font-size:11px; color:rgba(255,255,255,0.8); margin-top:3px;">현재 점수</div></div>
+      <div style="flex:1; padding:14px 0; border-radius:15px; background:rgba(255,255,255,0.14);"><div style="font-family:var(--font-en); font-size:23px; font-weight:800; color:#fff;">−{{ revivePenalty }}</div><div style="font-family:var(--font-small); font-size:11px; color:rgba(255,255,255,0.8); margin-top:3px;">부활 차감</div></div>
+    </div>
+
+    <!-- 스스로 부활 가능 -->
+    <sc-if value="{{ canSelfRevive }}" hint-placeholder-val="{{ true }}">
+    <button class="pt-primary" onClick="{{ onSelfRevive }}" style="width:100%; max-width:380px; margin-top:22px; height:56px; border:none; border-radius:15px; background:#fff; color:#8a5f22; font-family:var(--font-kr); font-size:16.5px; font-weight:800; cursor:pointer;"><i class="icon-ccw" style="font-size:14px;"></i> 다시 도전하기 (−{{ revivePenalty }}점)</button>
+    </sc-if>
+
+    <!-- 진행자 부활 대기 -->
+    <sc-if value="{{ waitHostRevive }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:22px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+      <div style="display:inline-flex; align-items:flex-end; gap:6px; height:18px;">
+        <span style="width:8px; height:8px; border-radius:50%; background:#fff; animation:qnDots 1.3s ease-in-out infinite;"></span>
+        <span style="width:8px; height:8px; border-radius:50%; background:#fff; animation:qnDots 1.3s ease-in-out .18s infinite;"></span>
+        <span style="width:8px; height:8px; border-radius:50%; background:#fff; animation:qnDots 1.3s ease-in-out .36s infinite;"></span>
+      </div>
+      <div style="font-family:var(--font-kr); font-size:14.5px; font-weight:700; color:#fff;">진행자가 다시 기회를 줄 거예요</div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- 실시간: 일시정지 잠금 -->
+  <sc-if value="{{ isLivePaused }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:18; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; background:rgba(30,24,18,0.72); backdrop-filter:blur(5px);">
+    <div style="width:76px; height:76px; border-radius:50%; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; color:#fff;"><i class="icon-pause-1" style="font-size:32px;"></i></div>
+    <div style="margin-top:18px; font-family:var(--font-kr); font-size:24px; font-weight:900; color:#fff;">잠시 멈췄어요</div>
+    <div style="margin-top:8px; font-family:var(--font-small); font-size:14px; line-height:1.6; color:rgba(255,255,255,0.85); max-width:340px;">진행자가 설명하고 있어요.<br>앞을 보고 기다려 주세요.</div>
+  </div>
+  </sc-if>
+
   <!-- ENDING -->
   <sc-if value="{{ isEnding }}" hint-placeholder-val="{{ false }}">
   <div style="position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; background:{{ endBg }};">
@@ -246,6 +312,25 @@ class Component extends DCLogic {
     })();
     let startId = this.sc.startId, deep = false, hintMode = '';
     try { const u = new URLSearchParams(location.search); const q = u.get('p'); if (q && this.sc.pages[q]) { startId = q; deep = true; } hintMode = u.get('hint') || ''; this._noAutoReveal = u.get('reveal') === '0'; } catch(e){}
+
+    // ---- 실시간 모드 바인딩 (?sid=세션 &u=참여자) ----
+    this._sid = null; this._uid = null;
+    try {
+      const u = new URLSearchParams(location.search);
+      this._sid = u.get('sid'); this._uid = u.get('u');
+      // 모음집 미리보기용: ?realtime=1 이면 세션 없이도 실시간 UI를 보여준다
+      this._liveDemo = u.get('realtime') === '1';
+      this._demoPaused = u.get('paused') === '1';
+      this._demoNotice = u.get('notice') || '';
+    } catch(e){}
+    if (this._sid && window.SessionStore) {
+      const s = window.SessionStore.get(this._sid);
+      // 참여자가 이미 진행 중이던 노드에서 복귀 (새로고침·재접속 대응)
+      if (s && this._uid) {
+        const me = (s.players||[]).filter(p=>p.id===this._uid)[0];
+        if (me && me.curId && this.sc.pages[me.curId] && !deep) startId = me.curId;
+      }
+    }
     this.state = this.freshState(startId);
     this.state.startedAt = Date.now();
     const sp = this.sc.pages[startId];
@@ -253,8 +338,49 @@ class Component extends DCLogic {
     if (deep && sp && sp.type === 'normal') { if (!this._noAutoReveal) this.state.revealed = this.lineCount(sp); if (hintMode === '1') this.state.hintRevealed = true; else if (hintMode === 'ask') this.state.askDeduct = true; }
   }
   freshState(id){ return { curId:id, revealed:1, score:START_SCORE, hintLeft:this.sc?this.sc.hintCount:2, hintRevealed:false, askDeduct:false, sel:null, shortText:'', order:[], shake:false, feedback:null, locked:false, endedAt:0 }; }
-  componentDidMount(){ this.scheduleReveal(); }
-  componentWillUnmount(){ [this._t1,this._t2,this._tr,this._tg].forEach(t=>t&&clearTimeout(t)); }
+  componentDidMount(){
+    this.scheduleReveal();
+    // 실시간: 세션 변경 구독(공지·일시정지·부활) + 접속 유지
+    if (this._sid && window.SessionStore) {
+      this._unsub = window.SessionStore.subscribe(()=>this.onSessionChange());
+      this._hb = setInterval(()=>{ if (this._uid) window.SessionStore.heartbeat(this._sid, this._uid); }, 5000);
+      // 최초 위치 보고 — 엔딩에서 시작(새로고침·딥링크)했으면 실패/완료 상태까지 반영
+      const p0 = this.cur();
+      const isFail0 = !!(p0 && p0.type === 'ending' && p0.endingType === 'fail');
+      this.report({ curId: this.state.curId, isFail: isFail0,
+        isDone: !!(p0 && p0.type === 'ending' && p0.endingType === 'success'),
+        lastQuestionId: isFail0 ? this.wrongSourceOf(this.state.curId) : null });
+    }
+  }
+  componentWillUnmount(){
+    [this._t1,this._t2,this._tr,this._tg].forEach(t=>t&&clearTimeout(t));
+    if (this._unsub) this._unsub();
+    if (this._hb) clearInterval(this._hb);
+    if (this._sid && this._uid && window.SessionStore) window.SessionStore.setOffline(this._sid, this._uid);
+  }
+  // 세션(진행자 조작) 변경 반영
+  onSessionChange(){
+    const s = this.liveSession();
+    if (!s) { this.setState(st=>({ liveTick:(st.liveTick||0)+1 })); return; }
+    // 진행자가 부활시켰으면 해당 노드로 이동
+    if (this._uid) {
+      const me = (s.players||[]).filter(p=>p.id===this._uid)[0];
+      if (me && me.status === 'playing' && me.curId && me.curId !== this.state.curId && this.sc.pages[me.curId]) {
+        const p = this.sc.pages[this.state.curId];
+        if (p && p.type === 'ending') { this.goTo(me.curId); return; }
+      }
+    }
+    this.setState(st=>({ liveTick:(st.liveTick||0)+1 }));
+  }
+  liveSession(){
+    if (this._sid && window.SessionStore) return window.SessionStore.get(this._sid);
+    return null;
+  }
+  // 진행 상황을 세션에 보고
+  report(patch){
+    if (!this._sid || !this._uid || !window.SessionStore) return;
+    window.SessionStore.progress(this._sid, this._uid, patch);
+  }
   // 말풍선/질문을 타이머로 하나씩 자동 등장, story는 다 나오면 자동으로 다음 페이지.
   // (componentDidUpdate 에 의존하지 않고 타이머가 스스로 다음 단계를 예약)
   scheduleReveal(){
@@ -275,7 +401,39 @@ class Component extends DCLogic {
   cur(){ return this.sc.pages[this.state.curId]; }
   msgList(p){ if (p.msgs) return p.msgs.filter(m=>m.type!=='delay'); return (p.lines||[]).map((t,i)=>({ speaker:(i%2?'narrator':'host'), type:'text', text:t })); }
   lineCount(p){ return this.msgList(p).length + (p.q?1:0); }
-  goTo(id){ const p=this.sc.pages[id]; if(!p) return; if(p.type==='ending'){ this.setState({curId:id, endedAt:Date.now(), askDeduct:false, revealed:1, feedback:null, locked:false}); return; } this.setState({ ...this.stateReset(), curId:id }); this._tg=setTimeout(()=>this.scheduleReveal(),0); }
+  goTo(id){
+    const p=this.sc.pages[id]; if(!p) return;
+    // 실시간 보고: 이동한 노드 · 실패/완료 상태
+    const prev = this.sc.pages[this.state.curId];
+    const lastQ = (prev && prev.type==='normal') ? prev.id : (this.state.lastQuestionId || null);
+    if(p.type==='ending'){
+      this.setState({curId:id, endedAt:Date.now(), askDeduct:false, revealed:1, feedback:null, locked:false, lastQuestionId:lastQ});
+      this.report({ curId:id, score:this.state.score, lastQuestionId:lastQ,
+        isFail: p.endingType==='fail', isDone: p.endingType==='success' });
+      return;
+    }
+    this.setState({ ...this.stateReset(), curId:id, lastQuestionId:lastQ });
+    this.report({ curId:id, score:this.state.score, lastQuestionId:lastQ });
+    this._tg=setTimeout(()=>this.scheduleReveal(),0);
+  }
+  // 실시간: 스스로 다시 도전 (실패 엔딩 → 틀린 문제로 복귀, 점수 차감)
+  // 실패 엔딩으로 보내는 문제 노드를 역추적 (딥링크·새로고침으로 lastQuestionId 가 없을 때)
+  wrongSourceOf(endId){
+    const pages = this.sc.pages;
+    const hit = Object.keys(pages).filter(k=>pages[k].wrongExit === endId);
+    return hit.length ? hit[0] : null;
+  }
+  onSelfRevive=()=>{
+    const s = this.liveSession();
+    const penalty = s && s.opts ? (s.opts.revivePenalty||0) : 100;
+    const back = this.state.lastQuestionId || this.wrongSourceOf(this.state.curId) || this.sc.startId;
+    if (!this.sc.pages[back]) return;
+    if (this._sid && this._uid && window.SessionStore) {
+      window.SessionStore.revive(this._sid, this._uid, back);
+    }
+    this.setState(st=>({ ...this.stateReset(), curId:back, score:Math.max(0, st.score - penalty) }));
+    this._tg=setTimeout(()=>this.scheduleReveal(),0);
+  };
   stateReset(){ return { revealed:1, hintRevealed:false, askDeduct:false, sel:null, shortText:'', order:[], shake:false, feedback:null, locked:false }; }
   judge(){ const p=this.cur(); const S=this.state;
     if(p.lock==='mc') return S.sel!=null && p.choices[S.sel] && p.choices[S.sel].c;
@@ -291,12 +449,12 @@ class Component extends DCLogic {
   onSubmit=()=>{ const p=this.cur();
     if(p.type==='story'){ this._t1=setTimeout(()=>this.goTo(p.correctExit),200); return; }
     if(this.state.locked||!this.canSubmit()) return;
-    if(this.judge()){ this.setState({feedback:'correct', locked:true}); this._t1=setTimeout(()=>this.goTo(p.correctExit),820); }
-    else if(p.wrongExit){ this.setState({feedback:'wrong', locked:true, shake:true}); this._t1=setTimeout(()=>this.setState({shake:false}),500); this._t2=setTimeout(()=>this.goTo(p.wrongExit),980); }
-    else { this.setState({feedback:'wrong', shake:true}); this._t1=setTimeout(()=>this.setState({shake:false, feedback:null, sel:(p.lock==='hotspot'||p.lock==='mc'||p.lock==='ox')?null:this.state.sel}),650); } };
+    if(this.judge()){ this.setState({feedback:'correct', locked:true}); this.report({ correct:true, lastQuestionId:p.id }); this._t1=setTimeout(()=>this.goTo(p.correctExit),820); }
+    else if(p.wrongExit){ this.setState({feedback:'wrong', locked:true, shake:true}); this.report({ correct:false, lastQuestionId:p.id }); this._t1=setTimeout(()=>this.setState({shake:false}),500); this._t2=setTimeout(()=>this.goTo(p.wrongExit),980); }
+    else { this.setState({feedback:'wrong', shake:true}); this.report({ correct:false, lastQuestionId:p.id }); this._t1=setTimeout(()=>this.setState({shake:false, feedback:null, sel:(p.lock==='hotspot'||p.lock==='mc'||p.lock==='ox')?null:this.state.sel}),650); } };
   tapOrder=(i)=>{ if(this.state.locked) return; const cur=this.state.order.slice(); const at=cur.indexOf(i); if(at>=0){ cur.splice(at,1); } else { cur.push(i); } this.setState({order:cur}); };
-  onHint=()=>{ const policy=this.sc.hintPolicy; if(policy==='free'){ this.setState({hintRevealed:true}); } else if(policy==='count'){ if(this.state.hintLeft>0) this.setState({hintRevealed:true, hintLeft:this.state.hintLeft-1}); } else { this.setState({askDeduct:true}); } };
-  onConfirmHint=()=>{ const p=this.cur(); this.setState(s=>({askDeduct:false, hintRevealed:true, score:Math.max(0,s.score-(p.hintDeduct||0))})); };
+  onHint=()=>{ const policy=this.sc.hintPolicy; if(policy==='free'){ this.setState({hintRevealed:true}); this.report({hintUsed:true}); } else if(policy==='count'){ if(this.state.hintLeft>0){ this.setState({hintRevealed:true, hintLeft:this.state.hintLeft-1}); this.report({hintUsed:true}); } } else { this.setState({askDeduct:true}); } };
+  onConfirmHint=()=>{ const p=this.cur(); const next=Math.max(0,this.state.score-(p.hintDeduct||0)); this.setState({askDeduct:false, hintRevealed:true, score:next}); this.report({hintUsed:true, score:next}); };
   onCancelHint=()=>this.setState({askDeduct:false});
   onRetry=()=>{ this.setState({ ...this.freshState(this.sc.startId), startedAt:Date.now() }); };
   renderVals(){
@@ -348,6 +506,31 @@ class Component extends DCLogic {
     const fbBg=fbCorrect?'#e6f7ee':'#fdeaea', fbColor=fbCorrect?'#1e9e5a':'#c0392b', fbIcon=fbCorrect?'icon-check':'icon-cancel';
     const fbText=fbCorrect?'정답이에요!':(p.wrongExit?'아쉽지만 오답이에요…':'다시 시도해 보세요');
 
+    // ---------- 실시간 모드 ----------
+    const sess = this.liveSession();
+    const isLive = !!sess || this._liveDemo;
+    const livePlayers = sess ? (sess.players||[]) : [];
+    const me = (sess && this._uid) ? livePlayers.filter(x=>x.id===this._uid)[0] : null;
+    // 진행자 공지
+    const noticeText = sess && sess.notice ? sess.notice.text : (this._demoNotice || '');
+    const hasNotice = isLive && !!noticeText;
+    // 일시정지 잠금
+    const isLivePaused = (sess ? sess.state === 'paused' : false) || (this._liveDemo && this._demoPaused);
+    // 진행자가 이 문제 힌트를 전체 공개했는가
+    const hostHintOpen = !!(sess && sess.openHints && sess.openHints[p.id]);
+    // 미니맵: 내 진도 / 전체 평균
+    const myStep = p.step || (me ? me.solved+1 : 1);
+    const avgSolved = livePlayers.length ? (livePlayers.reduce((a,x)=>a+x.solved,0)/livePlayers.length) : 0;
+    const miniLabel = isLive ? (livePlayers.length ? `${myStep}/${sc.total} · 평균 ${Math.round(avgSolved*10)/10}` : `${myStep}/${sc.total}`) : '';
+    const miniTip = livePlayers.length ? `참여자 ${livePlayers.length}명 · 평균 ${Math.round(avgSolved*10)/10}문제 해결` : '';
+    // 실패 엔딩 → 실시간에서는 부활 대기
+    const revivePolicy = sess && sess.opts ? (sess.opts.revive||'both') : 'both';
+    const revivePenalty = sess && sess.opts ? (sess.opts.revivePenalty||0) : 100;
+    const isFailEnding = isEnding && p.endingType === 'fail';
+    const isRevivePending = isLive && isFailEnding;
+    const canSelfRevive = isRevivePending && (revivePolicy === 'self' || revivePolicy === 'both');
+    const waitHostRevive = isRevivePending && revivePolicy === 'host';
+
     const hasHint=answerReady&&!!(p.hint&&p.hint.trim()); const policy=sc.hintPolicy;
     let hintBtnLabel='힌트 보기'; if(policy==='count') hintBtnLabel=`힌트 보기 (${S.hintLeft}회 남음)`; else if(policy==='deduct') hintBtnLabel=`힌트 보기 (−${p.hintDeduct||0}점)`;
     const hintDisabledCount=policy==='count'&&S.hintLeft<=0&&!S.hintRevealed;
@@ -365,7 +548,8 @@ class Component extends DCLogic {
 
     return {
       scenarioTitle:sc.title, stepLabel: isEnding?'완료':(isStory?'이야기':`미션 ${stepNum} / ${sc.total}`), score:S.score, progressPct,
-      isPlay, isStory, isEnding,
+      // 실시간 부활 대기 중이면 기존 실패 엔딩 화면은 감춘다
+      isPlay, isStory, isEnding: isEnding && !isRevivePending,
       bubbles, answerReady,
       shakeStyle:S.shake?'animation:qnShake .4s ease;':'',
       isMc, isOx, isShort, isOrder, isHotspot,
@@ -373,8 +557,17 @@ class Component extends DCLogic {
       shortText:S.shortText, onShort:(e)=>this.setState({shortText:e.target.value}),
       onOrderReset:()=>this.setState({order:[]}),
       showFeedback, fbBg, fbColor, fbIcon, fbText,
-      hasHint, hintRevealed:S.hintRevealed, hintHidden:!S.hintRevealed, hintText:p.hint, hintBtnLabel,
+      // 진행자가 힌트를 전체 공개하면 버튼 없이 바로 보인다
+      hasHint, hintRevealed:S.hintRevealed || hostHintOpen, hintHidden:!(S.hintRevealed || hostHintOpen), hintText:p.hint, hintBtnLabel,
       onHint:()=>{ if(!hintDisabledCount) this.onHint(); },
+
+      // 실시간
+      isLive, hasNotice, noticeText, isLivePaused,
+      miniLabel, miniTip,
+      isRevivePending, canSelfRevive, waitHostRevive, revivePenalty,
+      reviveTitle: p.title || '탈출 실패',
+      reviveBody: (p.body || '') + ' 다시 도전할 수 있어요!',
+      onSelfRevive: this.onSelfRevive,
       onSubmit:this.onSubmit, submitStyle,
       endBg, endImgEl, endTitle:p.title, endBody:p.body, endBadge:endSuccess?'탈출 성공':'탈출 실패', elapsed,
       onRetry:this.onRetry,

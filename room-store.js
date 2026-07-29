@@ -1,6 +1,14 @@
 /* 방탈출N 공유 데이터 스토어 — 모든 화면이 이 파일에서 방탈출 데이터를 읽고 씁니다.
    localStorage 기반. 최초 1회 SEED로 초기화되고, 이후 편집/생성/삭제가 저장됩니다. */
 (function () {
+  // 이 파일이 두 번 평가되면 스토어 인스턴스가 두 개 생겨, 한쪽에 저장한 변경이
+  // 다른 쪽 화면에서 안 보이게 된다(메모리 배열이 분리됨). 싱글턴으로 고정한다.
+  //
+  // 단, 이미 올라와 있는 게 "구버전"이면 교체해야 한다. 그냥 return 하면 새로 추가한
+  // API 가 없어 `store.xxx is not a function` 으로 깨진다. → 버전 비교.
+  var VERSION = 5;   // API 를 추가/변경하면 이 숫자를 올릴 것
+  if (window.RoomStore && (window.RoomStore.__v || 1) >= VERSION) return;
+
   var KEY = 'bangtalN.rooms.v8';
 
   var THUMBS = {
@@ -75,8 +83,8 @@
   }
 
   var SEED = [
-    { id:'r1', title:'사라진 실험실의 비밀', thumb:'lab',   status:'ing',  pin:'834 512', vis:'public',  date:'2026.07.10', order:6, hintPolicy:'deduct', hintCount:2, pages:R1_PAGES, play:R1_PLAY },
-    { id:'r2', title:'우주 정거장 탈출',     thumb:'space', status:'ing',  pin:'201 946', vis:'public',  date:'2026.07.08', order:5, hintPolicy:'count',  hintCount:3, pages:[
+    { id:'r1', title:'사라진 실험실의 비밀', thumb:'lab',   pin:'834 512', vis:'public',  date:'2026.07.10', order:6, hintPolicy:'deduct', hintCount:2, pages:R1_PAGES, play:R1_PLAY },
+    { id:'r2', title:'우주 정거장 탈출',     thumb:'space', pin:'201 946', vis:'public',  date:'2026.07.08', order:5, hintPolicy:'count',  hintCount:3, pages:[
       { id:'p1', num:1, type:'start',  lock:'mc',    title:'정거장 도킹부', body:'산소가 새고 있다. 도킹 코드를 입력해 탈출선을 열어야 한다.', summary:'탈출선을 여는 첫 절차는?', x:240, y:60,  choices:[{t:'해치 압력 균형',c:true},{t:'엔진 점화',c:false},{t:'통신 차단',c:false}], correctExit:'p2', wrongExit:'p5', points:100, hint:'', hintDeduct:50 },
       { id:'p2', num:2, type:'normal', lock:'mc',    title:'제어실 콘솔',   body:'세 개의 스위치가 있다. 올바른 것을 눌러라.', summary:'가장 먼저 눌러야 할 스위치는?', x:240, y:320, choices:[{t:'적색 스위치',c:false},{t:'청색 스위치',c:false},{t:'녹색 스위치',c:false}], correctExit:'p3', wrongExit:'p5', points:100, hint:'', hintDeduct:50 },
       { id:'p3', num:3, type:'normal', lock:'short', title:'산소 밸브',     body:'밸브 코드를 입력하라.', summary:'밸브 코드를 입력하세요', x:240, y:580, answer:'7412', correctExit:'p4', wrongExit:'p4', points:100, hint:'', hintDeduct:50 },
@@ -84,10 +92,10 @@
       { id:'p5', num:5, type:'ending', endingType:'fail',    title:'탈출 실패',   body:'산소가 바닥나 문이 잠겨버렸다.',       summary:'탈출에 실패했다', x:520, y:580 },
       { id:'p6', num:6, type:'normal', lock:'mc',    title:'예비 통신실',   body:'구조 신호를 보낼 수 있다.', summary:'구조 채널 주파수는?', x:800, y:320, choices:[{t:'121.5 MHz',c:true},{t:'88.0 MHz',c:false},{t:'400 MHz',c:false}], correctExit:'p4', wrongExit:'p5', points:100, hint:'', hintDeduct:50 },
     ] },
-    { id:'r3', title:'고대 도서관의 암호',   thumb:'book',  status:'pre',  pin:'557 038', vis:'private', date:'2026.07.05', order:4, hintPolicy:'free',   hintCount:0, pages:miniPages('먼지 쌓인 서가','금서 서가 앞에 암호가 걸린 책장이 있다. 첫 단서를 찾아라.','책장을 여는 열쇠가 되는 것은?',[{t:'표지의 로마 숫자',c:true},{t:'책 제목',c:false},{t:'저자 이름',c:false}],'비밀 통로가 열리고 도서관을 빠져나왔다!','종이 울리자 서가가 모두 잠겼다.') },
-    { id:'r4', title:'해적선의 보물지도',   thumb:'ship',  status:'done', pin:'642 187', vis:'public',  date:'2026.06.28', order:3, hintPolicy:'deduct', hintCount:2, pages:miniPages('갑판 위','낡은 보물지도의 방향을 읽어 선장실 금고를 열어야 한다.','지도가 가리키는 방향은?',[{t:'북동쪽',c:true},{t:'남서쪽',c:false},{t:'정서쪽',c:false}],'금고를 열고 보물과 함께 탈출했다!','파도에 휩쓸려 지도를 잃어버렸다.') },
-    { id:'r5', title:'미래 도시 수사대',     thumb:'space', status:'done', pin:'913 470', vis:'private', date:'2026.06.20', order:2, hintPolicy:'count',  hintCount:3, pages:miniPages('사건 현장','홀로그램 단서를 분석해 용의자의 이동 경로를 추적하라.','가장 먼저 확인할 단서는?',[{t:'CCTV 로그',c:true},{t:'목격자 진술',c:false},{t:'날씨 기록',c:false}],'용의자를 검거하고 사건을 해결했다!','증거가 사라져 수사가 종결됐다.') },
-    { id:'r6', title:'마법 학교 입학시험',   thumb:'lab',   status:'pre',  pin:'308 725', vis:'public',  date:'2026.06.15', order:1, hintPolicy:'free',   hintCount:0, pages:miniPages('마법 관문','입학 관문의 룬 문자를 해독해 문을 열어야 한다.','문을 여는 주문은?',[{t:'빛의 룬',c:true},{t:'어둠의 룬',c:false},{t:'물의 룬',c:false}],'관문이 열리고 마법 학교에 입학했다!','주문을 틀려 관문이 닫혀버렸다.') },
+    { id:'r3', title:'고대 도서관의 암호',   thumb:'book',  pin:'557 038', vis:'private', date:'2026.07.05', order:4, hintPolicy:'free',   hintCount:0, pages:miniPages('먼지 쌓인 서가','금서 서가 앞에 암호가 걸린 책장이 있다. 첫 단서를 찾아라.','책장을 여는 열쇠가 되는 것은?',[{t:'표지의 로마 숫자',c:true},{t:'책 제목',c:false},{t:'저자 이름',c:false}],'비밀 통로가 열리고 도서관을 빠져나왔다!','종이 울리자 서가가 모두 잠겼다.') },
+    { id:'r4', title:'해적선의 보물지도',   thumb:'ship',  pin:'642 187', vis:'public',  date:'2026.06.28', order:3, hintPolicy:'deduct', hintCount:2, pages:miniPages('갑판 위','낡은 보물지도의 방향을 읽어 선장실 금고를 열어야 한다.','지도가 가리키는 방향은?',[{t:'북동쪽',c:true},{t:'남서쪽',c:false},{t:'정서쪽',c:false}],'금고를 열고 보물과 함께 탈출했다!','파도에 휩쓸려 지도를 잃어버렸다.') },
+    { id:'r5', title:'미래 도시 수사대',     thumb:'space', pin:'913 470', vis:'private', date:'2026.06.20', order:2, hintPolicy:'count',  hintCount:3, pages:miniPages('사건 현장','홀로그램 단서를 분석해 용의자의 이동 경로를 추적하라.','가장 먼저 확인할 단서는?',[{t:'CCTV 로그',c:true},{t:'목격자 진술',c:false},{t:'날씨 기록',c:false}],'용의자를 검거하고 사건을 해결했다!','증거가 사라져 수사가 종결됐다.') },
+    { id:'r6', title:'마법 학교 입학시험',   thumb:'lab',   pin:'308 725', vis:'public',  date:'2026.06.15', order:1, hintPolicy:'free',   hintCount:0, pages:miniPages('마법 관문','입학 관문의 룬 문자를 해독해 문을 열어야 한다.','문을 여는 주문은?',[{t:'빛의 룬',c:true},{t:'어둠의 룬',c:false},{t:'물의 룬',c:false}],'관문이 열리고 마법 학교에 입학했다!','주문을 틀려 관문이 닫혀버렸다.') },
   ];
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -182,6 +190,10 @@
   function nextId() {
     var n = 1; rooms.forEach(function (r) { var m = /^r(\d+)$/.exec(r.id); if (m) n = Math.max(n, parseInt(m[1], 10) + 1); }); return 'r' + n;
   }
+  // 참고: 입장 PIN 은 더 이상 방의 것이 아니다(카훗 방식).
+  // 참여자는 진행자가 회차를 열 때 발급되는 "세션 PIN"으로만 입장한다 → session-store.js 의 freshPin().
+  // 여기 남아 있는 room.pin 은 리포트 등에서 "지난 회차 표기"로만 쓰이는 레거시 값이며,
+  // 입장 검증에 쓰면 종료된 회차로도 입장되는 버그가 생기니 절대 쓰지 말 것.
   function randPin() {
     function g() { return Math.floor(Math.random() * 900 + 100); }
     return g() + ' ' + g();
@@ -234,6 +246,7 @@
   }
 
   window.RoomStore = {
+    __v: VERSION,      // 싱글턴 가드가 구버전 교체 여부를 판단하는 데 씀
     THUMBS: THUMBS,
     validate: function (id) { var r = typeof id === 'string' ? this.get(id) : id; return validate(r); },
     all: function () { return rooms.map(withDerived); },
@@ -253,7 +266,7 @@
     duplicate: function (id) {
       var src = rooms.find(function (r) { return r.id === id; }); if (!src) return null;
       var copy = clone(src); copy.id = nextId(); copy.title = src.title + ' (복사본)'; copy.pin = randPin();
-      copy.status = 'pre'; copy.date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+      copy.date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
       copy.order = Math.max.apply(null, rooms.map(function (r) { return r.order || 0; })) + 1;
       if (copy.play) delete copy.play; // 복사본은 pages 기준으로 플레이 파생
       rooms.unshift(copy); persist(); return copy;
@@ -262,8 +275,7 @@
       meta = meta || {};
       var id = nextId();
       var room = {
-        id:id, title:meta.title || '새 방탈출', thumb:meta.thumb || 'lab', status:'pre',
-        pin:randPin(), vis:'private', date:new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+        id:id, title:meta.title || '새 방탈출', thumb:meta.thumb || 'lab', pin:randPin(), vis:'private', date:new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
         order:Math.max.apply(null, rooms.map(function (r) { return r.order || 0; }).concat([0])) + 1,
         hintPolicy:meta.hintPolicy || 'deduct', hintCount:meta.hintCount || 2,
         // 새 방 첫 페이지는 문제 없는 설명형으로 시작 (내용 편집에서 문제를 추가하면 일반으로 전환)

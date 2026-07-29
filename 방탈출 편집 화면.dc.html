@@ -9,11 +9,16 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
   <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
+    @keyframes qnBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
     * { box-sizing: border-box; }
     a { color: var(--main-color); text-decoration: none; }
     a:hover { color: var(--btn-hover-color); }
@@ -47,31 +52,20 @@
       <button class="qn-tbtn" onClick="{{ onBack }}" style="display:flex; align-items:center; gap:6px; height:38px; padding:0 12px 0 8px; border:none; border-radius:9px; background:transparent; color:var(--fg-sub); font-family:var(--font-kr); font-size:13.5px; font-weight:600; cursor:pointer; transition:background .15s;"><i class="icon-left-open" style="font-size:13px;"></i> My 방탈출</button>
       <span style="width:1px; height:22px; background:var(--border);"></span>
       <div style="display:flex; align-items:center; gap:9px; min-width:0;">
-        <!-- 진행상태 배지 — 클릭하면 상태 변경 드롭다운 -->
-        <div style="position:relative;">
-          <button onClick="{{ onToggleStatusMenu }}" title="진행 상태 변경" style="display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 9px; border:none; border-radius:50px; background:{{ sStatusBg }}; color:{{ sStatusFg }}; font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;"><span style="width:6px; height:6px; border-radius:50%; background:{{ sStatusFg }};"></span>{{ sStatus }}<i class="{{ statusChevron }}" style="font-size:9px; margin-left:1px;"></i></button>
-          <sc-if value="{{ statusMenuOpen }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute; top:30px; left:0; z-index:60; width:150px; background:#fff; border:1px solid var(--border-2); border-radius:11px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:5px;">
-            <sc-for list="{{ statusMenu }}" as="s" hint-placeholder-count="3">
-            <button onClick="{{ s.onPick }}" style="{{ s.style }}"><span style="{{ s.dotStyle }}"></span>{{ s.label }}</button>
-            </sc-for>
-          </div>
-          </sc-if>
-        </div>
+        <!-- 열림 상태 (읽기 전용) — 여닫는 건 My 방탈출에서 한다 -->
+        <span title="{{ sStateTip }}" style="{{ sStateStyle }}"><span style="{{ sStateDot }}"></span>{{ sStateLabel }}</span>
         <span style="font-family:var(--font-kr); font-size:15.5px; font-weight:700; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">{{ sTitle }}</span>
         <button class="qn-tbtn" onClick="{{ onToggleSettings }}" style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border:1.5px solid var(--border); border-radius:9px; background:#fff; color:var(--fg-sub); cursor:pointer; transition:all .15s;"><i class="icon-cog-1" style="font-size:15px;"></i></button>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
+      <sc-if value="{{ sHasPin }}" hint-placeholder-val="{{ false }}">
       <span style="display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 9px 0 8px; border-radius:7px; background:var(--bg-warm-2); font-family:var(--font-small); font-size:11.5px; color:var(--fg-sub);"><i class="icon-qr-code" style="font-size:12px;"></i>PIN <b style="font-family:var(--font-en); letter-spacing:1px; color:var(--fg);">{{ sPin }}</b></span>
+      </sc-if>
       <button class="qn-cta" onClick="{{ onOpenPreview }}" style="display:flex; align-items:center; gap:7px; height:38px; padding:0 16px; border:none; border-radius:10px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700; cursor:pointer; transition:background .15s;"><i class="icon-play" style="font-size:12px;"></i> 미리보기</button>
     </div>
   </header>
 
-  <!-- 진행상태 드롭다운 바깥 클릭 시 닫기 (헤더 zIndex 40 보다 낮게 둬서 헤더 안 메뉴가 항상 위에) -->
-  <sc-if value="{{ statusMenuOpen }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ onCloseStatusMenu }}" style="position:fixed; inset:0; z-index:39;"></div>
-  </sc-if>
 
   <!-- ===================== BODY ===================== -->
   <div style="flex:1; display:flex; min-height:0;">
@@ -552,7 +546,6 @@ class Component extends DCLogic {
     this.state = {
       title: room ? room.title : '사라진 실험실의 비밀',
       pin: room ? room.pin : '834 512',
-      status: room ? room.status : 'ing',          // pre | ing | done
       thumb: room ? room.thumb : 'lab',
       share: room ? (room.vis === 'public') : true,
       hintPolicy: room ? room.hintPolicy : 'deduct', // free | deduct | count
@@ -567,7 +560,6 @@ class Component extends DCLogic {
       moved: false,
       validationOpen: false,
       settingsOpen: false,
-      statusMenuOpen: false,
       mediaOpen: false,
       mediaFor: 'bg',
       mediaTab: 'url',
@@ -595,7 +587,7 @@ class Component extends DCLogic {
     const room = window.RoomStore.get(this._roomId);
     const pagesChanged = JSON.stringify(room.pages) !== JSON.stringify(S.pages);
     const saved = Object.assign({}, room, {
-      id: this._roomId, title: S.title, pin: S.pin, status: S.status, thumb: S.thumb,
+      id: this._roomId, title: S.title, pin: S.pin, thumb: S.thumb,
       vis: S.share ? 'public' : 'private', hintPolicy: S.hintPolicy, hintCount: S.hintCount,
       pages: JSON.parse(JSON.stringify(S.pages)),
     });
@@ -611,19 +603,19 @@ class Component extends DCLogic {
     // (support.js 에서 componentDidUpdate(prevProps) 만 호출) 직접 이전 값을 추적한다.
     const s = this.state;
     const p = prevState || this._prevSave || {};
-    if (s.pages !== p.pages || s.title !== p.title || s.pin !== p.pin || s.status !== p.status ||
+    if (s.pages !== p.pages || s.title !== p.title || s.pin !== p.pin ||
         s.thumb !== p.thumb || s.share !== p.share || s.hintPolicy !== p.hintPolicy || s.hintCount !== p.hintCount) {
       this.scheduleSave();
     }
     this._prevSave = {
-      pages: s.pages, title: s.title, pin: s.pin, status: s.status,
+      pages: s.pages, title: s.title, pin: s.pin,
       thumb: s.thumb, share: s.share, hintPolicy: s.hintPolicy, hintCount: s.hintCount,
     };
   }
 
   componentDidMount() {
     this._esc = (e) => {
-      if (e.key === 'Escape') this.setState({ previewOpen:false, mediaOpen:false, validationOpen:false, settingsOpen:false, statusMenuOpen:false });
+      if (e.key === 'Escape') this.setState({ previewOpen:false, mediaOpen:false, validationOpen:false, settingsOpen:false });
     };
     window.addEventListener('keydown', this._esc);
     requestAnimationFrame(() => {
@@ -768,12 +760,14 @@ class Component extends DCLogic {
     });
 
     // ---------- status ----------
-    const statusMap = {
-      pre:  { label:'진행 전', bg:'#eef0f2', fg:'#6b7280' },
-      ing:  { label:'진행 중', bg:'#e6f7ee', fg:'#1faf6a' },
-      done: { label:'종료',   bg:'#fdeaea', fg:'#c0392b' },
+    // 열림 상태(읽기 전용) — room.status 는 없앴고 세션에서 판단한다
+    const OPEN = {
+      realtime: { label:'실시간 진행 중', bg:'var(--mode-realtime-bg)', fg:'var(--mode-realtime)', dot:'var(--mode-realtime)', tip:'실시간 회차가 진행 중입니다' },
+      mission: { label:'미션 열림',    bg:'var(--mode-mission-bg)', fg:'var(--mode-mission)', dot:'var(--mode-mission)', tip:'참여자가 상시 입장할 수 있습니다' },
+      closed:  { label:'닫힘',        bg:'var(--state-pre-bg)', fg:'var(--state-pre)', dot:'var(--state-pre-soft)', tip:'My 방탈출에서 미션을 열거나 실시간을 시작하세요' },
     };
-    const st = statusMap[S.status];
+    const rs = window.SessionStore ? window.SessionStore.roomState(this._roomId) : { kind:'closed', pin:'' };
+    const st = OPEN[rs.kind] || OPEN.closed;
 
     // ---------- nodes ----------
     const chipMap = {
@@ -1047,23 +1041,17 @@ class Component extends DCLogic {
 
     return {
       // toolbar
-      sTitle: S.title, sPin: S.pin, sStatus: st.label, sStatusBg: st.bg, sStatusFg: st.fg,
+      sTitle: S.title,
+      // 열려 있을 때만 그 세션의 PIN 을 보여준다 (방 PIN 은 미션용 고정값)
+      sPin: rs.pin, sHasPin: !!rs.pin,
+      sStateLabel: st.label, sStateTip: st.tip,
+      sStateStyle: `display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 9px; border-radius:50px; background:${st.bg}; color:${st.fg}; font-family:var(--font-small); font-size:11.5px; font-weight:700;`,
+      sStateDot: `width:6px; height:6px; border-radius:50%; background:${st.dot};` + (rs.kind==='realtime' ? ' animation:qnBlink 1.4s ease-in-out infinite;' : ''),
       // 진행상태 배지 드롭다운
-      statusMenuOpen: S.statusMenuOpen,
-      statusChevron: S.statusMenuOpen ? 'icon-up-open' : 'icon-down-open',
-      statusMenu: ['pre','ing','done'].map(k => {
-        const sm = statusMap[k]; const on = S.status === k;
-        return { label: sm.label,
-          style: `display:flex; align-items:center; gap:8px; width:100%; padding:9px 10px; border:none; border-radius:8px; background:${on?sm.bg:'transparent'}; cursor:pointer; text-align:left; font-family:var(--font-kr); font-size:13px; font-weight:${on?700:600}; color:${on?sm.fg:'var(--fg)'};`,
-          dotStyle: `width:7px; height:7px; border-radius:50%; background:${sm.fg};`,
-          onPick: () => this.setState({ status:k, statusMenuOpen:false }) };
-      }),
-      onToggleStatusMenu: () => this.setState(s => ({ statusMenuOpen: !s.statusMenuOpen, settingsOpen:false, validationOpen:false })),
-      onCloseStatusMenu: () => this.setState({ statusMenuOpen:false }),
       valCount, valIcon: valClean ? 'icon-check' : 'icon-attention-alt-1', valBadgeBg, valBtnBorder, valBtnBg, valBtnFg,
       onBack: () => { this.persistRoom(); location.href = 'My 방탈출 - 웹.dc.html'; },
-      onToggleValidation: () => this.setState(s => ({ validationOpen: !s.validationOpen, settingsOpen:false, statusMenuOpen:false })),
-      onToggleSettings: () => this.setState(s => ({ settingsOpen: !s.settingsOpen, validationOpen:false, statusMenuOpen:false })),
+      onToggleValidation: () => this.setState(s => ({ validationOpen: !s.validationOpen, settingsOpen:false })),
+      onToggleSettings: () => this.setState(s => ({ settingsOpen: !s.settingsOpen, validationOpen:false })),
       onOpenPreview: () => { this.persistRoom(); this.setState({ previewOpen:true, previewMode:'full' }); },
       previewHref: '참여자 플레이 - 웹.dc.html?id=' + this._roomId,
 

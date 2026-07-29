@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
+  <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+
+    @keyframes lvBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+    @keyframes lvRise  { from{ transform:translateY(10px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes lvPop   { 0%{ transform:scale(0.7); opacity:0; } 60%{ transform:scale(1.08); } 100%{ transform:scale(1); opacity:1; } }
+    /* 캐릭터가 살짝 통통 튀는 대기 모션 */
+    @keyframes lvIdle  { 0%,100%{ transform:translateY(0) rotate(-1deg); } 50%{ transform:translateY(-4px) rotate(1deg); } }
+    /* 정체 중인 캐릭터 — 답답해서 좌우로 흔들림 */
+    @keyframes lvStuck { 0%,100%{ transform:translateX(0) rotate(0); } 25%{ transform:translateX(-2.5px) rotate(-6deg); } 75%{ transform:translateX(2.5px) rotate(6deg); } }
+    /* 노드 도착 반짝 */
+    @keyframes lvLand  { 0%{ transform:scale(0.5); opacity:0; } 55%{ transform:scale(1.22); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes lvSpark { 0%{ transform:scale(0.4); opacity:0.9; } 100%{ transform:scale(2.1); opacity:0; } }
+    /* 경로를 따라 흐르는 점선 (진행 방향 암시) */
+    @keyframes lvFlow  { to { stroke-dashoffset:-24; } }
+    @keyframes lvGlowPulse { 0%,100%{ opacity:0.35; transform:scale(1); } 50%{ opacity:0.7; transform:scale(1.06); } }
+    @keyframes lvFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-7px); } }
+    @keyframes lvWiggle { 0%,100%{ transform:rotate(-3deg); } 50%{ transform:rotate(3deg); } }
+
+    .lv-soft:hover  { filter:brightness(1.05); transform:translateY(-2px); }
+    .lv-ghost:hover { background:var(--bg-warm-2) !important; }
+    .lv-row:hover   { background:var(--bg-light-color) !important; }
+    /* 지도 장소 — 살짝 통통 튀며 반응 */
+    .lv-room { transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .18s ease; }
+    .lv-room:hover { transform:translateY(-4px) scale(1.04); filter:saturate(1.08); z-index:12; }
+    .lv-room:active { transform:translateY(-1px) scale(1.01); }
+    /* 캐릭터 뱃지 — 노드 사이를 부드럽게 이동 */
+    .lv-ch { transition:left .85s cubic-bezier(.45,1.5,.5,1), top .85s cubic-bezier(.45,1.5,.5,1); }
+    .lv-ch:hover { z-index:99 !important; }
+    .lv-ch:hover .lv-chname { opacity:1; transform:translateY(0); }
+    .lv-chname { transition:opacity .16s ease, transform .16s ease; }
+  </style>
+</helmet>
+
+<div data-screen-label="실시간 관제 · 진행자" style="position:relative; height:100vh; box-sizing:border-box; display:flex; flex-direction:column; background:#f5f5f7; font-family:var(--font-kr); overflow:hidden;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="flex:none; height:66px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:0 22px; background:rgba(255,255,255,0.82); border-bottom:1px solid var(--border-2); backdrop-filter:blur(8px); z-index:30;">
+    <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+      <a href="My 방탈출 - 웹.dc.html" class="lv-ghost" style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:12px; border:1px solid var(--border-2); background:#fff; color:var(--main-color);"><i class="icon-left-open" style="font-size:13px;"></i></a>
+      <div style="min-width:0;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-flex; align-items:center; gap:5px; height:23px; padding:0 10px; border-radius:50px; background:var(--mode-realtime-bg); color:var(--mode-realtime); font-family:var(--font-small); font-size:11px; font-weight:800;"><span style="width:6px; height:6px; border-radius:50%; background:var(--mode-realtime); animation:lvBlink 1.4s ease-in-out infinite;"></span>{{ stateLabel }}</span>
+          <div style="font-family:var(--font-kr); font-size:17px; font-weight:900; color:var(--fg); letter-spacing:-0.4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ title }}</div>
+        </div>
+        <div style="margin-top:1px; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">친구들이 어디까지 왔는지 지켜보고, 막히면 도와주세요 🔍</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:9px;">
+      <div style="display:flex; align-items:center; gap:8px; height:40px; padding:0 15px; border-radius:14px; background:#fff; border:1px solid var(--border-2);">
+        <i class="icon-qr-code" style="font-size:13px; color:var(--main-color);"></i>
+        <span style="font-family:var(--font-small); font-size:11px; font-weight:800; color:var(--fg-sub);">PIN</span>
+        <span style="font-family:var(--font-en); font-size:19px; font-weight:800; letter-spacing:2px; color:var(--theme-deep);">{{ pin }}</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px; height:40px; padding:0 14px; border-radius:14px; background:#fff; border:1px solid var(--border-2);">
+        <i class="icon-time" style="font-size:13px; color:var(--main-color);"></i>
+        <span style="font-family:var(--font-en); font-size:16px; font-weight:800; color:var(--fg);">{{ elapsed }}</span>
+      </div>
+      <sc-if value="{{ isPaused }}" hint-placeholder-val="{{ false }}">
+        <button class="lv-soft" onClick="{{ onResume }}" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 17px; border:none; border-radius:14px; background:#2fbd7e; color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:800; cursor:pointer; transition:all .15s; box-shadow:0 6px 16px -8px rgba(47,189,126,0.9);"><i class="icon-play" style="font-size:12px;"></i> 다시 시작</button>
+      </sc-if>
+      <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ true }}">
+        <button class="lv-soft" onClick="{{ onPause }}" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 17px; border:1px solid var(--border-2); border-radius:14px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14px; font-weight:800; cursor:pointer; transition:all .15s;"><i class="icon-pause-1" style="font-size:12px;"></i> 잠깐 멈춰</button>
+      </sc-if>
+      <button class="lv-soft" onClick="{{ onAskEnd }}" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 17px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14px; font-weight:800; cursor:pointer; transition:all .15s; box-shadow:0 6px 16px -8px var(--main-color);"><i class="icon-check-1" style="font-size:12px;"></i> 마치기</button>
+    </div>
+  </header>
+
+  <!-- ============ STAT PILLS ============ -->
+  <div style="flex:none; display:flex; align-items:center; gap:10px; padding:13px 22px 12px;">
+    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="5">
+      <div style="{{ s.style }}">
+        <span style="{{ s.iconWrap }}"><i class="{{ s.icon }}" style="font-size:13px;"></i></span>
+        <div style="display:flex; flex-direction:column; line-height:1.15;">
+          <span style="font-family:var(--font-en); font-size:19px; font-weight:800; color:{{ s.color }};">{{ s.value }}</span>
+          <span style="font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-mute);">{{ s.label }}</span>
+        </div>
+      </div>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <!-- 진행 요약 -->
+    <div style="display:flex; align-items:center; gap:11px; height:52px; padding:0 18px; border-radius:16px; background:#fff; border:1px solid var(--border-2);">
+      <span style="font-family:var(--font-small); font-size:11.5px; font-weight:700; color:var(--fg-mute);">전체 진행</span>
+      <div style="width:150px; height:10px; border-radius:50px; background:#ffeedd; overflow:hidden;"><div style="{{ overallBarStyle }}"></div></div>
+      <span style="font-family:var(--font-en); font-size:15px; font-weight:800; color:var(--main-color);">{{ overallPct }}%</span>
+    </div>
+  </div>
+
+  <!-- ============ BODY ============ -->
+  <div style="flex:1; display:flex; gap:14px; padding:0 22px 18px; min-height:0;">
+
+    <!-- ---------- 시나리오 맵 (백지 + 연한 모눈) ---------- -->
+    <div style="flex:1; position:relative; min-width:0; border-radius:20px; overflow:hidden; background:#fff; border:1px solid var(--border-2); box-shadow:0 1px 3px rgba(20,20,25,0.04);">
+
+      <!-- 연한 점 모눈 — 배경은 최대한 조용하게 -->
+      <div style="position:absolute; inset:0; pointer-events:none;
+        background-image:radial-gradient(#e4e4e8 1.2px, transparent 1.2px);
+        background-size:22px 22px;"></div>
+
+      <div ref="{{ setVp }}" onPointerDown="{{ onCanvasDown }}" onPointerMove="{{ onCanvasMove }}" onPointerUp="{{ onCanvasUp }}" style="{{ vpStyle }}">
+        <div style="{{ worldStyle }}">
+
+          <!-- 연결선 (순차 다이어그램) -->
+          <svg width="2600" height="1750" style="position:absolute; left:0; top:0; overflow:visible; pointer-events:none;">
+            <defs>
+              <marker id="lv-arrow-ok" markerWidth="7" markerHeight="7" refX="5.6" refY="3.5" orient="auto"><path d="M0,0.6 L6,3.5 L0,6.4 z" fill="#12b57e"></path></marker>
+              <marker id="lv-arrow-no" markerWidth="7" markerHeight="7" refX="5.6" refY="3.5" orient="auto"><path d="M0,0.6 L6,3.5 L0,6.4 z" fill="#e8a098"></path></marker>
+            </defs>
+            <sc-for list="{{ edges }}" as="e" hint-placeholder-count="5">
+              <path d="{{ e.d }}" fill="none" stroke="{{ e.stroke }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="{{ e.dash }}" marker-end="{{ e.marker }}"></path>
+            </sc-for>
+          </svg>
+
+          <!-- ===== 모험 지도 장소 (둥근 랜드마크) ===== -->
+          <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="6">
+            <div class="lv-room" style="{{ n.wrapStyle }}" onClick="{{ n.onSelect }}">
+
+              <!-- 정체 글로우 -->
+              <sc-if value="{{ n.isHot }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ n.glowStyle }}"></div>
+              </sc-if>
+
+              <!-- 땅 그림자 (장소가 지도에 놓인 느낌) -->
+              <div style="{{ n.groundStyle }}"></div>
+
+              <!-- 둥근 장소 마커 -->
+              <div style="{{ n.discStyle }}">
+                <!-- 안쪽 테두리 링 -->
+                <div style="{{ n.innerRingStyle }}"></div>
+                <!-- 큰 아이콘 -->
+                <div style="{{ n.iconStyle }}">{{ n.numText }}</div>
+                <!-- 문제 번호 뱃지 -->
+                <sc-if value="{{ n.hasNum }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ n.numBadgeStyle }}">{{ n.numLabel }}</div>
+                </sc-if>
+                <!-- 인원 뱃지 -->
+                <sc-if value="{{ n.hasPlayers }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ n.countBadgeStyle }}"><i class="icon-user" style="font-size:8.5px;"></i>{{ n.count }}</div>
+                </sc-if>
+              </div>
+
+              <!-- 장소 이름표 (마커 아래 리본) -->
+              <div style="{{ n.plateStyle }}">
+                <div style="font-family:var(--font-kr); font-size:12.5px; font-weight:800; color:{{ n.titleColor }}; line-height:1.2; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ n.title }}</div>
+                <div style="margin-top:2px; display:flex; align-items:center; justify-content:center; gap:4px;">
+                  <sc-if value="{{ n.hasLock }}" hint-placeholder-val="{{ true }}">
+                    <span style="{{ n.metaStyle }}"><i class="{{ n.lockIcon }}" style="font-size:9px;"></i>{{ n.lockLabel }}</span>
+                  </sc-if>
+                  <sc-if value="{{ n.isEndingTile }}" hint-placeholder-val="{{ false }}">
+                    <span style="{{ n.metaStyle }}">{{ n.kindLabel }}</span>
+                  </sc-if>
+                  <sc-if value="{{ n.hasAlert }}" hint-placeholder-val="{{ false }}">
+                    <span style="{{ n.alertStyle }}">{{ n.alertText }}</span>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+
+          <!-- ===== 참여자 캐릭터 뱃지 (노드 위를 이동) ===== -->
+          <sc-for list="{{ chars }}" as="ch" hint-placeholder-count="8">
+            <div class="lv-ch" style="{{ ch.wrapStyle }}">
+              <!-- 도착 반짝 -->
+              <sc-if value="{{ ch.justLanded }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; inset:-6px; border-radius:50%; border:2.5px solid #ffc91b; animation:lvSpark .7s ease-out forwards; pointer-events:none;"></div>
+              </sc-if>
+              <!-- 캐릭터 -->
+              <div style="{{ ch.bodyStyle }}">
+                <img src="{{ ch.img }}" alt="{{ ch.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                <!-- 상태 이모지 뱃지 -->
+                <sc-if value="{{ ch.hasMood }}" hint-placeholder-val="{{ false }}">
+                  <span style="{{ ch.moodStyle }}">{{ ch.mood }}</span>
+                </sc-if>
+              </div>
+              <!-- 이름표 -->
+              <div class="lv-chname" style="{{ ch.nameStyle }}">{{ ch.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- 범례 -->
+      <div style="position:absolute; bottom:14px; left:14px; z-index:12; display:flex; align-items:center; gap:12px; padding:8px 14px; border-radius:10px; background:rgba(255,255,255,0.95); border:1px solid var(--border-2); backdrop-filter:blur(6px); font-family:var(--font-small); font-size:11px; font-weight:600; color:var(--fg-sub);">
+        <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:18px; height:0; border-top:2px solid #12b57e;"></span>정답</span>
+        <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:18px; height:0; border-top:2px dashed #e8a098;"></span>오답</span>
+        <span style="width:1px; height:12px; background:var(--border);"></span>
+        <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:11px; height:11px; border-radius:50%; background:#fff8e8; border:2px solid #f0a815;"></span>문제</span>
+        <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:11px; height:11px; border-radius:50%; background:#eafaf3; border:2px solid #12b57e;"></span>성공</span>
+        <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:11px; height:11px; border-radius:50%; background:#fdeeec; border:2px solid #e0483d;"></span>실패</span>
+      </div>
+
+      <!-- 줌 -->
+      <div style="position:absolute; bottom:14px; right:14px; z-index:12; display:flex; align-items:center; gap:6px;">
+        <button class="lv-ghost" onClick="{{ onZoomOut }}" style="width:34px; height:34px; border:1px solid var(--border-2); border-radius:9px; background:#fff; color:var(--fg-sub); cursor:pointer;"><i class="icon-minus-circle" style="font-size:13px;"></i></button>
+        <div style="min-width:48px; text-align:center; font-family:var(--font-en); font-size:12px; font-weight:700; color:var(--fg-mute);">{{ zoomPct }}%</div>
+        <button class="lv-ghost" onClick="{{ onZoomIn }}" style="width:34px; height:34px; border:1px solid var(--border-2); border-radius:9px; background:#fff; color:var(--fg-sub); cursor:pointer;"><i class="icon-plus" style="font-size:13px;"></i></button>
+        <button class="lv-ghost" onClick="{{ onFit }}" style="height:34px; padding:0 13px; border:1px solid var(--border-2); border-radius:9px; background:#fff; color:var(--fg-sub); font-family:var(--font-small); font-size:12px; font-weight:600; cursor:pointer;">한눈에</button>
+      </div>
+
+      <!-- 일시정지 -->
+      <sc-if value="{{ isPaused }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:20; background:rgba(58,38,20,0.55); display:flex; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+        <img src="uploads/character01/play_focus_ob.png" alt="잠깐 멈춤" style="width:150px; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.4)); animation:lvFloat 4s ease-in-out infinite;">
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:23px; font-weight:900; color:#fff;">잠깐 멈췄어요</div>
+        <div style="margin-top:7px; font-family:var(--font-small); font-size:13.5px; color:rgba(255,255,255,0.88);">친구들 화면도 모두 멈춰 있어요. 설명이 끝나면 다시 시작하세요.</div>
+        <button class="lv-soft" onClick="{{ onResume }}" style="margin-top:20px; display:inline-flex; align-items:center; gap:8px; height:52px; padding:0 28px; border:none; border-radius:16px; background:#2fbd7e; color:#fff; font-family:var(--font-kr); font-size:16.5px; font-weight:800; cursor:pointer; box-shadow:0 12px 26px -12px rgba(47,189,126,0.9);"><i class="icon-play" style="font-size:14px;"></i> 다시 시작</button>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- ---------- 우측 패널 ---------- -->
+    <aside style="flex:none; width:376px; display:flex; flex-direction:column; gap:12px; min-height:0;">
+
+      <!-- 탭 -->
+      <div style="flex:none; display:flex; gap:6px; padding:6px; border-radius:16px; background:#fff; border:1px solid var(--border-2);">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.onPick }}" style="{{ t.style }}">
+            {{ t.label }}
+            <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}">
+              <span style="{{ t.badgeStyle }}">{{ t.badge }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0; padding-right:2px;">
+
+        <!-- ===== 도와주기 ===== -->
+        <sc-if value="{{ tabAction }}" hint-placeholder-val="{{ false }}">
+
+          <!-- 공지 -->
+          <div style="flex:none; border-radius:20px; background:#fff; border:1px solid var(--border-2); padding:15px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:#fff1e2; color:var(--main-color);"><i class="icon-megaphone" style="font-size:13px;"></i></span>
+              <span style="font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg);">모두에게 한마디</span>
+            </div>
+            <div style="margin-top:11px; display:flex; gap:7px;">
+              <input value="{{ noticeText }}" onInput="{{ onNoticeInput }}" placeholder="예: 2번 방 힌트 — 온도를 보세요!" style="flex:1; min-width:0; height:42px; padding:0 13px; border:1px solid var(--border-2); border-radius:13px; background:var(--bg-soft); font-family:var(--font-small); font-size:12.5px; color:var(--fg); outline:none;">
+              <button class="lv-soft" onClick="{{ onSendNotice }}" style="flex:none; height:42px; padding:0 16px; border:none; border-radius:13px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13px; font-weight:800; cursor:pointer;">보내기</button>
+            </div>
+            <sc-if value="{{ hasNotice }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px; display:flex; align-items:flex-start; gap:9px; padding:11px 12px; border-radius:13px; background:linear-gradient(90deg,#fff4e4,#fff9f0); border:1.5px solid #ffd9bd;">
+              <span style="font-size:14px;">📣</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-family:var(--font-small); font-size:12.5px; line-height:1.5; color:var(--theme-deep); font-weight:700;">{{ noticeShown }}</div>
+                <div style="margin-top:2px; font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute);">지금 친구들 화면에 보이는 중</div>
+              </div>
+              <button onClick="{{ onClearNotice }}" style="flex:none; border:none; background:transparent; color:var(--fg-mute); cursor:pointer; padding:0;"><i class="icon-cancel" style="font-size:12px;"></i></button>
+            </div>
+            </sc-if>
+            <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">
+              <sc-for list="{{ quickNotices }}" as="q" hint-placeholder-count="3">
+                <button class="lv-ghost" onClick="{{ q.onPick }}" style="height:30px; padding:0 11px; border:1px solid var(--border-2); border-radius:50px; background:var(--bg-soft); color:var(--fg-sub); font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;">{{ q.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- 막힌 친구들 -->
+          <div style="flex:none; border-radius:20px; background:{{ stuckBg }}; border:1.5px solid {{ stuckBorder }}; padding:15px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:{{ stuckIconBg }}; font-size:14px;">😣</span>
+              <span style="font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg);">막힌 친구들</span>
+              <span style="margin-left:auto; font-family:var(--font-small); font-size:11.5px; font-weight:800; color:{{ stuckColor }};">{{ stuckSummary }}</span>
+            </div>
+
+            <sc-if value="{{ hasStuckGroups }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:11px; display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ stuckGroups }}" as="g" hint-placeholder-count="2">
+                <div style="border:1px solid var(--border-2); border-radius:15px; background:#fff; padding:11px 12px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="flex:none; display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:8px; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:11px; font-weight:800;">{{ g.num }}</span>
+                    <span style="flex:1; min-width:0; font-family:var(--font-kr); font-size:13px; font-weight:800; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ g.title }}</span>
+                    <span style="flex:none; font-family:var(--font-small); font-size:11px; font-weight:800; color:#e0483d;">{{ g.count }}명</span>
+                  </div>
+                  <!-- 막힌 친구 얼굴들 -->
+                  <div style="margin-top:9px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                    <sc-for list="{{ g.faces }}" as="f" hint-placeholder-count="3">
+                      <span title="{{ f.tip }}" style="{{ f.style }}"><img src="{{ f.img }}" alt="{{ f.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span>
+                    </sc-for>
+                    <span style="font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute); margin-left:2px;">{{ g.detail }}</span>
+                  </div>
+                  <div style="margin-top:10px; display:flex; gap:6px;">
+                    <button class="lv-soft" onClick="{{ g.onOpenHint }}" style="{{ g.hintBtnStyle }}">💡 {{ g.hintBtnLabel }}</button>
+                    <button class="lv-ghost" onClick="{{ g.onNotice }}" style="flex:none; height:34px; padding:0 12px; border:1px solid var(--border-2); border-radius:11px; background:var(--bg-soft); color:var(--fg-sub); font-family:var(--font-small); font-size:11.5px; font-weight:800; cursor:pointer;">📣</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ noStuck }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:20px;">👍</span>
+              <span style="font-family:var(--font-small); font-size:12.5px; line-height:1.5; color:var(--fg-sub);">막힌 친구가 없어요.<br>모두 잘 풀고 있어요!</span>
+            </div>
+            </sc-if>
+          </div>
+
+          <!-- 부활 대기 -->
+          <div style="flex:none; border-radius:20px; background:{{ failBg }}; border:1.5px solid {{ failBorder }}; padding:15px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:{{ failIconBg }}; font-size:14px;">💤</span>
+              <span style="font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg);">다시 보내주기</span>
+              <span style="margin-left:auto; font-family:var(--font-small); font-size:11.5px; font-weight:800; color:{{ failColor }};">{{ failSummary }}</span>
+            </div>
+
+            <sc-if value="{{ hasFailed }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:11px; display:flex; flex-direction:column; gap:7px;">
+              <sc-for list="{{ failedList }}" as="f" hint-placeholder-count="3">
+                <div class="lv-row" style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--border-2); border-radius:14px; background:#fff;">
+                  <span style="{{ f.avatarStyle }}"><img src="{{ f.img }}" alt="{{ f.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-family:var(--font-kr); font-size:13px; font-weight:800; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.name }}</div>
+                    <div style="font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute);">{{ f.detail }}</div>
+                  </div>
+                  <button class="lv-soft" onClick="{{ f.onRevive }}" style="flex:none; display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 13px; border:none; border-radius:11px; background:#2fbd7e; color:#fff; font-family:var(--font-small); font-size:11.5px; font-weight:800; cursor:pointer;"><i class="icon-ccw" style="font-size:11px;"></i> 부활</button>
+                </div>
+              </sc-for>
+            </div>
+            <button class="lv-soft" onClick="{{ onReviveAll }}" style="margin-top:10px; width:100%; height:40px; border:2px dashed #7fd3aa; border-radius:13px; background:#f2fbf6; color:#1f8f5f; font-family:var(--font-kr); font-size:13px; font-weight:800; cursor:pointer;">✨ 모두 다시 보내주기 (−{{ revivePenalty }}점)</button>
+            </sc-if>
+
+            <sc-if value="{{ noFailed }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+              <span style="font-size:20px;">🌟</span>
+              <span style="font-family:var(--font-small); font-size:12.5px; line-height:1.5; color:var(--fg-sub);">멈춘 친구가 없어요.<br>다들 순항 중이에요!</span>
+            </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ===== 친구들 ===== -->
+        <sc-if value="{{ tabPlayers }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none; border-radius:20px; background:#fff; border:1px solid var(--border-2); padding:15px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="이름으로 찾기" style="flex:1; min-width:0; height:40px; padding:0 13px; border:1px solid var(--border-2); border-radius:13px; background:var(--bg-soft); font-family:var(--font-small); font-size:12.5px; color:var(--fg); outline:none;">
+            <span style="flex:none; font-family:var(--font-small); font-size:11.5px; font-weight:800; color:var(--main-color);">{{ playerCountLabel }}</span>
+          </div>
+          <div style="margin-top:11px; display:flex; flex-direction:column; gap:7px;">
+            <sc-for list="{{ players }}" as="p" hint-placeholder-count="6">
+              <div class="lv-row" style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1.5px solid #ffeedd; border-radius:14px; background:var(--bg-soft);">
+                <span style="{{ p.avatarStyle }}"><img src="{{ p.img }}" alt="{{ p.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span>
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-family:var(--font-kr); font-size:13px; font-weight:800; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.name }}</span>
+                    <span style="{{ p.badgeStyle }}">{{ p.badgeText }}</span>
+                  </div>
+                  <div style="margin-top:2px; font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.detail }}</div>
+                </div>
+                <div style="flex:none; text-align:right;">
+                  <div style="font-family:var(--font-en); font-size:14px; font-weight:800; color:var(--main-color);">{{ p.score }}</div>
+                  <div style="font-family:var(--font-small); font-size:10px; color:var(--fg-mute);">{{ p.solvedLabel }}</div>
+                </div>
+                <button class="lv-ghost" onClick="{{ p.onKick }}" title="내보내기" style="flex:none; width:28px; height:28px; border:1px solid var(--border-2); border-radius:9px; background:#fff; color:var(--fg-mute); cursor:pointer;"><i class="icon-cancel" style="font-size:10px;"></i></button>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ noPlayers }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:30px 0; text-align:center;">
+            <img src="uploads/character01/profile_blank_ob.png" alt="없음" style="width:70px; opacity:0.7;">
+            <div style="margin-top:10px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute);">아직 친구가 없어요</div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ===== 순위 ===== -->
+        <sc-if value="{{ tabRank }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:none; border-radius:20px; background:#fff; border:1px solid var(--border-2); padding:15px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:15px;">🏆</span>
+            <span style="font-family:var(--font-kr); font-size:14px; font-weight:800; color:var(--fg);">지금 순위</span>
+            <span style="margin-left:auto; font-family:var(--font-small); font-size:10.5px; color:var(--fg-mute);">친구들에게는 안 보여요</span>
+          </div>
+          <div style="margin-top:11px; display:flex; flex-direction:column; gap:7px;">
+            <sc-for list="{{ ranking }}" as="r" hint-placeholder-count="6">
+              <div class="lv-row" style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1.5px solid {{ r.border }}; border-radius:14px; background:{{ r.bg }};">
+                <span style="{{ r.rankStyle }}">{{ r.rankText }}</span>
+                <span style="{{ r.avatarStyle }}"><img src="{{ r.img }}" alt="{{ r.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span>
+                <span style="flex:1; min-width:0; font-family:var(--font-kr); font-size:13px; font-weight:800; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+                <span style="flex:none; font-family:var(--font-small); font-size:11px; font-weight:700; color:var(--fg-sub);">{{ r.solvedLabel }}</span>
+                <span style="flex:none; min-width:42px; text-align:right; font-family:var(--font-en); font-size:14px; font-weight:800; color:var(--main-color);">{{ r.score }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+
+      <!-- 하단 -->
+      <div style="flex:none; display:flex; align-items:center; gap:7px;">
+        <button class="lv-ghost" onClick="{{ onToggleDemo }}" style="{{ demoBtnStyle }}">{{ demoBtnLabel }}</button>
+        <button class="lv-ghost" onClick="{{ onSeedDemo }}" style="flex:none; height:38px; padding:0 12px; border:1px solid var(--border-2); border-radius:13px; background:#fff; color:var(--fg-sub); font-family:var(--font-small); font-size:11.5px; font-weight:700; cursor:pointer;">🧸 친구 채우기</button>
+        <a href="실시간 대기실 - 웹.dc.html?sid={{ sid }}" class="lv-ghost" style="flex:none; display:inline-flex; align-items:center; gap:5px; height:38px; padding:0 13px; border:1px solid var(--border-2); border-radius:13px; background:#fff; color:var(--fg-sub); font-family:var(--font-small); font-size:11.5px; font-weight:700;"><i class="icon-left-open" style="font-size:10px;"></i> 대기실</a>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============ 마치기 확인 ============ -->
+  <sc-if value="{{ askEnd }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ onCancelEnd }}" style="position:absolute; inset:0; z-index:80; background:rgba(58,38,20,0.5); display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(3px);">
+    <div onClick="{{ stop }}" style="width:100%; max-width:390px; background:#fff; border-radius:26px; padding:28px 26px; text-align:center; animation:lvPop .28s ease;">
+      <img src="uploads/character01/play_rank_emo.gif" alt="마치기" style="width:110px; margin:0 auto; animation:lvFloat 4s ease-in-out infinite;">
+      <h3 style="margin:12px 0 0; font-family:var(--font-kr); font-size:19px; font-weight:900; color:var(--fg);">방탈출을 마칠까요?</h3>
+      <p style="margin:9px 0 0; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub);">친구들 화면이 모두 결과 발표로 바뀌고,<br>더 이상 진행할 수 없어요.</p>
+      <div style="display:flex; gap:10px; margin-top:22px;">
+        <button onClick="{{ onCancelEnd }}" style="flex:1; height:48px; border:1px solid var(--border-2); border-radius:14px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:14.5px; font-weight:800; cursor:pointer;">더 할래요</button>
+        <button class="lv-soft" onClick="{{ onEnd }}" style="flex:1; height:48px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:14.5px; font-weight:800; cursor:pointer;">결과 보기 🎉</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- toast -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; left:50%; bottom:28px; transform:translateX(-50%); z-index:90; display:flex; align-items:center; gap:9px; padding:13px 22px; border-radius:50px; background:#fff; border:2px solid var(--main-color); color:var(--fg); font-family:var(--font-kr); font-size:13.5px; font-weight:800; box-shadow:0 16px 34px -14px rgba(219,88,0,0.5); animation:lvRise .25s ease;">
+    <span style="font-size:15px;">{{ toastEmoji }}</span> {{ toastText }}
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1680,&quot;height&quot;:980}}">
+// 지도 장소 1칸이 차지하는 영역 (둥근 마커 + 아래 이름표). 캐릭터는 별도 레이어로 위에 얹음
+const NODE_W = 186, NODE_H = 128;
+const CH = 42;                          // 캐릭터 뱃지 지름
+const LOCKS = [
+  { key:'mc',      label:'객관식', icon:'icon-quiz-01' },
+  { key:'short',   label:'주관식', icon:'icon-pen' },
+  { key:'ox',      label:'OX',    icon:'icon-help' },
+  { key:'order',   label:'순서',   icon:'icon-sliders' },
+  { key:'hotspot', label:'핫스팟', icon:'icon-location' },
+];
+// 참여자 프로필 캐릭터 — 닉네임으로 안정적으로 배정
+const FACES = [
+  'uploads/character01/profile_Cula.png',
+  'uploads/character01/profile_Frankie.png',
+  'uploads/character01/profile_Kay.png',
+  'uploads/character01/profile_Kebi.png',
+  'uploads/character01/profile_Kongkong.png',
+  'uploads/character01/profile_Zizi.png',
+];
+function faceOf(name){
+  let h = 0; const s = String(name||'?');
+  for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) % 9973;
+  return FACES[h % FACES.length];
+}
+
+function demoPlayers(qIds, startId) {
+  const NAMES = ['민준','서연','도윤','하은','지호','수아','예준','채원','시우','유진','건우','다은'];
+  return NAMES.map((n, i) => {
+    const at = i % (qIds.length + 1);
+    const cur = qIds[Math.min(at, qIds.length - 1)] || startId;
+    return { id:'u'+i, name:n, curId:cur, score:1000 - (i%4)*50, solved:at, wrong:i%3, hintUsed:i%2,
+      revived:0, status:(i%7===3?'failed':'playing'), online:i%9!==4, stuckMs:(i%5)*70000,
+      isStuck:(i%5)===4, lastQuestionId:cur, trail:[] };
+  });
+}
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let sid = null, roomId = 'r1';
+    // demo=1 : 예시 참여자를 넣고 자동으로 방을 옮겨다니게 해서 뱃지 이동을 보여준다
+    this._demoMode = false;
+    try {
+      const u = new URLSearchParams(location.search);
+      sid = u.get('sid');
+      if (u.get('id')) roomId = u.get('id');
+      this._demoMode = u.get('demo') === '1';
+    } catch(e){}
+
+    let session = null;
+    if (window.SessionStore) {
+      if (sid) session = window.SessionStore.get(sid);
+      if (!session) session = window.SessionStore.activeForRoom(roomId);
+      if (!session) session = window.SessionStore.create(roomId, {});
+      if (session && session.state === 'lobby') session = window.SessionStore.start(session.id);
+    }
+    this._sid = session ? session.id : null;
+    this._roomId = session ? session.roomId : roomId;
+
+    const room = window.RoomStore ? window.RoomStore.get(this._roomId) : null;
+    this._pages = room && room.pages ? JSON.parse(JSON.stringify(room.pages)) : [];
+    this._room = room;
+    this.layoutNodes(this._pages);
+
+    // 캐릭터 이동 감지용: 이전에 어느 노드에 있었는지 기억 (도착 반짝 효과)
+    this._prevAt = {};
+    this._landed = {};
+
+    this.state = {
+      tab: 'rank',        // 첫 탭 = 순위
+      pan: { x: 60, y: 30 },
+      zoom: 0.82,
+      panning: null,
+      search: '',
+      noticeText: '',
+      askEnd: false,
+      toast: '', toastEmoji: '✨',
+      tick: 0,
+    };
+  }
+
+  // ---------- 순차 다이어그램 배치 (편집 화면 좌표는 무시하고 자동 정렬) ----------
+  // 시작 노드에서 정답 출구를 따라가며 왼→오른쪽으로 한 칸씩 놓고,
+  // 오답으로 갈라지는 곳(주로 실패 엔딩)은 그 아래 줄에 놓는다.
+  layoutNodes(pages){
+    const COL = NODE_W + 46;       // 칸 사이 가로 간격
+    const ROW = NODE_H + 74;       // 아래 분기 줄까지의 세로 간격
+    const ORIGIN_X = 80, ORIGIN_Y = 120;
+    const map = {}; pages.forEach(p=>map[p.id]=p);
+
+    const col = {};                // id → 열(가로 순서)
+    const start = pages.find(p=>p.type === 'start') || pages[0];
+    if (!start) return pages;
+
+    // 1) 정답 경로를 따라 메인 라인(0번 줄) 열 번호 부여
+    let cur = start, guard = 0;
+    const main = [];
+    while (cur && guard++ < 200) {
+      if (col[cur.id] != null) break;             // 순환 방지
+      col[cur.id] = main.length;
+      main.push(cur.id);
+      cur = cur.correctExit ? map[cur.correctExit] : null;
+    }
+
+    // 2) 메인에 없는 노드: 자기를 가리키는 노드의 바로 다음 열에 배치
+    const rest = pages.filter(p=>col[p.id] == null);
+    rest.forEach(p=>{
+      const parent = pages.find(q => q.correctExit === p.id || q.wrongExit === p.id);
+      col[p.id] = parent && col[parent.id] != null ? col[parent.id] + 1 : main.length;
+    });
+
+    // 3) 같은 열에 여러 개면 줄(row)을 나눠 겹치지 않게 — 메인 라인이 항상 0번 줄
+    const byCol = {};
+    pages.forEach(p=>{ (byCol[col[p.id]] = byCol[col[p.id]] || []).push(p); });
+    Object.keys(byCol).forEach(c=>{
+      // 메인 경로 노드를 먼저(0번 줄), 나머지(오답/고립)는 아래 줄로
+      const list = byCol[c].slice().sort((a,b)=>{
+        const am = main.indexOf(a.id) >= 0 ? 0 : 1;
+        const bm = main.indexOf(b.id) >= 0 ? 0 : 1;
+        return am - bm || (a.num||0) - (b.num||0);
+      });
+      list.forEach((p, row)=>{
+        p.x = ORIGIN_X + Number(c) * COL;
+        p.y = ORIGIN_Y + row * ROW;
+      });
+    });
+    return pages;
+  }
+
+  componentDidMount(){
+    if (window.SessionStore) this._unsub = window.SessionStore.subscribe(()=> this.setState(s=>({ tick:s.tick+1 })));
+    this._iv = setInterval(()=> this.setState(s=>({ tick:s.tick+1 })), 1000);
+    this.fit();
+    if (this._demoMode) this.startDemo();
+  }
+  componentWillUnmount(){
+    if (this._unsub) this._unsub();
+    if (this._iv) clearInterval(this._iv);
+    if (this._tt) clearTimeout(this._tt);
+    if (this._demoIv) clearInterval(this._demoIv);
+    Object.keys(this._landed||{}).forEach(k=>clearTimeout(this._landed[k]));
+  }
+
+  // ---------- 예시 참여자 자동 이동 (뱃지 이동 시연) ----------
+  startDemo(){
+    const st = window.SessionStore;
+    if (!st || !this._sid) return;
+    const sess = st.get(this._sid);
+    if (!sess) return;
+    if (this._demoIv) clearInterval(this._demoIv);   // 중복 실행 방지
+
+    // 아직 아무도 없으면 예시 참여자를 채운다
+    if (!sess.players.length) st.seedDemo(this._sid, 10);
+
+    // 초기 배치: 앞/중간/뒤로 흩어놓고, 몇 명은 막힘/실패/탈출 상태로 만들어 상태별 표현을 함께 보여준다
+    const qIds = this._pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock).map(p=>p.id);
+    const failEnd = (this._pages.find(p=>p.type==='ending' && p.endingType==='fail')||{}).id;
+    const okEnd  = (this._pages.find(p=>p.type==='ending' && p.endingType==='success')||{}).id;
+    const raw = st.get(this._sid);
+    raw.players.forEach((pl, i)=>{
+      const at = i % Math.max(1, qIds.length);
+      pl.curId = qIds[at] || raw.startId;
+      pl.solved = at;
+      pl.status = 'playing';
+      pl.online = true;
+      pl.enteredNodeAt = Date.now();
+      pl.lastQuestionId = pl.curId;
+      if (i === 2 || i === 3) pl.enteredNodeAt = Date.now() - 6*60*1000;   // 막힘 연출
+      if (i === 5 && failEnd) { pl.curId = failEnd; pl.status = 'failed'; pl.lastQuestionId = qIds[1] || raw.startId; }
+      if (i === 8 && okEnd)   { pl.curId = okEnd;   pl.status = 'done'; pl.solved = qIds.length; }
+    });
+    st.setOpts(this._sid, {});   // 저장 + 구독자에게 알림
+
+    // 2.6초마다 한 명씩 다음 방으로 이동 → 뱃지가 실제로 움직이는 걸 보여준다
+    this._demoIv = setInterval(()=>{
+      const s = st.get(this._sid);
+      if (!s || s.state !== 'running') return;
+      const movable = s.players.filter(p=>p.status === 'playing');
+      if (!movable.length) return;
+      // 한 번에 2~3명씩 옮겨서 판이 살아 있는 느낌을 준다 (한 명씩이면 너무 뜸함)
+      const step = Math.max(2, Math.round(movable.length / 4));
+      for (let k = 0; k < step; k++) {
+        this._demoCursor = ((this._demoCursor || 0) + 1) % movable.length;
+        this.demoStep(st, s, movable[this._demoCursor]);
+      }
+    }, 2600);
+  }
+
+  // 한 명을 정답 출구로 한 칸 이동. 성공 엔딩에 닿으면 잠시 머문 뒤 출발점으로 되돌려 계속 순환시킨다.
+  demoStep(st, s, pl){
+    if (!pl) return;
+    const page = this._pages.filter(p=>p.id === pl.curId)[0];
+    if (!page) return;
+
+    // 이미 엔딩에 있으면 출발점으로 되돌려 다시 달리게 한다
+    if (page.type === 'ending') {
+      st.progress(this._sid, pl.id, { curId: s.startId });
+      const me = (st.get(this._sid).players || []).filter(x=>x.id===pl.id)[0];
+      if (me) { me.solved = 0; me.status = 'playing'; me.enteredNodeAt = Date.now(); }
+      st.setOpts(this._sid, {});
+      return;
+    }
+
+    const next = page.correctExit;
+    const nextPage = next ? this._pages.filter(p=>p.id === next)[0] : null;
+    if (!nextPage) return;                       // 갈 곳이 없으면 그대로 둔다
+    const isEnd = nextPage.type === 'ending';
+
+    st.progress(this._sid, pl.id, {
+      curId: next,
+      correct: true,
+      lastQuestionId: (page.type === 'normal' || page.type === 'start') ? page.id : pl.lastQuestionId,
+      isDone: !!(isEnd && nextPage.endingType === 'success'),
+      isFail: !!(isEnd && nextPage.endingType === 'fail'),
+    });
+  }
+
+  session(){
+    if (window.SessionStore && this._sid) {
+      const s = window.SessionStore.get(this._sid);
+      if (s) return s;
+    }
+    const qIds = this._pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock).map(p=>p.id);
+    const startId = (this._pages.find(p=>p.type==='start')||{}).id || 'p1';
+    if (!this._demo) {
+      this._demo = {
+        id:'demo', roomId:this._roomId, title:(this._room&&this._room.title)||'사라진 실험실의 비밀',
+        pin:(this._room&&this._room.pin)||'834 512', state:'running',
+        opts:{ revivePenalty:100, lateJoin:true }, startedAt: Date.now()-8*60*1000,
+        startId, qIds, total:qIds.length, players:demoPlayers(qIds, startId), notice:null, openHints:{},
+      };
+    }
+    return this._demo;
+  }
+
+  toast(t, emoji){ this.setState({ toast:t, toastEmoji: emoji||'✨' }); if (this._tt) clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}), 2000); }
+
+  setVp = (el)=>{ this._vp = el; };
+  fit(){
+    if (!this._vp || !this._pages.length) return;
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    // 카드 위에 서는 캐릭터(최대 2줄)까지 시야에 포함
+    const HEAD = CH*2 + 22;
+    this._pages.forEach(p=>{ minX=Math.min(minX,p.x); minY=Math.min(minY,p.y-HEAD); maxX=Math.max(maxX,p.x+NODE_W); maxY=Math.max(maxY,p.y+NODE_H+16); });
+    const PAD = 40;
+    const vw=this._vp.clientWidth, vh=this._vp.clientHeight;
+    const cw=maxX-minX, ch=maxY-minY;
+    const z=Math.max(0.35, Math.min(1, Math.min((vw-PAD*2)/cw, (vh-PAD*2)/ch)));
+    // 다이어그램을 뷰포트 정중앙에 놓는다
+    this.setState({ zoom:z, pan:{
+      x: Math.round((vw - cw*z)/2 - minX*z),
+      y: Math.round((vh - ch*z)/2 - minY*z),
+    } });
+  }
+  onCanvasDown = (e)=>{ if (e.target.closest && (e.target.closest('.lv-room') || e.target.closest('.lv-ch'))) return; this._pan0={ x:e.clientX, y:e.clientY, px:this.state.pan.x, py:this.state.pan.y }; this.setState({ panning:true }); };
+  onCanvasMove = (e)=>{ if (!this._pan0) return; this.setState({ pan:{ x:this._pan0.px+(e.clientX-this._pan0.x), y:this._pan0.py+(e.clientY-this._pan0.y) } }); };
+  onCanvasUp = ()=>{ this._pan0=null; this.setState({ panning:false }); };
+
+  act(fn){ if (!window.SessionStore || !this._sid) { this.toast('데모 모드예요', '🧸'); return; } fn(window.SessionStore); this.setState(s=>({tick:s.tick+1})); }
+
+  renderVals(){
+    const S = this.state;
+    const sess = this.session();
+    const players = sess.players || [];
+    const pages = this._pages;
+    const map = {}; pages.forEach(p=>map[p.id]=p);
+    const lockOf = k => LOCKS.find(l=>l.key===k) || LOCKS[0];
+
+    const isRunning = sess.state === 'running';
+    const isPaused = sess.state === 'paused';
+    const isEnded = sess.state === 'ended';
+    const stateLabel = isPaused ? '잠깐 멈춤' : (isEnded ? '끝났어요' : '실시간');
+
+    const ms = (sess.endedAt || Date.now()) - (sess.startedAt || Date.now());
+    const sec = Math.max(0, Math.floor(ms/1000));
+    const elapsed = `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor(sec/60)%60).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+
+    // ---------- 통계 ----------
+    const nStuck = players.filter(p=>p.isStuck && p.status==='playing').length;
+    const nFail = players.filter(p=>p.status==='failed').length;
+    const nDone = players.filter(p=>p.status==='done').length;
+    const nPlaying = players.filter(p=>p.status==='playing').length;
+    const total = sess.total || pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock).length;
+
+    const pill = (bg,bd)=>`display:flex; align-items:center; gap:10px; height:52px; padding:0 16px; border-radius:16px; background:${bg}; border:1.5px solid ${bd};`;
+    const iw = (bg)=>`display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; flex:none; border-radius:11px; background:${bg}; color:#fff;`;
+    const stats = [
+      { label:'친구들',   value:players.length, icon:'icon-user',            color:'var(--fg)',        style:pill('#fff','var(--border-2)'), iconWrap:iw('#c9ccd3') },
+      { label:'풀고 있어요', value:nPlaying,     icon:'icon-play',            color:'var(--main-color)',style:pill('#fff6ec','#ffd9bd'),     iconWrap:iw('var(--main-color)') },
+      { label:'막혔어요',  value:nStuck,        icon:'icon-attention-alt-1', color:nStuck?'#e0483d':'var(--fg-mute)', style:pill(nStuck?'#fdeeec':'#fff', nStuck?'#f5cdc8':'var(--border-2)'), iconWrap:iw(nStuck?'#e0483d':'#c9ccd3') },
+      { label:'쉬고 있어요', value:nFail,        icon:'icon-ccw',             color:nFail?'#96690a':'var(--fg-mute)',  style:pill(nFail?'#fff8e8':'#fff',  nFail?'#f5dfae':'var(--border-2)'), iconWrap:iw(nFail?'#f0a815':'#c9ccd3') },
+      { label:'탈출했어요', value:nDone,        icon:'icon-check-1',         color:nDone?'#0a7d57':'var(--fg-mute)',  style:pill(nDone?'#eafaf3':'#fff',  nDone?'#bfeeda':'var(--border-2)'), iconWrap:iw(nDone?'#12b57e':'#c9ccd3') },
+    ];
+
+    // 전체 진행률 = 평균 해결 문제수 / 전체 문제수
+    const avgSolved = players.length ? players.reduce((a,p)=>a+p.solved,0)/players.length : 0;
+    const overallPct = total ? Math.round(avgSolved/total*100) : 0;
+    const overallBarStyle = `width:${overallPct}%; height:100%; border-radius:50px; background:linear-gradient(90deg,#ffc91b,#ff6800); transition:width .5s ease;`;
+
+    // ---------- 노드별 참여자 ----------
+    const byNode = {};
+    players.forEach(p=>{ (byNode[p.curId] = byNode[p.curId] || []).push(p); });
+
+    const nodes = pages.map(p=>{
+      const here = byNode[p.id] || [];
+      const isEndingNode = p.type === 'ending';
+      const isFailNode = isEndingNode && p.endingType === 'fail';
+      const isSuccessNode = isEndingNode && p.endingType === 'success';
+      const stuckHere = here.filter(x=>x.isStuck && x.status==='playing').length;
+
+      // ---- 색: 성공=초록 / 실패=빨강 / 나머지=노랑(앰버). 톤다운 — 연한 배경 + 진한 테두리·글씨 ----
+      let numText = p.num || '', kindLabel = '방';
+      let line, fill, ink, soft;      // line=테두리, fill=디스크 배경, ink=글씨/아이콘, soft=안쪽 링
+      if (isSuccessNode) {
+        numText='🏁'; kindLabel='탈출 성공';
+        line='#12b57e'; fill='#eafaf3'; ink='#0a7d57'; soft='#bfeeda';
+      } else if (isFailNode) {
+        numText='💥'; kindLabel='탈출 실패';
+        line='#e0483d'; fill='#fdeeec'; ink='#b3352b'; soft='#f8cdc8';
+      } else {
+        numText='🔒'; kindLabel='문제';
+        line='#f0a815'; fill='#fff8e8'; ink='#96690a'; soft='#fae3ae';
+        if (p.type === 'start') { numText='🚩'; kindLabel='출발'; }
+        else if (p.type === 'desc') { numText='💬'; kindLabel='이야기'; }
+      }
+
+      const isHot = stuckHere > 0;
+      const lk = p.lock ? lockOf(p.lock) : null;
+
+      let hasAlert=false, alertText='';
+      if (stuckHere) { hasAlert=true; alertText=`${stuckHere}명 막힘`; }
+      else if (isFailNode && here.length) { hasAlert=true; alertText='부활 대기'; }
+
+      // 둥근 노드 — 사람이 있으면 살짝 크게(시선 유도)
+      const D = here.length ? 74 : 66;
+      const cx = NODE_W / 2;
+      const ring = isHot ? '#e0483d' : line;
+      return {
+        wrapStyle: `position:absolute; left:0; top:0; width:${NODE_W}px; height:${NODE_H}px; transform:translate(${p.x}px,${p.y}px); user-select:none; cursor:pointer; z-index:3;`,
+        // 정체 강조 링 (은은하게)
+        glowStyle: `position:absolute; left:${cx}px; top:${D/2}px; width:${D+26}px; height:${D+26}px; margin-left:${-(D+26)/2}px; margin-top:${-(D+26)/2}px; border-radius:50%; background:rgba(224,72,61,0.10); animation:lvGlowPulse 2.1s ease-in-out infinite; pointer-events:none;`,
+        // 그림자는 아주 옅게 (촌스러운 갈색 그림자 제거)
+        groundStyle: `position:absolute; left:${cx}px; top:${D - 3}px; width:${D*0.6}px; height:${D*0.1}px; margin-left:${-(D*0.6)/2}px; border-radius:50%; background:rgba(30,30,40,0.07); filter:blur(3px);`,
+        // 평평한 단색 디스크 + 진한 테두리
+        discStyle: `position:absolute; left:${cx}px; top:0; width:${D}px; height:${D}px; margin-left:${-D/2}px; border-radius:50%; background:${fill}; border:2.5px solid ${ring}; box-shadow:0 2px 8px rgba(30,30,40,0.07); display:flex; align-items:center; justify-content:center;`,
+        // 안쪽 링은 실선 + 아주 옅게 (점선 이중링이 지저분했음)
+        innerRingStyle: `position:absolute; inset:6px; border-radius:50%; border:1px solid ${soft}; pointer-events:none;`,
+        iconStyle: `font-size:${here.length ? 28 : 25}px; line-height:1;`,
+        // 좌상단 문제 번호
+        hasNum: !isEndingNode && !!p.num,
+        numLabel: p.num || '',
+        numBadgeStyle: `position:absolute; left:-4px; top:-4px; display:flex; align-items:center; justify-content:center; min-width:21px; height:21px; padding:0 6px; border-radius:50px; background:${ink}; color:#fff; font-family:var(--font-en); font-size:11px; font-weight:800;`,
+        // 우하단 인원 뱃지 — 오렌지는 브랜드색으로만
+        countBadgeStyle: `position:absolute; right:-6px; bottom:-4px; display:inline-flex; align-items:center; gap:3px; height:21px; padding:0 8px; border-radius:50px; background:${isHot?'#e0483d':'var(--main-color)'}; border:2px solid #fff; color:#fff; font-family:var(--font-small); font-size:10px; font-weight:800; white-space:nowrap;`,
+        // 마커 아래 이름표
+        plateStyle: `position:absolute; left:0; right:0; top:${D + 11}px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 6px;`,
+        titleColor: 'var(--fg)',
+        metaStyle: `display:inline-flex; align-items:center; gap:3px; height:17px; padding:0 7px; border-radius:5px; background:var(--bg-soft); color:var(--fg-mute); font-family:var(--font-small); font-size:9.5px; font-weight:700; white-space:nowrap;`,
+        alertStyle: `display:inline-flex; align-items:center; height:17px; padding:0 7px; border-radius:5px; background:${stuckHere?'#fdeeec':'#fff8e8'}; color:${stuckHere?'#b3352b':'#96690a'}; font-family:var(--font-small); font-size:9.5px; font-weight:800; white-space:nowrap;`,
+        numText, kindLabel, isEndingTile: isEndingNode || p.type === 'desc',
+        hasLock: !!lk, lockIcon: lk?lk.icon:'', lockLabel: lk?lk.label:'',
+        title: p.title || '(제목 없음)',
+        isHot,
+        hasPlayers: here.length > 0, isEmpty: here.length === 0,
+        count: here.length,
+        hasAlert, alertText,
+        onSelect: ()=> this.setState({ tab:'players', search:'' }),
+      };
+    });
+
+    // ---------- 캐릭터 뱃지: 장소 마커 위쪽에 모여 서고, 이동은 애니메이션 ----------
+    const chars = [];
+    Object.keys(byNode).forEach(nodeId=>{
+      const p = map[nodeId]; if (!p) return;
+      const list = byNode[nodeId];
+      const perRow = 4;
+      list.forEach((pl, i)=>{
+        const row = Math.floor(i / perRow);
+        const col = i % perRow;
+        const inRow = Math.min(perRow, list.length - row*perRow);
+        const spacing = CH - 9;                                   // 살짝 겹쳐서 옹기종기
+        const rowW = (inRow-1)*spacing;
+        const cx = p.x + NODE_W/2 - rowW/2 + col*spacing;
+        // 카드 위쪽에 나란히 서 있도록 — 카드를 가리지 않게 완전히 위로 띄운다
+        const cy = p.y - CH - 8 - row*(CH - 10);
+
+        // 이동 감지 → 도착 반짝
+        const prev = this._prevAt[pl.id];
+        const moved = prev && prev !== nodeId;
+        if (prev !== nodeId) {
+          this._prevAt[pl.id] = nodeId;
+          if (moved) {
+            if (this._landed[pl.id]) clearTimeout(this._landed[pl.id]);
+            this._landedAt = this._landedAt || {};
+            this._landedAt[pl.id] = Date.now();
+            this._landed[pl.id] = setTimeout(()=>{ delete this._landedAt[pl.id]; this.setState(s=>({tick:s.tick+1})); }, 800);
+          }
+        }
+        const justLanded = !!(this._landedAt && this._landedAt[pl.id] && Date.now()-this._landedAt[pl.id] < 800);
+
+        const isStuck = pl.isStuck && pl.status === 'playing';
+        const isFail = pl.status === 'failed';
+        const isDone = pl.status === 'done';
+        let ring = '#fff', anim = `lvIdle ${(2.6 + (i%4)*0.35).toFixed(2)}s ease-in-out infinite`;
+        if (isStuck) { ring = '#ff8079'; anim = 'lvStuck .55s ease-in-out infinite'; }
+        else if (isFail) { ring = '#e8b33c'; anim = 'none'; }
+        else if (isDone) { ring = '#2fbd7e'; anim = `lvIdle 2.2s ease-in-out infinite`; }
+        if (justLanded) anim = 'lvLand .55s cubic-bezier(.34,1.56,.64,1)';
+
+        let mood = '', hasMood = false;
+        if (isStuck) { mood = '😣'; hasMood = true; }
+        else if (isFail) { mood = '💤'; hasMood = true; }
+        else if (isDone) { mood = '🎉'; hasMood = true; }
+
+        chars.push({
+          name: pl.name,
+          img: faceOf(pl.name),
+          justLanded,
+          wrapStyle: `position:absolute; left:${Math.round(cx)}px; top:${Math.round(cy)}px; width:${CH}px; height:${CH}px; z-index:${20 + row*2 + (isStuck?3:0)};`,
+          bodyStyle: `position:relative; width:${CH}px; height:${CH}px; border-radius:50%; border:3px solid ${ring}; background:#fff; box-shadow:0 4px 10px -3px rgba(90,60,30,0.45); overflow:visible; opacity:${pl.online?1:0.45}; animation:${anim};`,
+          hasMood, mood,
+          moodStyle: `position:absolute; right:-5px; bottom:-4px; display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.22); font-size:11px; line-height:1;`,
+          nameStyle: `position:absolute; left:50%; bottom:${CH + 4}px; transform:translateX(-50%) translateY(3px); opacity:0; white-space:nowrap; padding:3px 8px; border-radius:50px; background:rgba(58,38,20,0.92); color:#fff; font-family:var(--font-kr); font-size:11px; font-weight:700; pointer-events:none;`,
+        });
+      });
+    });
+
+    // ---------- 연결선: 직각 다이어그램 (직선 + 둥근 꺾임) ----------
+    const DISC = 74;                       // 마커 지름 근사값 (테두리에서 선이 시작/끝남)
+    const R = DISC/2, PAD = 9;             // 반지름 · 마커와 선 사이 여백
+    const edgePath = (s, t)=>{
+      const sc = { x: s.x + NODE_W/2, y: s.y + R };   // 출발 원 중심
+      const tc = { x: t.x + NODE_W/2, y: t.y + R };   // 도착 원 중심
+      const sameRow = Math.abs(sc.y - tc.y) < 4;
+
+      // 같은 줄 → 수평 직선
+      if (sameRow) {
+        const dir = tc.x >= sc.x ? 1 : -1;
+        return `M ${(sc.x + dir*(R+PAD)).toFixed(1)} ${sc.y.toFixed(1)} L ${(tc.x - dir*(R+PAD)).toFixed(1)} ${tc.y.toFixed(1)}`;
+      }
+      // 같은 열 → 수직 직선
+      if (Math.abs(sc.x - tc.x) < 4) {
+        const dirY = tc.y >= sc.y ? 1 : -1;
+        return `M ${sc.x.toFixed(1)} ${(sc.y + dirY*(R+PAD)).toFixed(1)} L ${tc.x.toFixed(1)} ${(tc.y - dirY*(R+PAD)).toFixed(1)}`;
+      }
+      // 줄이 다르면 ㄴ자 꺾임: 아래(위)로 먼저 빠진 뒤 수평 이동 → 도착 옆으로 진입.
+      // (수평으로 먼저 가면 중간 노드를 관통하므로, 반드시 세로로 먼저 빠진다)
+      const dirY = tc.y > sc.y ? 1 : -1;
+      const dirX = tc.x >= sc.x ? 1 : -1;
+      const sx = sc.x, sy = sc.y + dirY*(R + PAD);      // 출발: 아래(위)로
+      const tx = tc.x - dirX*(R + PAD), ty = tc.y;      // 도착: 옆에서
+      const bend = 14;
+      // 같은 열이면 그냥 수직
+      if (Math.abs(tc.x - sc.x) < bend*2) {
+        return `M ${sx.toFixed(1)} ${sy.toFixed(1)} L ${sc.x.toFixed(1)} ${(tc.y - dirY*(R+PAD)).toFixed(1)}`;
+      }
+      const vEnd = ty - dirY*bend;                      // 수직 구간 끝(꺾임 시작)
+      const hStart = sx + dirX*bend;                    // 수평 구간 시작
+      return `M ${sx.toFixed(1)} ${sy.toFixed(1)} L ${sx.toFixed(1)} ${vEnd.toFixed(1)} Q ${sx.toFixed(1)} ${ty.toFixed(1)}, ${hStart.toFixed(1)} ${ty.toFixed(1)} L ${tx.toFixed(1)} ${ty.toFixed(1)}`;
+    };
+    const edges = [];
+    pages.forEach(p=>{
+      if (p.type === 'ending') return;
+      // 정답 = 초록 실선(흐름 애니메이션) / 오답 = 빨강 점선
+      if (p.correctExit && map[p.correctExit]) {
+        edges.push({ d: edgePath(p, map[p.correctExit]), stroke:'#12b57e', dash:'', marker:'url(#lv-arrow-ok)' });
+      }
+      if ((p.type==='normal'||p.type==='start') && p.wrongExit && map[p.wrongExit]) {
+        edges.push({ d: edgePath(p, map[p.wrongExit]), stroke:'#e8a098', dash:'6 5', marker:'url(#lv-arrow-no)' });
+      }
+    });
+
+    // ---------- 막힌 친구들 ----------
+    const stuckGroups = pages
+      .filter(p=>(p.type==='normal'||p.type==='start') && p.lock)
+      .map(p=>{
+        const here = (byNode[p.id]||[]).filter(x=>x.status==='playing');
+        return { p, here, stuck: here.filter(x=>x.isStuck) };
+      })
+      .filter(g=>g.stuck.length > 0)
+      .sort((a,b)=>b.stuck.length - a.stuck.length)
+      .map(g=>{
+        const opened = !!(sess.openHints && sess.openHints[g.p.id]);
+        const worst = Math.max.apply(null, g.stuck.map(x=>x.stuckMs||0));
+        const mins = Math.floor(worst/60000);
+        return {
+          num: g.p.num || '', title: g.p.title || '',
+          count: g.stuck.length,
+          detail: `최장 ${mins}분째${opened?' · 힌트 열림':''}`,
+          faces: g.stuck.slice(0,5).map(x=>({
+            name:x.name, img:faceOf(x.name), tip:`${x.name} · ${Math.floor((x.stuckMs||0)/60000)}분째`,
+            style:'display:inline-block; width:26px; height:26px; border-radius:50%; border:2px solid #ff8079; background:#fff; overflow:hidden; animation:lvStuck .6s ease-in-out infinite;',
+          })),
+          hintBtnLabel: opened ? '힌트 열어줬어요' : '힌트 열어주기',
+          hintBtnStyle: `flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:34px; border:none; border-radius:11px; background:${opened?'#f4ece2':'linear-gradient(135deg,#ffc247,#e8a01a)'}; color:${opened?'#a08b76':'#6b4405'}; font-family:var(--font-kr); font-size:12px; font-weight:800; cursor:${opened?'default':'pointer'};`,
+          onOpenHint: ()=>{ if (opened) return; this.act(st=>st.openHint(this._sid, g.p.id)); this.toast(`${g.p.num}번 방 힌트를 열어줬어요`, '💡'); },
+          onNotice: ()=>{ const t=`${g.p.num}번 방 힌트: ${g.p.hint || '문제를 다시 천천히 읽어보세요'}`; this.setState({ noticeText:t, tab:'action' }); },
+        };
+      });
+
+    // ---------- 부활 대기 ----------
+    const failedList = players.filter(p=>p.status==='failed').map(p=>{
+      const back = p.lastQuestionId || sess.startId;
+      const backPage = map[back];
+      return {
+        name: p.name, img: faceOf(p.name),
+        avatarStyle:'flex:none; display:inline-block; width:34px; height:34px; border-radius:50%; border:2.5px solid #e8b33c; background:#fff; overflow:hidden;',
+        detail: `${p.solved}문제 해결 · ${p.score}점 · ${backPage?((backPage.num||'')+'번 방으로'):'처음으로'}`,
+        onRevive: ()=>{ this.act(st=>st.revive(this._sid, p.id, back)); this.toast(`${p.name} 다시 출발!`, '🚀'); },
+      };
+    });
+
+    // ---------- 친구들 ----------
+    const q = (S.search||'').trim();
+    const filtered = players.filter(p=>!q || (p.name||'').indexOf(q) >= 0);
+    const playerRows = filtered.map(p=>{
+      const at = map[p.curId];
+      let badgeText='풀고 있어요', bBg='var(--bg-soft)', bFg='var(--fg-sub)';
+      if (p.status==='failed') { badgeText='쉬는 중'; bBg='#fff7e0'; bFg='#8a5a08'; }
+      else if (p.status==='done') { badgeText='탈출 🎉'; bBg='#e6f7ee'; bFg='#1f8f5f'; }
+      else if (p.isStuck) { badgeText=`막힘 ${Math.floor((p.stuckMs||0)/60000)}분`; bBg='#ffe9e6'; bFg='#e0483d'; }
+      else if (!p.online) { badgeText='연결 끊김'; bBg='#f4ece2'; bFg='#a08b76'; }
+      const ring = p.status==='failed' ? '#e8b33c' : (p.isStuck ? '#ff8079' : (p.status==='done' ? '#2fbd7e' : '#ffcf9a'));
+      return {
+        name:p.name, img:faceOf(p.name),
+        avatarStyle:`flex:none; display:inline-block; width:34px; height:34px; border-radius:50%; border:2.5px solid ${ring}; background:#fff; overflow:hidden; opacity:${p.online?1:0.5};`,
+        badgeText, badgeStyle:`flex:none; display:inline-flex; align-items:center; height:19px; padding:0 7px; border-radius:50px; background:${bBg}; color:${bFg}; font-family:var(--font-small); font-size:10px; font-weight:800;`,
+        detail: `${at?((at.num?at.num+'번 방 · ':'')+(at.title||'')):'—'} · 힌트 ${p.hintUsed}`,
+        score:p.score, solvedLabel:`${p.solved}/${total}`,
+        onKick: ()=>{ this.act(st=>st.kick(this._sid, p.id)); this.toast(`${p.name}을(를) 내보냈어요`, '👋'); },
+      };
+    });
+
+    // ---------- 순위 ----------
+    const ranked = players.slice().sort((a,b)=> (b.solved-a.solved) || (b.score-a.score));
+    const medals = ['🥇','🥈','🥉'];
+    const ranking = ranked.map((p,i)=>{
+      const top = i < 3;
+      return {
+        rankText: top ? medals[i] : (i+1),
+        name:p.name, img:faceOf(p.name), score:p.score, solvedLabel:`${p.solved}문제`,
+        border: top ? '#ffd9bd' : 'var(--border-2)', bg: top ? 'var(--brand-show-light)' : '#fff',
+        rankStyle:`flex:none; display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:10px; background:${top?'transparent':'#fff1e2'}; color:var(--fg-sub); font-family:var(--font-en); font-size:${top?16:12.5}px; font-weight:800;`,
+        avatarStyle:'flex:none; display:inline-block; width:30px; height:30px; border-radius:50%; border:2px solid #ffcf9a; background:#fff; overflow:hidden;',
+      };
+    });
+
+    // ---------- 탭 ----------
+    const mkTab = (key, label, badge)=>{
+      const on = S.tab===key;
+      return { label, onPick:()=>this.setState({tab:key}),
+        style:`flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; height:40px; border:none; border-radius:12px; background:${on?'var(--main-color)':'transparent'}; color:${on?'#fff':'var(--fg-sub)'}; font-family:var(--font-kr); font-size:13.5px; font-weight:800; cursor:pointer; transition:all .15s;`,
+        hasBadge: badge>0, badge,
+        badgeStyle:`display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:50px; background:${on?'rgba(255,255,255,0.3)':'#e0483d'}; color:#fff; font-family:var(--font-en); font-size:10px; font-weight:800;` };
+    };
+    const tabs = [ mkTab('rank','순위',0), mkTab('players','친구들',0), mkTab('action','도와주기', nStuck+nFail) ];
+
+    const quickNotices = [
+      { label:'⏰ 5분 남았어요', t:'5분 남았어요! 조금만 더 힘내요.' },
+      { label:'📖 천천히 읽어요', t:'문제를 다시 천천히 읽어보세요. 단서가 숨어 있어요!' },
+      { label:'💡 힌트 써도 돼요', t:'막히면 힌트 버튼을 눌러도 좋아요.' },
+      { label:'👏 잘하고 있어요', t:'모두 잘하고 있어요! 계속 가볼까요?' },
+    ].map(x=>({ label:x.label, onPick:()=>this.setState({ noticeText:x.t }) }));
+
+    return {
+      sid: this._sid || '',
+      title: sess.title, pin: sess.pin, stateLabel, elapsed,
+      isRunning, isPaused, isEnded,
+      stats, overallPct, overallBarStyle,
+      nodes, edges, chars,
+
+      vpStyle: `position:absolute; inset:0; overflow:hidden; cursor:${S.panning?'grabbing':'grab'}; touch-action:none;`,
+      worldStyle: `position:absolute; left:0; top:0; width:2600px; height:1750px; transform:translate(${S.pan.x}px,${S.pan.y}px) scale(${S.zoom}); transform-origin:0 0;`,
+      zoomPct: Math.round(S.zoom*100),
+      setVp: this.setVp,
+      onCanvasDown:this.onCanvasDown, onCanvasMove:this.onCanvasMove, onCanvasUp:this.onCanvasUp,
+      onZoomIn: ()=>this.setState(s=>({ zoom:Math.min(1.4, Math.round((s.zoom+0.1)*100)/100) })),
+      onZoomOut: ()=>this.setState(s=>({ zoom:Math.max(0.3, Math.round((s.zoom-0.1)*100)/100) })),
+      onFit: ()=>this.fit(),
+
+      tabs, tabAction:S.tab==='action', tabPlayers:S.tab==='players', tabRank:S.tab==='rank',
+
+      noticeText:S.noticeText, onNoticeInput:(e)=>this.setState({noticeText:e.target.value}),
+      onSendNotice: ()=>{ const t=(this.state.noticeText||'').trim(); if(!t) return; this.act(st=>st.notify(this._sid, t)); this.setState({noticeText:''}); this.toast('모두에게 전했어요', '📣'); },
+      hasNotice: !!(sess.notice && sess.notice.text), noticeShown: sess.notice ? sess.notice.text : '',
+      onClearNotice: ()=>{ this.act(st=>st.clearNotice(this._sid)); },
+      quickNotices,
+
+      stuckGroups, hasStuckGroups: stuckGroups.length>0, noStuck: stuckGroups.length===0,
+      stuckSummary: nStuck ? `${nStuck}명` : '없어요',
+      stuckColor: nStuck ? '#e0483d' : 'var(--fg-mute)',
+      stuckBg: nStuck ? '#fffaf9' : '#fff',
+      stuckBorder: nStuck ? '#f5cdc8' : 'var(--border-2)',
+      stuckIconBg: nStuck ? '#ffe9e6' : '#f4ece2',
+
+      failedList, hasFailed: failedList.length>0, noFailed: failedList.length===0,
+      failSummary: nFail ? `${nFail}명` : '없어요',
+      failColor: nFail ? '#c07b12' : 'var(--fg-mute)',
+      failBg: nFail ? '#fffdf7' : '#fff',
+      failBorder: nFail ? '#f5dfae' : 'var(--border-2)',
+      failIconBg: nFail ? '#fff7e0' : '#f4ece2',
+      revivePenalty: (sess.opts && sess.opts.revivePenalty) || 0,
+      onReviveAll: ()=>{ this.act(st=>st.reviveAll(this._sid)); this.toast('모두 다시 출발!', '🚀'); },
+
+      players: playerRows, noPlayers: playerRows.length===0,
+      playerCountLabel: `${filtered.length}명`,
+      search:S.search, onSearch:(e)=>this.setState({search:e.target.value}),
+      ranking,
+
+      onPause: ()=>{ this.act(st=>st.pause(this._sid)); },
+      onResume: ()=>{ this.act(st=>st.resume(this._sid)); },
+      onAskEnd: ()=>this.setState({askEnd:true}),
+      onCancelEnd: ()=>this.setState({askEnd:false}),
+      askEnd:S.askEnd,
+      onEnd: ()=>{ this.act(st=>st.end(this._sid)); this.setState({askEnd:false}); try{ location.href='실시간 결과 - 웹.dc.html?sid='+encodeURIComponent(this._sid||''); }catch(e){} },
+      stop:(e)=>e.stopPropagation(),
+
+      onSeedDemo: ()=>{ this.act(st=>st.seedDemo(this._sid, 12)); this.toast('가상 친구를 불렀어요', '🧸'); },
+
+      // 예시 참여자 자동 이동 켜기/끄기 — 뱃지가 방을 옮겨다니는 걸 눈으로 확인
+      demoBtnLabel: this._demoMode ? '⏸ 자동 이동 끄기' : '▶ 예시 친구 이동 보기',
+      demoBtnStyle: `flex:1; height:38px; border:1px solid ${this._demoMode?'var(--main-color)':'var(--border-2)'}; border-radius:13px; background:${this._demoMode?'var(--brand-show-light)':'#fff'}; color:${this._demoMode?'var(--main-color)':'var(--fg-sub)'}; font-family:var(--font-small); font-size:11.5px; font-weight:800; cursor:pointer;`,
+      onToggleDemo: ()=>{
+        if (!window.SessionStore || !this._sid) { this.toast('데모 모드예요', '🧸'); return; }
+        if (this._demoMode) {
+          this._demoMode = false;
+          if (this._demoIv) { clearInterval(this._demoIv); this._demoIv = null; }
+          this.toast('자동 이동을 멈췄어요', '⏸');
+        } else {
+          this._demoMode = true;
+          this.startDemo();
+          this.toast('친구들이 방을 옮겨다녀요!', '🏃');
+        }
+        this.setState(s=>({ tick:s.tick+1 }));
+      },
+
+      hasToast: !!S.toast, toastText:S.toast, toastEmoji:S.toastEmoji,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -9,11 +9,15 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
   <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
     * { box-sizing:border-box; }
     a { color: var(--main-color); text-decoration:none; }
     a:hover { color: var(--btn-hover-color); }
@@ -71,8 +75,34 @@
     <!-- title -->
     <div style="display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap;">
       <h1 style="margin:0; font-family:var(--font-kr); font-size:28px; font-weight:900; letter-spacing:-1px; color:var(--fg);">{{ scTitle }}</h1>
-      <span style="display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 10px; border-radius:50px; background:var(--bg-warm-2); font-family:var(--font-en); font-size:12px; font-weight:700; letter-spacing:0.5px; color:var(--fg-sub);"><i class="icon-qr-code" style="font-size:11px;"></i>{{ scPin }}</span>
+      <!-- ① 미션 / 실시간 구분 배지 -->
+      <sc-if value="{{ hasKind }}" hint-placeholder-val="{{ false }}">
+      <span style="{{ kindStyle }}"><i class="{{ kindIcon }}" style="font-size:11px;"></i>{{ kindLabel }}</span>
+      </sc-if>
+      <!-- 어느 회차의 결과인지 + 다른 회차로 전환 (실시간만) -->
+      <sc-if value="{{ hasRound }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative;" data-round-menu>
+        <button onClick="{{ onToggleRound }}" style="display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border:1px solid #ffd0a6; border-radius:50px; background:var(--bg-light-color); color:var(--theme-deep); font-family:var(--font-kr); font-size:12.5px; font-weight:800; cursor:pointer;">회차 바꾸기 <i class="{{ roundCaret }}" style="font-size:9px;"></i></button>
+        <sc-if value="{{ roundOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:0; top:34px; z-index:40; width:230px; background:#fff; border:1px solid var(--border-2); border-radius:12px; box-shadow:0 16px 40px -14px rgba(0,0,0,0.3); overflow:hidden; padding:6px; animation:qnMenu .16s ease;">
+          <sc-for list="{{ roundList }}" as="r" hint-placeholder-count="3">
+            <a class="qn-dd-item" href="{{ r.href }}" style="{{ r.style }}">
+              <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800;">{{ r.label }}</span>
+              <span style="margin-left:auto; font-family:var(--font-small); font-size:11px; color:var(--fg-mute);">{{ r.sub }}</span>
+            </a>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+      <!-- 미션이면 진행 기간, 실시간이면 시작 날짜 (PIN 은 여기서 뺐다 — 끝난 회차 PIN 은 쓸모가 없다) -->
+      <span style="display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:var(--bg-warm-2); font-family:var(--font-small); font-size:12px; font-weight:600; color:var(--fg-sub);"><i class="icon-time" style="font-size:11px;"></i>{{ whenLabel }}</span>
     </div>
+    <!-- 메모 — 제목 아래 작은 글씨 한 줄(박스 없이) -->
+    <sc-if value="{{ hasMemo }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:7px; font-family:var(--font-small); font-size:12.5px; font-weight:400; color:var(--fg-mute);">{{ memo }}</div>
+    </sc-if>
+
 
     <!-- summary: 완주율 강조 + 인라인 스트립 -->
     <div style="display:flex; gap:14px; margin-top:22px;">
@@ -267,24 +297,87 @@ function difficulty(rate){
 class Component extends DCLogic {
   constructor(props){
     super(props);
-    let id='s1'; this._room=null;
+    let id='s1'; this._room=null; this._rep=null; this._rounds=[];
     try{
-      const raw=new URLSearchParams(location.search).get('id');
-      if(raw&&SCEN[raw]) id=raw;
-      else if(raw&&window.RoomStore){ const rm=window.RoomStore.get(raw); if(rm){ this._room=rm; id=(/2$/.test(raw)?'s2':'s1'); } }
+      const u=new URLSearchParams(location.search);
+      const sid=u.get('sid');
+      const raw=u.get('id');
+      // ① ?sid= : 해당 회차의 실제 기록으로 리포트를 만든다 (기본 경로)
+      if(sid && window.SessionStore){
+        this._sid = sid;
+        // 미션은 회차가 없어 기록이 계속 누적되므로 기간(from~to)으로 잘라 본다.
+        // ?from=YYYY-MM-DD&to=YYYY-MM-DD 로 딥링크도 가능.
+        this._from = u.get('from') || '';
+        this._to   = u.get('to') || '';
+        this._rep = window.SessionStore.report(sid, this.rangeOpts());
+      }
+      // ② ?id= 만 온 예전 링크 : 그 방의 최근 회차로 넘겨준다
+      if(!this._rep && raw && window.SessionStore){
+        const latest = window.SessionStore.latestForRoom(raw);
+        if (latest) this._rep = window.SessionStore.report(latest.id);
+      }
+      if(this._rep && window.RoomStore){
+        this._room = window.RoomStore.get(this._rep.roomId);
+        this._rounds = window.SessionStore.roundsForRoom(this._rep.roomId);
+      }
+      // ③ 세션이 아예 없으면 기존 데모 시나리오로 폴백 (모음집 미리보기용)
+      if(!this._rep){
+        if(raw&&SCEN[raw]) id=raw;
+        else if(raw&&window.RoomStore){ const rm=window.RoomStore.get(raw); if(rm){ this._room=rm; id=(/2$/.test(raw)?'s2':'s1'); } }
+      }
     }catch(e){}
-    this.state={ scId:id, tab:'students', sortKey:'score', sortDir:'desc', ddOpen:false, expandedProb:1 };
+    this.state={ scId:id, tab:'students', sortKey:'score', sortDir:'desc', ddOpen:false, expandedProb:1, roundOpen:false };
   }
-  componentDidMount(){ this._oc=(e)=>{ if(this.state.ddOpen && !e.target.closest('[data-profile-menu]')) this.setState({ddOpen:false}); }; document.addEventListener('click', this._oc); }
+  // 'YYYY-MM-DD' → timestamp. to 는 그날 23:59:59 까지 포함한다.
+  // 화면의 기간 선택 UI 는 제거했고, `?from=&to=` 딥링크로만 범위를 준다.
+  rangeOpts(){
+    const opts = {};
+    const f = this._from, t = this._to;
+    if (f) { const d = new Date(f + 'T00:00:00'); if (!isNaN(d)) opts.from = d.getTime(); }
+    if (t) { const d = new Date(t + 'T23:59:59'); if (!isNaN(d)) opts.to = d.getTime(); }
+    return opts;
+  }
+  // 세션 report() → 이 화면이 쓰는 students/meta 형태로 변환
+  fromSession(rep){
+    const meta = rep.perQuestion.map(q=>({ t:q.title, ty:q.lock }));
+    const students = rep.players.map(p=>{
+      // 문제별 셀: c=정답, w=오답/멈춤, a=풀이 중, .=미도달
+      const cells = rep.perQuestion.map((q,i)=>{
+        const cell = p.perQ[i];
+        if (cell.correct) return { s:'c', h:false };
+        if (cell.tried)   return { s:'w', h:false };
+        // 아직 도달 못함 — 현재 위치면 '풀이 중'
+        return { s: (p.status==='playing' && p.curId===q.id) ? 'a' : 'n', h:false };
+      });
+      const sec = Math.floor((p.elapsedMs||0)/1000);
+      // ② 성공 엔딩까지 걸린 시간. 완주한 사람만 값이 있다(미완주는 —)
+      const mm = Math.floor(sec/60), ss = sec%60;
+      const time = p.status==='done' ? (mm >= 60 ? `${Math.floor(mm/60)}시간 ${mm%60}분` : `${mm}분 ${String(ss).padStart(2,'0')}초`) : '—';
+      const state = p.status==='done' ? 'done' : (p.status==='playing' ? 'active' : 'dropped');
+      let lastIdx=-1; cells.forEach((c,i)=>{ if(c.s!=='n') lastIdx=i; });
+      const activeIdx = cells.findIndex(c=>c.s==='a');
+      return { name:p.name, cells, time, score:p.score, completed:state==='done',
+               state, activeIdx, lastIdx, hints:p.hintUsed||0 };
+    });
+    return { meta, students };
+  }
+  componentDidMount(){ this._oc=(e)=>{
+    if(this.state.ddOpen && !e.target.closest('[data-profile-menu]')) this.setState({ddOpen:false});
+    if(this.state.roundOpen && !e.target.closest('[data-round-menu]')) this.setState({roundOpen:false});
+  }; document.addEventListener('click', this._oc); }
   componentWillUnmount(){ document.removeEventListener('click', this._oc); }
   sec(t){ if(!t||t==='—') return 999999; const [m,s]=t.split(':').map(Number); return m*60+s; }
   sortBy(k){ this.setState(s=>({ sortKey:k, sortDir: s.sortKey===k?(s.sortDir==='asc'?'desc':'asc'):'desc' })); }
   renderVals(){
     const S=this.state; const sc=SCEN[S.scId]||SCEN.s1;
-    const meta=sc.meta;
-    const students=sc.rows.map(buildStudent);
-    const title=this._room?this._room.title:sc.title;
-    const pin=this._room?this._room.pin:sc.pin;
+    // 회차 기록이 있으면 실데이터, 없으면 데모 시나리오
+    const rep=this._rep;
+    const conv = rep ? this.fromSession(rep) : null;
+    const meta = conv ? conv.meta : sc.meta;
+    const students = conv ? conv.students : sc.rows.map(buildStudent);
+    const title = rep ? rep.title : (this._room?this._room.title:sc.title);
+    // PIN 은 그 회차의 것 (방 PIN 아님)
+    const pin = rep ? rep.pin : (this._room?this._room.pin:sc.pin);
     const puzzles=meta.length;
 
     const N=students.length;
@@ -309,13 +402,14 @@ class Component extends DCLogic {
 
     // ---- 학생별 ----
     const STATE_BADGE={ done:{l:'완주',bg:'#e6f7ee',fg:'#1e9e5a'}, active:{l:'진행 중',bg:'#eaf2ff',fg:'#1e6ba8'}, dropped:{l:'중도 이탈',bg:'#eef0f2',fg:'#6b7280'} };
-    const colDef=[{k:'name',l:'이름'},{k:'score',l:'점수'},{k:'result',l:'결과'},{k:'completed',l:'완주'},{k:'time',l:'시간'},{k:'hints',l:'힌트'}];
+    const colDef=[{k:'name',l:'이름'},{k:'score',l:'점수'},{k:'result',l:'결과'},{k:'completed',l:'완주'},{k:'time',l:'탈출 시간'},{k:'hints',l:'힌트'}];
     const studentCols=colDef.map((c,i)=>{ const on=S.sortKey===c.k; return { label:c.l, style:`display:inline-flex; align-items:center; gap:4px; border:none; background:transparent; padding:0; font-family:var(--font-small); font-size:12px; font-weight:700; color:${on?'var(--main-color)':'var(--fg-mute)'}; cursor:pointer; ${i===0?'':'justify-self:start;'}`, caret:on?(S.sortDir==='asc'?'icon-up-open':'icon-down-open'):'icon-down-open', caretOp:on?1:0, onSort:()=>this.sortBy(c.k) }; });
     const sortVal=(r)=>{ const k=S.sortKey; if(k==='result') return r.state==='done'?2:(r.state==='active'?1:0); if(k==='completed') return r.completed?1:0; if(k==='time') return this.sec(r.time); if(k==='name') return r.name; return r[k]; };
     const dir=S.sortDir==='asc'?1:-1;
     const srows=students.slice().sort((a,b)=>{ const x=sortVal(a),y=sortVal(b); if(typeof x==='string') return dir*String(x).localeCompare(String(y),'ko'); return dir*(x-y); });
-    const studentRows=srows.map((r,i)=>{ const sb=STATE_BADGE[r.state]; const low=r.score<250||!r.completed; return {
-      href:`리포트 개인별 상세 - 웹.dc.html?id=${this._room?this._room.id:S.scId}&name=${encodeURIComponent(r.name)}`,
+    const studentRows=srows.map((r,i)=>{ const sb=STATE_BADGE[r.state]||STATE_BADGE.dropped; const low=r.score<250||!r.completed; return {
+      href: rep ? `리포트 개인별 상세 - 웹.dc.html?sid=${encodeURIComponent(rep.sid)}&name=${encodeURIComponent(r.name)}`
+                 : `리포트 개인별 상세 - 웹.dc.html?id=${this._room?this._room.id:S.scId}&name=${encodeURIComponent(r.name)}`,
       rowStyle:`display:grid; grid-template-columns:1.6fr 1fr 1fr 0.9fr 1fr 0.9fr; gap:12px; align-items:center; padding:13px 22px; border-bottom:1px solid var(--border-2); ${low?'background:#fdf6f5;':''} transition:background .15s;`,
       initial:initial(r.name), avBg:AV[i%AV.length], name:r.name, score:r.score,
       resultLabel:sb.l, resultStyle:`display:inline-flex; align-items:center; height:22px; padding:0 9px; border-radius:50px; background:${sb.bg}; color:${sb.fg}; font-family:var(--font-small); font-size:11.5px; font-weight:700;`,
@@ -332,11 +426,11 @@ class Component extends DCLogic {
       const hintRate=reached?Math.round(hintUsers/reached*100)+'%':'0%';
       const d=difficulty(rate);
       const num=pi+1;
-      const ord={c:0,w:1,a:2,n:3};
-      const prows=students.slice().sort((x,y)=>ord[x.cells[pi].s]-ord[y.cells[pi].s]||y.score-x.score).map((s,ri)=>{
+      const ord={c:0,w:1,a:2,n:3}; const ordOf=(v)=>(ord[v]!=null?ord[v]:3);
+      const prows=students.slice().sort((x,y)=>ordOf(x.cells[pi].s)-ordOf(y.cells[pi].s)||y.score-x.score).map((s,ri)=>{
         const cell=s.cells[pi], st=cell.s;
         const map={ c:{l:'정답',ic:'icon-check',col:'#1e9e5a'}, w:{l:'오답 · 멈춤',ic:'icon-close',col:'#c0392b'}, a:{l:'풀이 중',ic:'icon-play',col:'#1e6ba8'}, n:{l:'미도달',ic:'icon-minus-circle',col:'#9aa0a6'} };
-        const info=map[st], faint=st==='n';
+        const info=map[st]||map.n, faint=st==='n';
         let points='—', ptColor='var(--fg-mute)';
         if(st==='c'){ points='+'+(POINT-(cell.h?HINT_PENALTY:0)); ptColor='#1e9e5a'; }
         else if(st==='w'){ const v=0-(cell.h?HINT_PENALTY:0); points=v<0?('−'+Math.abs(v)):'0'; ptColor=v<0?'#c0392b':'var(--fg-sub)'; }
@@ -369,6 +463,60 @@ class Component extends DCLogic {
 
     return {
       scTitle:title, scPin:pin,
+      // 제목 옆 시간 표기 — 미션은 '기간', 실시간은 '시작 날짜'
+      whenLabel: (()=>{
+        if (!rep) return '';
+        const p = (n)=>String(n).padStart(2,'0');
+        const ymdhm = (ts)=>{ const d=new Date(ts); return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+        const mdhm  = (ts)=>{ const d=new Date(ts); return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+        const from = rep.startedAt || 0;
+        if (rep.kind === 'mission') {
+          // 열려 있으면 마감 예정일까지, 닫혔으면 실제 종료일까지
+          const open = rep.state !== 'ended';
+          const to = open ? rep.dueAt : (rep.endedAt || rep.dueAt);
+          if (!from && !to) return '—';
+          if (!to) return ymdhm(from) + ' ~';
+          // 끝이 같은 해면 연도를 생략해 길이를 줄인다
+          const sameYear = from && new Date(from).getFullYear() === new Date(to).getFullYear();
+          return ymdhm(from) + ' ~ ' + (sameYear ? mdhm(to) : ymdhm(to));
+        }
+        return from ? ymdhm(from) : '—';
+      })(),
+      // ① 모드 배지 — 이 결과가 미션인지 실시간인지
+      hasKind: !!rep,
+      memo: rep && rep.memo ? rep.memo : '', hasMemo: !!(rep && rep.memo),
+      // 칩에 회차까지 넣는다(리포트 회차 목록과 같은 표기): '실시간 3회차' · '미션 2회차'
+      // 미션은 그 방에 여러 개일 때만 번호를 붙인다(하나면 그냥 '미션').
+      kindLabel: (()=>{
+        if (!rep) return '';
+        if (rep.kind !== 'mission') return '실시간 ' + (rep.round || 1) + '회차';
+        const n = (window.SessionStore && window.SessionStore.missionsForRoom)
+          ? window.SessionStore.missionsForRoom(rep.roomId).length : 1;
+        return n > 1 ? ('미션 ' + (rep.seq || 1) + '회차') : '미션';
+      })(),
+      kindIcon: rep ? (rep.kind === 'mission' ? 'icon-mission' : 'icon-megaphone') : '',
+      kindStyle: rep
+        ? (rep.kind === 'mission'
+            ? 'display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:var(--mode-mission-bg); color:var(--mode-mission); font-family:var(--font-small); font-size:12px; font-weight:800;'
+            : 'display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 11px; border-radius:50px; background:var(--mode-realtime-bg); color:var(--mode-realtime); font-family:var(--font-small); font-size:12px; font-weight:800;')
+        : '',
+      // 회차 표기 + 전환 드롭다운 — 미션은 회차가 없으므로 숨긴다
+      hasRound: !!(rep && rep.kind !== 'mission'),
+      roundLabel: rep ? (rep.round + '회차') : '',
+      roundOpen: S.roundOpen,
+      roundCaret: S.roundOpen ? 'icon-up-open' : 'icon-down-open',
+      onToggleRound: (e)=>{ e.stopPropagation(); this.setState(s=>({roundOpen:!s.roundOpen})); },
+      roundList: (this._rounds||[]).map(s=>{
+        const on = rep && s.id === rep.sid;
+        const d = s.startedAt ? new Date(s.startedAt) : null;
+        const p = (n)=>String(n).padStart(2,'0');
+        return {
+          label: (s.round||1) + '회차',
+          sub: d ? `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` : '—',
+          href: '리포트 상세 - 웹.dc.html?sid=' + encodeURIComponent(s.id),
+          style: `display:flex; align-items:center; gap:8px; padding:10px 11px; border-radius:8px; background:${on?'var(--bg-light-color)':'transparent'}; color:${on?'var(--theme-deep)':'var(--fg)'};`,
+        };
+      }),
       ddOpen:S.ddOpen, ddCaret:S.ddOpen?'icon-up-open':'icon-down-open',
       onToggleDd:()=>this.setState(s=>({ddOpen:!s.ddOpen})), onLogout:()=>this.setState({ddOpen:false}),
       heroValue, heroSub, strip, tabs,

@@ -9,15 +9,21 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
     a { color: var(--main-color); text-decoration: none; }
     a:hover { color: var(--btn-hover-color); }
     @keyframes qnFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-9px); } }
     @keyframes qnDrift { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(16px); } }
     @keyframes qnShake { 0%,100%{ transform:translateX(0); } 20%,60%{ transform:translateX(-7px); } 40%,80%{ transform:translateX(7px); } }
+    @keyframes qnBlink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
     .pt-primary:hover { filter:brightness(1.04); transform:translateY(-2px); box-shadow:0 14px 28px -12px var(--main-color); }
   </style>
 </helmet>
@@ -51,12 +57,12 @@
       <sc-if value="{{ entryPin }}" hint-placeholder-val="{{ true }}">
       <div>
         <div style="display:flex; align-items:center; justify-content:center; gap:7px; font-family:var(--font-kr); font-size:16px; font-weight:700; color:var(--fg);"><span style="display:inline-flex; align-items:center; justify-content:center; width:21px; height:21px; border-radius:50%; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:11px; font-weight:800;">1</span> 게임 PIN 입력</div>
-        <div style="text-align:center; font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute); margin-top:4px;">선생님이 알려준 7자리 번호를 입력하세요</div>
+        <div style="text-align:center; font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute); margin-top:4px;">선생님이 알려준 6자리 번호를 입력하세요</div>
 
         <div style="{{ shakeStyle }}">
           <div style="position:relative; margin-top:20px;">
             <div style="display:flex; gap:7px;">
-              <sc-for list="{{ pinCells }}" as="c" hint-placeholder-count="7">
+              <sc-for list="{{ pinCells }}" as="c" hint-placeholder-count="6">
                 <div style="{{ c.style }}">{{ c.ch }}</div>
               </sc-for>
             </div>
@@ -66,7 +72,15 @@
 
         <div style="min-height:20px; margin-top:10px; text-align:center;">
           <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
-          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:12.5px; font-weight:600; color:var(--incorrect-color, #e0483d);"><i class="icon-attention-alt-1" style="font-size:12px;"></i> PIN 7자리를 모두 입력해 주세요.</span>
+          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:12.5px; font-weight:600; color:var(--incorrect-color, #e0483d);"><i class="icon-attention-alt-1" style="font-size:12px;"></i> PIN 6자리를 모두 입력해 주세요.</span>
+          </sc-if>
+          <!-- 6자리를 채웠는데 열린 회차가 없을 때 -->
+          <sc-if value="{{ showNotFound }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:12.5px; font-weight:600; color:var(--incorrect-color, #e0483d);"><i class="icon-attention-alt-1" style="font-size:12px;"></i> 진행 중인 방탈출이 없는 PIN이에요.</span>
+          </sc-if>
+          <!-- 유효한 방/회차를 찾았을 때 제목 확인 (미션·실시간 공통) -->
+          <sc-if value="{{ foundSession }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:12.5px; font-weight:700; color:var(--state-ing);"><i class="icon-check-1" style="font-size:12px;"></i> {{ sessionTitle }}</span>
           </sc-if>
         </div>
 
@@ -81,7 +95,28 @@
         <div style="margin-top:16px; display:flex; align-items:center; gap:7px; font-family:var(--font-kr); font-size:20px; font-weight:800; color:var(--fg);"><span style="display:inline-flex; align-items:center; justify-content:center; width:23px; height:23px; border-radius:50%; background:var(--main-color); color:#fff; font-family:var(--font-en); font-size:12px; font-weight:800;">2</span> 닉네임을 정해주세요</div>
         <div style="margin-top:6px; font-family:var(--font-small); font-size:12.5px; color:var(--fg-mute);">방 안에서 이 이름으로 표시돼요.</div>
         <input value="{{ name }}" onInput="{{ onName }}" placeholder="사용할 닉네임 (미입력 시 게스트)" style="width:100%; box-sizing:border-box; height:56px; margin-top:18px; padding:0 16px; border:1.5px solid var(--border); border-radius:14px; background:#fafafa; font-family:var(--font-kr); font-size:16px; color:var(--fg); outline:none;">
-        <a class="pt-primary" href="참여자 플레이 - 웹.dc.html" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; box-sizing:border-box; margin-top:16px; height:56px; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17px; font-weight:700; transition:all .2s ease;">입장하기 <i class="icon-right-open" style="font-size:12px;"></i></a>
+        <!-- 실시간 세션이면 대기실로, 아니면 바로 플레이로 -->
+        <sc-if value="{{ isLiveSession }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; display:flex; align-items:center; gap:8px; padding:11px 13px; border-radius:12px; background:var(--mode-realtime-bg); border:1px solid var(--mode-realtime-soft);">
+          <span style="display:inline-flex; align-items:center; gap:5px; font-family:var(--font-small); font-size:11px; font-weight:800; color:var(--mode-realtime);"><span style="width:6px; height:6px; border-radius:50%; background:var(--mode-realtime); animation:qnBlink 1.4s ease-in-out infinite;"></span>실시간</span>
+          <span style="font-family:var(--font-small); font-size:12.5px; font-weight:600; color:var(--fg-sub);">진행자가 함께하는 실시간 세션이에요</span>
+        </div>
+        </sc-if>
+        <!-- 미션모드: 진행자 없이 혼자 푸는 방 -->
+        <sc-if value="{{ isMissionSession }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; display:flex; align-items:center; gap:8px; padding:11px 13px; border-radius:12px; background:var(--mode-mission-bg); border:1px solid var(--mode-mission-soft);">
+          <i class="icon-mission" style="font-size:13px; color:var(--mode-mission);"></i>
+          <span style="font-family:var(--font-small); font-size:12.5px; font-weight:600; color:var(--fg-sub);">혼자 풀 수 있는 <b style="color:var(--mode-mission);">미션</b>이에요. 지금 바로 시작해요!</span>
+        </div>
+        </sc-if>
+        <!-- 입장 실패 사유 (종료된 회차·지각 차단 등) -->
+        <sc-if value="{{ hasJoinError }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; display:flex; align-items:center; gap:8px; padding:11px 13px; border-radius:12px; background:var(--state-done-bg); border:1px solid var(--state-done-soft);">
+          <i class="icon-attention-alt-1" style="font-size:13px; color:var(--state-done);"></i>
+          <span style="font-family:var(--font-small); font-size:12.5px; font-weight:700; color:var(--state-done);">{{ joinError }}</span>
+        </div>
+        </sc-if>
+        <button class="pt-primary" onClick="{{ onEnter }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; box-sizing:border-box; margin-top:16px; height:56px; border:none; border-radius:14px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17px; font-weight:700; cursor:pointer; transition:all .2s ease;">입장하기 <i class="icon-right-open" style="font-size:12px;"></i></button>
         <div style="margin-top:16px; display:flex; gap:8px; align-items:center; justify-content:center; font-family:var(--font-small); font-size:12px; color:var(--fg-mute);"><i class="icon-qr-code" style="font-size:13px;"></i> PIN <b style="font-family:var(--font-en); letter-spacing:1px; color:var(--fg-sub);">{{ pinShown }}</b> 로 입장합니다</div>
       </div>
       </sc-if>
@@ -92,27 +127,79 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820}}">
 class Component extends DCLogic {
-  state = { step: (typeof location !== 'undefined' && new URLSearchParams(location.search).get('step') === 'name') ? 'name' : 'pin', pin: '', name: '', error: false };
+  state = { step: (typeof location !== 'undefined' && new URLSearchParams(location.search).get('step') === 'name') ? 'name' : 'pin', pin: '', name: '', error: false, joinError: '' };
   componentWillUnmount(){ if (this._t) clearTimeout(this._t); }
   renderVals(){
     const S = this.state;
-    const pinCells = [0,1,2,3,4,5,6].map(i => {
+    const pinCells = [0,1,2,3,4,5].map(i => {
       const ch = S.pin[i] || '';
       const bd = S.error ? 'var(--incorrect-color, #e0483d)' : (ch ? 'var(--main-color)' : 'var(--border)');
       const bg = S.error ? '#fdecea' : (ch ? 'var(--bg-light-color)' : '#fafafa');
       return { ch, style:`display:flex; align-items:center; justify-content:center; flex:1; height:56px; border-radius:12px; border:2px solid ${bd}; background:${bg}; font-family:var(--font-en); font-size:23px; font-weight:800; color:var(--fg);` };
     });
     const pinShown = S.pin ? S.pin.slice(0,3) + ' ' + S.pin.slice(3) : '';
+
+    // ---- PIN 은 "열려 있는 세션"의 것. 두 종류가 들어올 수 있다 ----
+    //  · 미션모드(kind:'mission') = 방 고정 PIN. 진행자 없이 아무 때나 → 바로 플레이
+    //  · 실시간(kind:'realtime')      = 회차 전용 PIN. 진행자가 열어둔 동안만 → 대기실
+    // 어느 쪽도 아니면(없는 PIN·닫힌 방·끝난 회차) 입장 불가.
+    let sess = null;
+    if (window.SessionStore && S.pin.length === 6) {
+      sess = window.SessionStore.findByPin(S.pin);
+    }
+    const isMission = !!(sess && sess.kind === 'mission');
+    const isLive = !!(sess && !isMission);
+    const scenarioTitle = sess ? sess.title : 'PIN을 입력하세요';
+    const lateBlocked = !!(isLive && sess.state === 'running' && sess.opts && !sess.opts.lateJoin);
+
     return {
-      scenarioTitle: '사라진 실험실의 비밀',
+      scenarioTitle,
+      isLiveSession: isLive,          // 실시간 안내 배너는 실시간일 때만
+      isMissionSession: isMission,    // 미션은 다른 안내
+      foundSession: !!sess,           // 제목 확인 문구 (두 모드 공통)
+      sessionTitle: sess ? sess.title : '',
+      // PIN 을 다 입력했는데 열려 있는 방/회차가 없으면 안내
+      showNotFound: S.pin.length === 6 && !sess,
+      lateBlocked,
+      joinError: S.joinError || '', hasJoinError: !!S.joinError,
+      onEnter: ()=>{
+        const nm = (this.state.name||'').trim() || '게스트';
+        if (!window.SessionStore) return;
+        const res = window.SessionStore.join(this.state.pin, nm);
+        if (res && res.sessionId) {
+          const q = 'sid=' + encodeURIComponent(res.sessionId) + '&u=' + encodeURIComponent(res.playerId);
+          // 미션모드는 기다릴 진행자가 없으니 곧바로 플레이로 보낸다
+          location.href = isMission
+            ? ('참여자 플레이 - 웹.dc.html?id=' + encodeURIComponent(sess.roomId) + '&' + q)
+            : ('실시간 참여자 대기 - 웹.dc.html?' + q + '&name=' + encodeURIComponent(nm));
+          return;
+        }
+        // 입장 실패 사유를 그대로 보여준다
+        const msg = res && res.error === 'late' ? '이미 시작해서 지금은 들어갈 수 없어요.'
+                  : res && res.error === 'ended' ? '지금은 닫혀 있어요. 선생님에게 확인해 주세요.'
+                  : '유효하지 않은 PIN이에요. 다시 확인해 주세요.';
+        this.setState({ joinError: msg });
+      },
       entryPin: S.step==='pin', entryName: S.step==='name',
       pin: S.pin, name: S.name, pinShown,
       pinCells, shakeStyle: S.error ? 'animation:qnShake .4s ease;' : '', showError: S.error,
-      onPin: (e)=> this.setState({ pin:(e.target.value||'').replace(/\D/g,'').slice(0,7), error:false }),
-      onName: (e)=> this.setState({ name:e.target.value }),
+      onPin: (e)=> this.setState({ pin:(e.target.value||'').replace(/\D/g,'').slice(0,6), error:false, joinError:'' }),
+      onName: (e)=> this.setState({ name:e.target.value, joinError:'' }),
       onNext: ()=> {
-        if (this.state.pin.length === 7) { this.setState({ step:'name', error:false }); }
-        else { this.setState({ error:true }); if (this._t) clearTimeout(this._t); this._t = setTimeout(()=>this.setState({ error:false }), 500); }
+        // 6자리를 채웠어도 열린 회차가 없으면 다음 단계로 못 넘어간다
+        if (this.state.pin.length !== 6) {
+          this.setState({ error:true });
+          if (this._t) clearTimeout(this._t);
+          this._t = setTimeout(()=>this.setState({ error:false }), 500);
+          return;
+        }
+        if (!sess) {
+          this.setState({ error:true });
+          if (this._t) clearTimeout(this._t);
+          this._t = setTimeout(()=>this.setState({ error:false }), 500);
+          return;
+        }
+        this.setState({ step:'name', error:false, joinError:'' });
       },
       onBack: ()=> this.setState({ step:'pin' }),
     };

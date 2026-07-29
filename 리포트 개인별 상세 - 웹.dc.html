@@ -9,11 +9,14 @@
 <x-dc>
 <helmet>
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
   <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
   <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
   <script src="room-store.js"></script>
   <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
     * { box-sizing:border-box; }
     a { color: var(--main-color); text-decoration:none; }
     a:hover { color: var(--btn-hover-color); }
@@ -199,6 +202,7 @@ class Component extends DCLogic {
     super(props);
     let id='s1'; this._room=null; this._backId='s1';
     try{ const u=new URLSearchParams(location.search); const raw=u.get('id');
+      this._sid=u.get('sid');
       if(raw&&SCEN[raw]){ id=raw; this._backId=raw; }
       else if(raw&&window.RoomStore){ const rm=window.RoomStore.get(raw); if(rm){ this._room=rm; this._backId=raw; id=(/2$/.test(raw)?'s2':'s1'); } }
       const n=u.get('name'); if(n) this._name=decodeURIComponent(n);
@@ -264,7 +268,8 @@ class Component extends DCLogic {
       ddOpen:S.ddOpen, ddCaret:S.ddOpen?'icon-up-open':'icon-down-open',
       onToggleDd:()=>this.setState(s=>({ddOpen:!s.ddOpen})),
       onLogout:()=>this.setState({ddOpen:false}),
-      backHref:`리포트 상세 - 웹.dc.html?id=${this._backId}`,
+      backHref: this._sid ? `리포트 상세 - 웹.dc.html?sid=${encodeURIComponent(this._sid)}`
+                          : `리포트 상세 - 웹.dc.html?id=${this._backId}`,
       initial:name.charAt(0), avBg:avColor,
       name, scTitle,
       resultLabel:rs.label, resultBadgeStyle:`display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 12px; border-radius:50px; background:${rs.bg}; color:${rs.fg}; font-family:var(--font-small); font-size:12.5px; font-weight:700;`,

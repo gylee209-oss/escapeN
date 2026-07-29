@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
+  <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes rsRise { from{ transform:translateY(24px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    @keyframes rsPop { 0%{ transform:scale(0.6); opacity:0; } 60%{ transform:scale(1.06); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes rsDrift { 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(16px); } }
+    @keyframes rsFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+    .rs-btn:hover { filter:brightness(1.05); transform:translateY(-2px); }
+    .rs-row:hover { background:var(--bg-light-color) !important; }
+  </style>
+</helmet>
+
+<div data-screen-label="실시간 결과 · 진행자" style="position:relative; min-height:100vh; box-sizing:border-box; display:flex; flex-direction:column; background:radial-gradient(120% 90% at 50% -10%, #3a2a1e 0%, #241a13 55%, #17110c 100%); font-family:var(--font-kr); overflow:hidden;">
+
+  <div style="position:absolute; width:620px; height:620px; border-radius:50%; background:rgba(255,104,0,0.10); top:-220px; left:-160px; animation:rsDrift 15s ease-in-out infinite;"></div>
+  <div style="position:absolute; width:420px; height:420px; border-radius:50%; background:rgba(255,104,0,0.07); bottom:-160px; right:-100px; animation:rsDrift 18s ease-in-out infinite;"></div>
+
+  <!-- HEADER -->
+  <header style="position:relative; flex:none; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; z-index:20;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="font-family:var(--font-kr); font-size:17px; font-weight:900; letter-spacing:-0.5px; color:#fff;">방탈출<span style="color:var(--main-color);">N</span></div>
+      <span style="width:1px; height:18px; background:rgba(255,255,255,0.2);"></span>
+      <span style="font-family:var(--font-kr); font-size:14px; font-weight:700; color:rgba(255,255,255,0.8);">{{ title }}</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a href="{{ reportHref }}" class="rs-btn" style="display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 16px; border:none; border-radius:11px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:800; transition:all .15s;"><i class="icon-chart" style="font-size:13px;"></i> 결과 리포트</a>
+      <a href="My 방탈출 - 웹.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 16px; border:1px solid rgba(255,255,255,0.22); border-radius:11px; background:rgba(255,255,255,0.08); color:#fff; font-family:var(--font-kr); font-size:13.5px; font-weight:700;">My 방탈출</a>
+    </div>
+  </header>
+
+  <div style="position:relative; flex:1; display:flex; flex-direction:column; align-items:center; padding:10px 30px 40px; z-index:10;">
+
+    <!-- 타이틀 -->
+    <div style="text-align:center; animation:rsRise .5s ease;">
+      <div style="display:inline-flex; align-items:center; gap:6px; padding:6px 15px; border-radius:50px; background:rgba(255,255,255,0.14); color:#fff; font-family:var(--font-small); font-size:12px; font-weight:800;"><i class="icon-mission" style="font-size:12px;"></i> 세션 종료</div>
+      <h1 style="margin:12px 0 0; font-family:var(--font-kr); font-size:32px; font-weight:900; color:#fff; letter-spacing:-1px;">최종 결과</h1>
+      <div style="margin-top:7px; font-family:var(--font-small); font-size:13.5px; color:rgba(255,255,255,0.65);">{{ subtitle }}</div>
+    </div>
+
+    <!-- 요약 -->
+    <div style="display:flex; gap:12px; margin-top:24px; width:100%; max-width:820px;">
+      <sc-for list="{{ summary }}" as="s" hint-placeholder-count="4">
+        <div style="flex:1; padding:16px 18px; border-radius:16px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); text-align:center;">
+          <div style="font-family:var(--font-en); font-size:26px; font-weight:800; color:{{ s.color }};">{{ s.value }}</div>
+          <div style="margin-top:3px; font-family:var(--font-small); font-size:11.5px; font-weight:600; color:rgba(255,255,255,0.62);">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- 시상대 -->
+    <sc-if value="{{ hasPodium }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex; align-items:flex-end; justify-content:center; gap:16px; margin-top:34px; width:100%; max-width:660px;">
+      <sc-for list="{{ podium }}" as="p" hint-placeholder-count="3">
+        <div style="{{ p.wrapStyle }}">
+          <div style="{{ p.crownStyle }}">{{ p.medal }}</div>
+          <span style="{{ p.avatarStyle }}">{{ p.initial }}</span>
+          <div style="margin-top:9px; font-family:var(--font-kr); font-size:{{ p.nameSize }}px; font-weight:800; color:#fff; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;">{{ p.name }}</div>
+          <div style="margin-top:2px; font-family:var(--font-en); font-size:{{ p.scoreSize }}px; font-weight:800; color:var(--main-color);">{{ p.score }}</div>
+          <div style="margin-top:1px; font-family:var(--font-small); font-size:11px; color:rgba(255,255,255,0.55);">{{ p.solvedLabel }}</div>
+          <div style="{{ p.baseStyle }}">{{ p.rank }}</div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <!-- 전체 순위 -->
+    <div style="margin-top:30px; width:100%; max-width:820px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:9px; padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.1);">
+        <i class="icon-chart" style="font-size:14px; color:var(--main-color);"></i>
+        <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:#fff;">전체 순위</span>
+        <span style="margin-left:auto; font-family:var(--font-small); font-size:12px; color:rgba(255,255,255,0.55);">{{ countLabel }}</span>
+      </div>
+
+      <!-- 헤더 -->
+      <div style="display:flex; align-items:center; gap:12px; padding:9px 20px; background:rgba(255,255,255,0.04); font-family:var(--font-small); font-size:11px; font-weight:700; color:rgba(255,255,255,0.5);">
+        <span style="flex:none; width:34px;">순위</span>
+        <span style="flex:1;">닉네임</span>
+        <span style="flex:none; width:80px; text-align:center;">상태</span>
+        <span style="flex:none; width:70px; text-align:center;">해결</span>
+        <span style="flex:none; width:54px; text-align:center;">힌트</span>
+        <span style="flex:none; width:54px; text-align:center;">부활</span>
+        <span style="flex:none; width:64px; text-align:right;">점수</span>
+      </div>
+
+      <div style="max-height:300px; overflow-y:auto;">
+        <sc-for list="{{ ranking }}" as="r" hint-placeholder-count="8">
+          <div class="rs-row" style="display:flex; align-items:center; gap:12px; padding:11px 20px; border-top:1px solid rgba(255,255,255,0.07);">
+            <span style="{{ r.rankStyle }}">{{ r.rank }}</span>
+            <div style="flex:1; min-width:0; display:flex; align-items:center; gap:9px;">
+              <span style="{{ r.avatarStyle }}">{{ r.initial }}</span>
+              <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+            </div>
+            <span style="flex:none; width:80px; text-align:center;"><span style="{{ r.badgeStyle }}">{{ r.badgeText }}</span></span>
+            <span style="flex:none; width:70px; text-align:center; font-family:var(--font-small); font-size:12px; font-weight:700; color:rgba(255,255,255,0.8);">{{ r.solvedLabel }}</span>
+            <span style="flex:none; width:54px; text-align:center; font-family:var(--font-en); font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.6);">{{ r.hintUsed }}</span>
+            <span style="flex:none; width:54px; text-align:center; font-family:var(--font-en); font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.6);">{{ r.revived }}</span>
+            <span style="flex:none; width:64px; text-align:right; font-family:var(--font-en); font-size:15px; font-weight:800; color:var(--main-color);">{{ r.score }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ noPlayers }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:44px 20px; text-align:center;">
+        <img src="uploads/character01/quiz_nodata_ob.png" alt="데이터 없음" style="width:150px; opacity:0.85; animation:rsFloat 5s ease-in-out infinite;">
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:15px; font-weight:700; color:rgba(255,255,255,0.8);">참여자가 없었습니다</div>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 문제별 정답률 -->
+    <sc-if value="{{ hasQuestions }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px; width:100%; max-width:820px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:18px 20px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <i class="icon-quiz-01" style="font-size:14px; color:var(--main-color);"></i>
+        <span style="font-family:var(--font-kr); font-size:15px; font-weight:800; color:#fff;">문제별 통과율</span>
+        <span style="margin-left:auto; font-family:var(--font-small); font-size:11.5px; color:rgba(255,255,255,0.5);">낮은 문제가 어려웠던 구간입니다</span>
+      </div>
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+        <sc-for list="{{ questions }}" as="q" hint-placeholder-count="5">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="flex:none; display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:7px; background:rgba(255,255,255,0.14); color:#fff; font-family:var(--font-en); font-size:11.5px; font-weight:800;">{{ q.num }}</span>
+            <span style="flex:none; width:150px; font-family:var(--font-kr); font-size:12.5px; font-weight:600; color:rgba(255,255,255,0.82); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ q.title }}</span>
+            <div style="flex:1; height:10px; border-radius:50px; background:rgba(255,255,255,0.1); overflow:hidden;">
+              <div style="{{ q.barStyle }}"></div>
+            </div>
+            <span style="flex:none; width:70px; text-align:right; font-family:var(--font-en); font-size:13px; font-weight:800; color:{{ q.color }};">{{ q.pctLabel }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1060}}">
+const AV_COLORS = ['#ff6800','#6b5bd2','#1e9e7a','#d6453f','#c07b12','#2f7fd0','#b0468f','#3f9e5a'];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let sid = null, roomId = 'r1';
+    try {
+      const u = new URLSearchParams(location.search);
+      sid = u.get('sid');
+      if (u.get('id')) roomId = u.get('id');
+    } catch(e){}
+    this._sid = sid;
+    let sess = null;
+    if (window.SessionStore && sid) sess = window.SessionStore.get(sid);
+    this._roomId = sess ? sess.roomId : roomId;
+    this._room = window.RoomStore ? window.RoomStore.get(this._roomId) : null;
+    this.state = { tick:0 };
+  }
+  componentDidMount(){
+    if (window.SessionStore) this._unsub = window.SessionStore.subscribe(()=>this.setState(s=>({tick:s.tick+1})));
+  }
+  componentWillUnmount(){ if (this._unsub) this._unsub(); }
+
+  session(){
+    if (window.SessionStore && this._sid) {
+      const s = window.SessionStore.get(this._sid);
+      if (s) return s;
+    }
+    if (!this._demo) {
+      const NAMES = ['민준','서연','도윤','하은','지호','수아','예준','채원','시우','유진','건우','다은'];
+      const pages = (this._room && this._room.pages) || [];
+      const qIds = pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock).map(p=>p.id);
+      this._demo = {
+        id:'demo', roomId:this._roomId,
+        title:(this._room&&this._room.title)||'사라진 실험실의 비밀',
+        pin:(this._room&&this._room.pin)||'834 512',
+        state:'ended', startedAt: Date.now()-22*60*1000, endedAt: Date.now(),
+        total: qIds.length,
+        players: NAMES.map((n,i)=>({
+          id:'u'+i, name:n,
+          solved: Math.max(0, qIds.length - (i%4)),
+          score: 1000 - (i%5)*70,
+          wrong: i%3, hintUsed: i%3, revived: i%7===3?1:0,
+          status: i%4===0 ? 'done' : (i%7===3 ? 'failed' : 'playing'),
+          trail: [],
+        })),
+      };
+    }
+    return this._demo;
+  }
+
+  renderVals(){
+    const sess = this.session();
+    const players = sess.players || [];
+    const pages = (this._room && this._room.pages) || [];
+    const total = sess.total || pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock).length;
+
+    const ms = (sess.endedAt || Date.now()) - (sess.startedAt || Date.now());
+    const sec = Math.max(0, Math.floor(ms/1000));
+    const dur = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+
+    const nDone = players.filter(p=>p.status==='done').length;
+    const avgScore = players.length ? Math.round(players.reduce((a,p)=>a+p.score,0)/players.length) : 0;
+
+    const summary = [
+      { label:'참여자',      value:players.length, color:'#fff' },
+      { label:'탈출 성공',   value:nDone,          color:'#7ee0a8' },
+      { label:'평균 점수',   value:avgScore,       color:'var(--main-color)' },
+      { label:'진행 시간',   value:dur,            color:'#fff' },
+    ];
+
+    const avOf = (name, size, ring)=>{
+      const c = AV_COLORS[(name||'').charCodeAt(0) % AV_COLORS.length] || AV_COLORS[0];
+      return `display:inline-flex; align-items:center; justify-content:center; width:${size}px; height:${size}px; flex:none; border-radius:50%; background:${c}; border:${ring||'2px solid rgba(255,255,255,0.3)'}; color:#fff; font-family:var(--font-kr); font-size:${Math.round(size*0.4)}px; font-weight:800;`;
+    };
+
+    const ranked = players.slice().sort((a,b)=> (b.solved-a.solved) || (b.score-a.score));
+
+    // 시상대 (1·2·3위) — 가운데가 1위
+    const medals = ['🥇','🥈','🥉'];
+    const heights = [96, 72, 58];
+    const sizes = [78, 64, 60];
+    const podiumOrder = [1, 0, 2]; // 2위 · 1위 · 3위
+    const podium = podiumOrder
+      .filter(i => ranked[i])
+      .map(i => {
+        const p = ranked[i];
+        const isFirst = i === 0;
+        return {
+          rank: i+1, medal: medals[i], name: p.name, initial:(p.name||'?').slice(0,1),
+          score: p.score, solvedLabel: `${p.solved}/${total}문제`,
+          nameSize: isFirst ? 17 : 14.5, scoreSize: isFirst ? 20 : 16,
+          wrapStyle: `flex:1; max-width:190px; display:flex; flex-direction:column; align-items:center; animation:rsRise .5s ease ${i*0.12}s both;`,
+          crownStyle: `font-size:${isFirst?30:23}px; line-height:1; margin-bottom:6px;`,
+          avatarStyle: avOf(p.name, sizes[i], isFirst ? '3px solid #ffd66b' : '2px solid rgba(255,255,255,0.3)'),
+          baseStyle: `margin-top:12px; width:100%; height:${heights[i]}px; border-radius:14px 14px 0 0; background:${isFirst?'linear-gradient(180deg,rgba(255,104,0,0.42),rgba(255,104,0,0.14))':'linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05))'}; border:1px solid rgba(255,255,255,0.16); border-bottom:none; display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:${isFirst?30:24}px; font-weight:800; color:rgba(255,255,255,0.85);`,
+        };
+      });
+
+    const ranking = ranked.map((p,i)=>{
+      const top = i < 3;
+      const medalBg = ['#e8b923','#b9c0c8','#c98b52'][i] || 'rgba(255,255,255,0.12)';
+      let badgeText='미완료', bBg='rgba(255,255,255,0.12)', bFg='rgba(255,255,255,0.7)';
+      if (p.status==='done') { badgeText='탈출 성공'; bBg='rgba(31,175,106,0.22)'; bFg='#7ee0a8'; }
+      else if (p.status==='failed') { badgeText='실패'; bBg='rgba(192,123,18,0.22)'; bFg='#f0c674'; }
+      return {
+        rank:i+1, name:p.name, initial:(p.name||'?').slice(0,1),
+        avatarStyle: avOf(p.name, 26),
+        rankStyle:`flex:none; display:flex; align-items:center; justify-content:center; width:34px; height:26px; border-radius:8px; background:${top?medalBg:'rgba(255,255,255,0.1)'}; color:${top?'#fff':'rgba(255,255,255,0.75)'}; font-family:var(--font-en); font-size:12.5px; font-weight:800;`,
+        badgeText, badgeStyle:`display:inline-flex; align-items:center; height:20px; padding:0 8px; border-radius:6px; background:${bBg}; color:${bFg}; font-family:var(--font-small); font-size:10.5px; font-weight:800;`,
+        solvedLabel:`${p.solved}/${total}`, hintUsed:p.hintUsed||0, revived:p.revived||0, score:p.score,
+      };
+    });
+
+    // 문제별 통과율 — 참여자의 solved 진도로 근사 (백엔드 없음)
+    const qPages = pages.filter(p=>(p.type==='normal'||p.type==='start')&&p.lock);
+    const questions = qPages.map((p, idx)=>{
+      const passed = players.filter(x=>x.solved > idx).length;
+      const pct = players.length ? Math.round(passed/players.length*100) : 0;
+      const color = pct < 50 ? '#ff8b80' : (pct < 75 ? '#f0c674' : '#7ee0a8');
+      return {
+        num: p.num || (idx+1), title: p.title || '',
+        pctLabel: `${pct}%`, color,
+        barStyle: `width:${pct}%; height:100%; border-radius:50px; background:${pct<50?'linear-gradient(90deg,#d6453f,#ff8b80)':(pct<75?'linear-gradient(90deg,#c07b12,#f0c674)':'linear-gradient(90deg,#1faf6a,#7ee0a8)')}; transition:width .5s ease;`,
+      };
+    });
+
+    return {
+      title: sess.title,
+      subtitle: `${players.length}명 참여 · ${dur} 진행 · PIN ${sess.pin}`,
+      summary,
+      podium, hasPodium: podium.length > 0,
+      ranking, noPlayers: ranking.length === 0,
+      countLabel: `${players.length}명`,
+      questions, hasQuestions: questions.length > 0,
+      reportHref: this._sid ? ('리포트 상세 - 웹.dc.html?sid=' + encodeURIComponent(this._sid))
+                             : ('리포트 회차 목록 - 웹.dc.html?id=' + encodeURIComponent(this._roomId)),
+    };
+  }
+}
+</script>
+</body>
+</html>

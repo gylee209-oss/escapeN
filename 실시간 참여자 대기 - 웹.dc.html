@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/colors_and_type.css">
+  <link rel="stylesheet" href="mode-colors.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello-codes.css">
+  <link rel="stylesheet" href="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/fonts/fontello/css/fontello.css">
+  <script src="_ds/quizn-design-system-019dd1f4-2c70-7609-916f-874d459447f7/_ds_bundle.js"></script>
+  <script src="room-store.js"></script>
+  <script src="session-store.js"></script>
+  <style>
+    /* 브라우저 기본 body margin(8px) 제거 — 화면이 꽉 차게 */
+    body { margin: 0; }
+    a { color: var(--main-color); text-decoration: none; }
+    a:hover { color: var(--btn-hover-color); }
+    @keyframes pwFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+    @keyframes pwDrift { 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(16px); } }
+    @keyframes pwPop { 0%{ transform:scale(0.6); opacity:0; } 60%{ transform:scale(1.08); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes pwDot { 0%,80%,100%{ transform:translateY(0); opacity:0.4; } 40%{ transform:translateY(-6px); opacity:1; } }
+    @keyframes pwFade { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+    .pw-primary:hover { filter:brightness(1.04); transform:translateY(-2px); }
+  </style>
+</helmet>
+
+<div data-screen-label="실시간 참여자 대기 · 웹" style="position:relative; min-height:100vh; box-sizing:border-box; background:radial-gradient(130% 100% at 50% -10%, #fff2e8 0%, #faf1e6 45%, #efece4 100%); display:flex; align-items:center; justify-content:center; padding:48px; font-family:var(--font-kr); overflow:hidden;">
+
+  <!-- ambient decor -->
+  <div style="position:absolute; width:520px; height:520px; border-radius:50%; background:rgba(255,104,0,0.06); top:-160px; left:-120px; animation:pwDrift 13s ease-in-out infinite;"></div>
+  <div style="position:absolute; width:360px; height:360px; border-radius:50%; background:rgba(255,104,0,0.05); bottom:-140px; right:-80px; animation:pwDrift 15s ease-in-out infinite;"></div>
+
+  <div style="position:relative; width:100%; max-width:520px; background:#fff; border-radius:32px; overflow:hidden; box-shadow:0 50px 110px -34px rgba(219,88,0,0.45), 0 12px 34px rgba(0,0,0,0.08);">
+
+    <!-- hero -->
+    <div style="position:relative; background:linear-gradient(165deg,#ffb37a 0%, #ff8533 52%, #ff6800 100%); padding:32px 34px 0; text-align:center; overflow:hidden;">
+      <div style="position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.14); top:-64px; right:-56px;"></div>
+      <div style="position:relative; color:#fff;">
+        <div style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:50px; background:rgba(255,255,255,0.22); font-family:var(--font-small); font-size:12px; font-weight:800;"><i class="icon-mission" style="font-size:12px;"></i> 실시간 방탈출</div>
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:24px; font-weight:900; letter-spacing:-0.8px;">{{ title }}</div>
+        <img src="uploads/character01/play_loading_bg.png" alt="캐릭터 버스" style="display:block; width:62%; margin:6px auto -6px; filter:drop-shadow(0 12px 16px rgba(150,50,0,0.35)); animation:pwFloat 6s ease-in-out infinite;">
+      </div>
+    </div>
+
+    <!-- body -->
+    <div style="padding:28px 36px 32px;">
+
+      <!-- 내 정보 -->
+      <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:16px; background:var(--bg-light-color); border:1px solid #ffd9bd;">
+        <span style="{{ myAvatarStyle }}">{{ myInitial }}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:var(--font-kr); font-size:16px; font-weight:800; color:var(--fg);">{{ myName }}</div>
+          <div style="margin-top:1px; font-family:var(--font-small); font-size:11.5px; color:var(--fg-mute);">이 이름으로 참여합니다</div>
+        </div>
+        <a href="참여자 입장 - 웹.dc.html?step=name" style="flex:none; display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 12px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--fg-sub); font-family:var(--font-small); font-size:12px; font-weight:700;"><i class="icon-pen" style="font-size:11px;"></i> 변경</a>
+      </div>
+
+      <!-- ===== 대기 상태 ===== -->
+      <sc-if value="{{ isWaiting }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:24px; text-align:center;">
+        <div style="display:inline-flex; align-items:flex-end; gap:6px; height:20px;">
+          <span style="width:9px; height:9px; border-radius:50%; background:var(--main-color); animation:pwDot 1.3s ease-in-out infinite;"></span>
+          <span style="width:9px; height:9px; border-radius:50%; background:var(--main-color); animation:pwDot 1.3s ease-in-out .18s infinite;"></span>
+          <span style="width:9px; height:9px; border-radius:50%; background:var(--main-color); animation:pwDot 1.3s ease-in-out .36s infinite;"></span>
+        </div>
+        <div style="margin-top:12px; font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">진행자를 기다리고 있어요</div>
+        <div style="margin-top:7px; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub);">곧 시작됩니다. 화면을 그대로 두고 기다려 주세요.</div>
+      </div>
+
+      <!-- 함께 기다리는 사람 -->
+      <div style="margin-top:22px; padding:16px; border-radius:16px; background:#fbfaf7; border:1px solid var(--border-2);">
+        <div style="display:flex; align-items:center; gap:7px;">
+          <i class="icon-user" style="font-size:13px; color:var(--main-color);"></i>
+          <span style="font-family:var(--font-kr); font-size:13.5px; font-weight:800; color:var(--fg);">함께 기다리는 친구</span>
+          <span style="margin-left:auto; font-family:var(--font-en); font-size:14px; font-weight:800; color:var(--main-color);">{{ count }}명</span>
+        </div>
+        <div style="margin-top:11px; display:flex; flex-wrap:wrap; gap:6px;">
+          <sc-for list="{{ others }}" as="o" hint-placeholder-count="6">
+            <span style="{{ o.chipStyle }}"><span style="{{ o.avatarStyle }}">{{ o.initial }}</span>{{ o.name }}</span>
+          </sc-for>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+            <span style="display:inline-flex; align-items:center; height:30px; padding:0 11px; border-radius:50px; background:var(--bg-warm-2); color:var(--fg-sub); font-family:var(--font-en); font-size:12px; font-weight:800;">+{{ moreCount }}</span>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- 팁 로테이션 -->
+      <div style="margin-top:18px; display:flex; gap:10px; padding:14px 16px; border-radius:14px; background:#fff7e0; border:1px solid #f0dca0;">
+        <i class="icon-help" style="font-size:15px; color:#c07b12; margin-top:1px;"></i>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:var(--font-small); font-size:11px; font-weight:800; color:#8a5a08;">플레이 팁</div>
+          <div style="margin-top:3px; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub); animation:pwFade .4s ease;">{{ tip }}</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== 시작됨 ===== -->
+      <sc-if value="{{ isStarted }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:24px; text-align:center; animation:pwPop .4s ease;">
+        <div style="width:70px; height:70px; margin:0 auto; border-radius:50%; background:#e6f7ee; display:flex; align-items:center; justify-content:center; color:#1faf6a;"><i class="icon-check-1" style="font-size:30px;"></i></div>
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:21px; font-weight:900; color:var(--fg);">방탈출이 시작됐어요!</div>
+        <div style="margin-top:7px; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub);">지금 바로 입장할 수 있습니다.</div>
+        <a class="pw-primary" href="{{ playHref }}" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; box-sizing:border-box; margin-top:20px; height:58px; border-radius:15px; background:var(--main-color); color:#fff; font-family:var(--font-kr); font-size:17.5px; font-weight:800; transition:all .18s; box-shadow:0 14px 32px -14px rgba(255,104,0,0.75);">입장하기 <i class="icon-right-open" style="font-size:12px;"></i></a>
+      </div>
+      </sc-if>
+
+      <!-- ===== 종료됨 ===== -->
+      <sc-if value="{{ isEnded }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:24px; text-align:center;">
+        <div style="width:70px; height:70px; margin:0 auto; border-radius:50%; background:var(--bg-warm-2); display:flex; align-items:center; justify-content:center; color:var(--fg-mute);"><i class="icon-cancel" style="font-size:28px;"></i></div>
+        <div style="margin-top:14px; font-family:var(--font-kr); font-size:19px; font-weight:800; color:var(--fg);">세션이 종료됐어요</div>
+        <div style="margin-top:7px; font-family:var(--font-small); font-size:13px; line-height:1.6; color:var(--fg-sub);">진행자가 방탈출을 마쳤습니다.</div>
+        <a href="참여자 입장 - 웹.dc.html" style="display:flex; align-items:center; justify-content:center; width:100%; box-sizing:border-box; margin-top:20px; height:52px; border:1.5px solid var(--border); border-radius:14px; background:#fff; color:var(--fg-sub); font-family:var(--font-kr); font-size:15px; font-weight:700;">처음으로</a>
+      </div>
+      </sc-if>
+
+      <!-- PIN 표시 -->
+      <div style="margin-top:20px; display:flex; align-items:center; justify-content:center; gap:8px; font-family:var(--font-small); font-size:12px; color:var(--fg-mute);">
+        <i class="icon-qr-code" style="font-size:13px;"></i> PIN <b style="font-family:var(--font-en); letter-spacing:1px; color:var(--fg-sub);">{{ pin }}</b> 세션에 접속 중
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+const AV_COLORS = ['#ff6800','#6b5bd2','#1e9e7a','#d6453f','#c07b12','#2f7fd0','#b0468f','#3f9e5a'];
+const TIPS = [
+  '문제를 잘 읽으면 지문 안에 단서가 숨어 있어요.',
+  '막히면 힌트를 써도 괜찮아요. 대신 점수가 조금 줄어듭니다.',
+  '틀려도 끝이 아니에요! 진행자가 다시 기회를 줄 수 있어요.',
+  '진행자가 보내는 공지를 놓치지 마세요.',
+];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let sid = null, uidp = null, roomId = 'r1', nameQ = '';
+    try {
+      const u = new URLSearchParams(location.search);
+      sid = u.get('sid'); uidp = u.get('u');
+      if (u.get('id')) roomId = u.get('id');
+      nameQ = u.get('name') || '';
+    } catch(e){}
+    this._sid = sid; this._uid = uidp; this._roomId = roomId;
+    this._room = window.RoomStore ? window.RoomStore.get(roomId) : null;
+
+    // 세션이 지정되지 않았으면 방의 활성 세션을 찾아본다
+    if (!this._sid && window.SessionStore) {
+      const s = window.SessionStore.activeForRoom(roomId);
+      if (s) this._sid = s.id;
+    }
+    this.state = { name: nameQ || '게스트', tipIdx: 0, tick: 0 };
+  }
+  componentDidMount(){
+    if (window.SessionStore) this._unsub = window.SessionStore.subscribe(()=>this.setState(s=>({tick:s.tick+1})));
+    this._tip = setInterval(()=>this.setState(s=>({ tipIdx:(s.tipIdx+1)%TIPS.length })), 4200);
+    // 접속 유지 신호
+    this._hb = setInterval(()=>{ if (window.SessionStore && this._sid && this._uid) window.SessionStore.heartbeat(this._sid, this._uid); }, 5000);
+  }
+  componentWillUnmount(){
+    if (this._unsub) this._unsub();
+    if (this._tip) clearInterval(this._tip);
+    if (this._hb) clearInterval(this._hb);
+  }
+
+  session(){
+    if (window.SessionStore && this._sid) {
+      const s = window.SessionStore.get(this._sid);
+      if (s) return s;
+    }
+    if (!this._demo) {
+      this._demo = {
+        id:'demo', roomId:this._roomId,
+        title:(this._room&&this._room.title)||'사라진 실험실의 비밀',
+        pin:(this._room&&this._room.pin)||'834 512',
+        state:'lobby',
+        players:[{id:'d1',name:'민준'},{id:'d2',name:'서연'},{id:'d3',name:'도윤'},{id:'d4',name:'하은'},{id:'d5',name:'지호'},{id:'d6',name:'수아'},{id:'d7',name:'예준'}],
+      };
+    }
+    return this._demo;
+  }
+
+  renderVals(){
+    const S = this.state;
+    const sess = this.session();
+    const players = sess.players || [];
+
+    const me = this._uid ? players.filter(p=>p.id===this._uid)[0] : null;
+    const myName = me ? me.name : S.name;
+
+    const avOf = (name, size)=>{
+      const c = AV_COLORS[(name||'').charCodeAt(0) % AV_COLORS.length] || AV_COLORS[0];
+      return `display:inline-flex; align-items:center; justify-content:center; width:${size}px; height:${size}px; flex:none; border-radius:50%; background:${c}; color:#fff; font-family:var(--font-kr); font-size:${Math.round(size*0.42)}px; font-weight:800;`;
+    };
+
+    // 나를 제외한 다른 참여자
+    const others = players.filter(p=>p.id !== this._uid).slice(0, 10).map(p=>({
+      name: p.name, initial:(p.name||'?').slice(0,1),
+      chipStyle:'display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 11px 0 4px; border-radius:50px; background:#fff; border:1px solid var(--border-2); font-family:var(--font-kr); font-size:12.5px; font-weight:700; color:var(--fg-sub);',
+      avatarStyle: avOf(p.name, 22),
+    }));
+    const otherTotal = Math.max(0, players.filter(p=>p.id !== this._uid).length);
+
+    const isWaiting = sess.state === 'lobby';
+    const isStarted = sess.state === 'running' || sess.state === 'paused';
+    const isEnded = sess.state === 'ended';
+
+    let playHref = '참여자 플레이 - 웹.dc.html?id=' + encodeURIComponent(sess.roomId || this._roomId);
+    if (this._sid) playHref += '&sid=' + encodeURIComponent(this._sid);
+    if (this._uid) playHref += '&u=' + encodeURIComponent(this._uid);
+
+    return {
+      title: sess.title, pin: sess.pin,
+      myName, myInitial:(myName||'?').slice(0,1), myAvatarStyle: avOf(myName, 44),
+      count: players.length,
+      others, hasMore: otherTotal > 10, moreCount: otherTotal - 10,
+      tip: TIPS[S.tipIdx],
+      isWaiting, isStarted, isEnded,
+      playHref,
+    };
+  }
+}
+</script>
+</body>
+</html>
